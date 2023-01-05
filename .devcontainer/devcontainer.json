@@ -35,6 +35,11 @@
     "editor.autoIndent": "keep",
     "editor.detectIndentation": false,
     "C_Cpp.clang_format_fallbackStyle": "Google",
+    "[cpp]": {
+      "editor.wordBasedSuggestions": false,
+      "editor.suggest.insertMode": "replace",
+      "editor.semanticHighlighting.enabled": true,
+    },
     "[dockerfile]": {
       "editor.quickSuggestions": {
         "strings": true
@@ -59,6 +64,7 @@
       "editor.defaultFormatter": "redhat.vscode-yaml"
     },
     "xml.format.maxLineWidth": 80,
+    "json.format.maxLineWidth": 80,
     "search.exclude": {
       "**/node_modules": true,
       "**/bower_components": true,
@@ -73,9 +79,9 @@
     "ms-vscode.cpptools",
     "ZainChen.json",
     "ms-vscode.cmake-tools",
-    "zachflower.uncrustify",
-    "ms-iot.vscode-ros",
     "redhat.vscode-xml",
-    "redhat.vscode-yaml"
+    "redhat.vscode-yaml",
+    "ms-vscode.cpptools-extension-pack",
+    "cschlosser.doxdocgen"
   ]
 }
