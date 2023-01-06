@@ -10,11 +10,6 @@
 namespace alpha_driver {
 
 class Packet {
- protected:
-  PacketId packet_id_;
-  DeviceId device_id_;
-  std::vector<unsigned char> data_;
-
  public:
   /**
    * @brief
@@ -48,6 +43,11 @@ class Packet {
    * @return std::vector<unsigned char>
    */
   std::vector<unsigned char> encode() const;
+
+ private:
+  PacketId packet_id_;
+  DeviceId device_id_;
+  std::vector<unsigned char> data_;
 };
 
 }  // namespace alpha_driver
