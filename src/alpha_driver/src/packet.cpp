@@ -4,18 +4,18 @@
 
 #include <vector>
 
-namespace alpha_driver {
+namespace alpha_driver
+{
 
-Packet::Packet(PacketId packet_id, DeviceId data_id)
-    : packet_id_(packet_id), device_id_(data_id){};
+Packet::Packet(PacketId packet_id, DeviceId data_id) : packet_id_(packet_id), device_id_(data_id){};
 
-Packet::Packet(PacketId packet_id, DeviceId data_id,
-               std::vector<unsigned char> data)
-    : packet_id_(packet_id), device_id_(data_id), data_(data){};
+Packet::Packet(PacketId packet_id, DeviceId data_id, std::vector<unsigned char> data)
+: packet_id_(packet_id), device_id_(data_id), data_(data){};
 
-unsigned char Packet::decode(const std::vector<unsigned char>& data){};
+unsigned char Packet::Decode(const std::vector<unsigned char> & data){};
 
-std::vector<unsigned char> Packet::encode() const {
+std::vector<unsigned char> Packet::Encode() const
+{
   std::vector<unsigned char> data(data_);
 
   // Add the packet ID and the device ID

@@ -1,19 +1,21 @@
 #pragma once
 
-namespace alpha_driver {
+namespace alpha_driver
+{
 
 /**
  * @brief The device ID is a unique identifier used to denote each of the
  * manipulator's joints.
  *
  */
-enum class DeviceId : unsigned char {
-  linearJaws = 0x01,
-  rotateEndEffector = 0x02,
-  bendElbow = 0x03,
-  bendShoulder = 0x04,
-  rotateBase = 0x05,
-  allJoints = 0xFF,
+enum class DeviceId : unsigned char
+{
+  kLinearJaws = 0x01,
+  kRotateEndEffector = 0x02,
+  kBendElbow = 0x03,
+  kBendShoulder = 0x04,
+  kRotateBase = 0x05,
+  kAllJoints = 0xFF,
 };
 
 }  // namespace alpha_driver
