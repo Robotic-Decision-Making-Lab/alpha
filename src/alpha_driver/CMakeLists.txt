@@ -10,8 +10,14 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake_auto REQUIRED)
-find_package(rclcpp REQUIRED)
 ament_auto_find_build_dependencies()
+
+ament_auto_add_executable(
+  serial_client
+  src/serial_client.cpp
+)
+
+target_include_directories(serial_client PRIVATE include)
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)

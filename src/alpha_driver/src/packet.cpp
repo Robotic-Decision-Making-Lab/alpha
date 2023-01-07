@@ -4,6 +4,8 @@
 
 #include <vector>
 
+#include "alpha_driver/crc.hpp"
+
 namespace alpha_driver
 {
 
