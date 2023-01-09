@@ -78,13 +78,14 @@
     }
   },
   "extensions": [
-    "ms-azuretools.vscode-docker",
-    "ms-vscode.cpptools",
-    "ZainChen.json",
-    "ms-vscode.cmake-tools",
-    "redhat.vscode-xml",
-    "redhat.vscode-yaml",
-    "ms-vscode.cpptools-extension-pack",
-    "cschlosser.doxdocgen"
-  ]
+	"ms-azuretools.vscode-docker",
+	"ms-vscode.cpptools",
+	"ZainChen.json",
+	"ms-vscode.cmake-tools",
+	"redhat.vscode-xml",
+	"redhat.vscode-yaml",
+	"ms-vscode.cpptools-extension-pack",
+	"cschlosser.doxdocgen",
+	"josetr.cmake-language-support-vscode"
+]
 }
