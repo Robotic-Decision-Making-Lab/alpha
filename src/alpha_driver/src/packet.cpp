@@ -9,10 +9,11 @@
 namespace alpha_driver
 {
 
-Packet::Packet(PacketId packet_id, DeviceId data_id) : packet_id_(packet_id), device_id_(data_id){};
+Packet::Packet(PacketId packet_id, DeviceId data_id)
+: packet_id_(packet_id), device_id_(data_id) {}
 
 Packet::Packet(PacketId packet_id, DeviceId data_id, std::vector<unsigned char> data)
-: packet_id_(packet_id), device_id_(data_id), data_(data){};
+: packet_id_(packet_id), device_id_(data_id), data_(data) {}
 
 // unsigned char Packet::Decode(const std::vector<unsigned char> & data){};
 
@@ -32,6 +33,6 @@ std::vector<unsigned char> Packet::Encode() const
   // TODO: calculate the CRC and add it to the buffer
   // TODO: encode the COBS and add it to the buffer
   // TODO: add the terminator (0x00) to the buffer
-};
+}
 
 }  // namespace alpha_driver

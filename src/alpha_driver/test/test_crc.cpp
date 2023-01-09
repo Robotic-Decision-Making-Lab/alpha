@@ -7,8 +7,8 @@ namespace alpha_driver_test
 
 TEST(CrcTest, CalculatesCorrectBplCrc)
 {
-  std::vector<unsigned char> message = {0xAA, 0xD8, 0x92, 0x84, 0x75};
-  const unsigned char expected_crc = 0xD7;
+  std::vector<unsigned char> message = {0xFF, 0x12, 0xAD, 0x23, 0x56};
+  const unsigned char expected_crc = 0xF3;
 
   EXPECT_EQ(alpha_driver::CalculateBplCrc8(message, message.size()), expected_crc);
 }
