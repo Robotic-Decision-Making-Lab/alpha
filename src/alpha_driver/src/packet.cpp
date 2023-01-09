@@ -14,7 +14,7 @@ Packet::Packet(PacketId packet_id, DeviceId data_id) : packet_id_(packet_id), de
 Packet::Packet(PacketId packet_id, DeviceId data_id, std::vector<unsigned char> data)
 : packet_id_(packet_id), device_id_(data_id), data_(data){};
 
-unsigned char Packet::Decode(const std::vector<unsigned char> & data){};
+// unsigned char Packet::Decode(const std::vector<unsigned char> & data){};
 
 std::vector<unsigned char> Packet::Encode() const
 {

@@ -36,7 +36,7 @@ public:
    * @param data
    * @return Packet
    */
-  static Packet Decode(const std::vector<unsigned char> & data);
+  // static Packet Decode(const std::vector<unsigned char> & data);
 
   /**
    * @brief
