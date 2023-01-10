@@ -20,8 +20,6 @@
 
 #include "alpha_driver/crc.hpp"
 
-#include <cstdint>
-
 namespace alpha_driver
 {
 
