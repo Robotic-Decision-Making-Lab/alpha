@@ -17,3 +17,4 @@ ContinuationIndentWidth: 2
 DerivePointerAlignment: false
 PointerAlignment: Middle
 ReflowComments: false
+PackConstructorInitializers: Never

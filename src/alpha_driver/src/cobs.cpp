@@ -1,7 +1,9 @@
 #include "alpha_driver/cobs.hpp"
 
-#include <vector>
 #include <stdint.h>
+
+#include <stdexcept>
+#include <vector>
 
 namespace alpha_driver
 {
@@ -32,6 +34,8 @@ std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data)
       current_block_size++;
 
       // Handle the case where the block size is 254 or greater
+      // Note that the BPL specification dictates that packets may not be larger than 254
+      // bytes including the footer; however, we handle this case for the sake of security.
       if (current_block_size >= 254) {
         encoded_data[block_start] = (uint8_t)(current_block_size + 1);
 
@@ -51,4 +55,36 @@ std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data)
   return encoded_data;
 }
 
-} // namespace alpha_driver
+std::vector<unsigned char> CobsDecode(const std::vector<unsigned char> & data)
+{
+  std::vector<unsigned char> decoded_data;
+  std::vector<int>::size_type encoded_data_pos = 0;
+
+  while (encoded_data_pos < data.size()) {
+    int block_size = data[encoded_data_pos] - 1;
+    encoded_data_pos++;
+
+    for (int i = 0; i < block_size; ++i) {
+      unsigned char byte = data[encoded_data_pos];
+
+      if (byte == 0x00) {
+        throw std::runtime_error("Failed to decode the encoded data.");
+      }
+
+      decoded_data.push_back(data[encoded_data_pos]);
+      encoded_data_pos++;
+    }
+
+    if (data[encoded_data_pos] == 0x00) {
+      break;
+    }
+
+    if (block_size < 0xFE) {
+      decoded_data.push_back(0x00);
+    }
+  }
+
+  return decoded_data;
+}
+
+}  // namespace alpha_driver

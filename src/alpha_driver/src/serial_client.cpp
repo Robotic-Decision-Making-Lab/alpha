@@ -6,7 +6,9 @@ namespace alpha_driver
 {
 
 SerialClient::SerialClient()
-: Node("SerialClient") {}
+: Node("SerialClient")
+{
+}
 
 }  // namespace alpha_driver
 

@@ -48,6 +48,7 @@ install(DIRECTORY include/
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
+  find_package(ament_cmake_gmock REQUIRED)
   find_package(ament_lint_auto REQUIRED)
 
   # Run linters found in package.xml
@@ -61,6 +62,12 @@ if(BUILD_TESTING)
     test/test_crc.cpp
   )
   target_link_libraries(test_crc ${PROJECT_NAME})
+
+  ament_add_gmock(
+    test_cobs
+    test/test_cobs.cpp
+  )
+  target_link_libraries(test_cobs ${PROJECT_NAME})
 endif()
 
 ament_export_include_directories(include)

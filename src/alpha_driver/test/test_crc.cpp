@@ -5,7 +5,7 @@
 namespace alpha_driver_test
 {
 
-TEST(CrcTest, CalculatesCorrectBplCrc)
+TEST(CrcTest, CalculatesBplCrc)
 {
   std::vector<unsigned char> message = {0xFF, 0x12, 0xAD, 0x23, 0x56};
   const unsigned char expected_crc = 0xF3;

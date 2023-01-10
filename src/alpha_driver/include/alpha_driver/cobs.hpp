@@ -6,19 +6,23 @@ namespace alpha_driver
 {
 
 /**
- * @brief encode the data using the consistent overhead bytes stuffing algorithm
+ * @brief Encode the data using the consistent overhead bytes stuffing (COBS) algorithm. This
+ * implementation has been inspired by the following source:
+ * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L19
  *
- * @param in
+ * @param data
  * @return std::vector<unsigned char>
  */
-std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & in);
+std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data);
 
 /**
- * @brief
+ * @brief Decode a data packet that has been encoded using the COBS algorithm. This implementation
+ * has been inspired by the following source:
+ * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L74
  *
- * @param in
+ * @param data
  * @return std::vector<unsigned char>
  */
-std::vector<unsigned char> CobsDecode(const std::vector<unsigned char> & in);
+std::vector<unsigned char> CobsDecode(const std::vector<unsigned char> & data);
 
 }  // namespace alpha_driver
