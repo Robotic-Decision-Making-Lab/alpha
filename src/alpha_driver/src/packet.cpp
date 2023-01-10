@@ -21,6 +21,7 @@
 #include "alpha_driver/packet.hpp"
 
 #include <cstdint>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -43,10 +44,13 @@ Packet::Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char
 {
 }
 
-// unsigned char Packet::Decode(const std::vector<unsigned char> & data){};
-
 auto Packet::Encode() const -> std::vector<unsigned char>
 {
+  if (data_.empty()) {
+    throw std::runtime_error(
+      "Cannot encode an empty data packet. Please define the packet data before attempting to "
+      "encode it.");
+  }
   std::vector<unsigned char> data(data_);
 
   // Add the packet ID and the device ID
@@ -65,6 +69,44 @@ auto Packet::Encode() const -> std::vector<unsigned char>
   std::vector<unsigned char> encoded_data = CobsEncode(data);
 
   return encoded_data;
+}
+
+static auto Decode(const std::vector<unsigned char> & data) -> Packet
+{
+  if (data.empty()) {
+    throw std::runtime_error("An empty data packet was received for decoding.");
+  }
+
+  // Note that an exception will be raised if the decoding fails
+  std::vector<unsigned char> decoded_data = CobsDecode(data);
+
+  // Pop the CRC and make sure that it is defined correctly
+  const unsigned char actual_crc = decoded_data.back();
+  decoded_data.pop_back();
+
+  const unsigned char expected_crc = CalculateBplCrc8(decoded_data);
+
+  if (actual_crc != expected_crc) {
+    throw std::runtime_error("The expected and actual CRC values do not match.");
+  }
+
+  // Pop the packet length to ensure that a packet of the correct size was provided
+  const int length = static_cast<int>(decoded_data.back());
+  decoded_data.pop_back();
+
+  if (decoded_data.size() != length) {
+    throw std::runtime_error("The specified payload size is not equal to the actual payload size.");
+  }
+
+  // Get the device ID
+  const unsigned char device_id = decoded_data.back();
+  decoded_data.pop_back();
+
+  // Get the packet ID
+  const unsigned char packet_id = decoded_data.back();
+  decoded_data.pop_back();
+
+  return Packet(static_cast<PacketId>(packet_id), static_cast<DeviceId>(device_id), decoded_data);
 }
 
 }  // namespace alpha_driver

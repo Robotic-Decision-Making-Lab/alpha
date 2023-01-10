@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <stdint.h>
-
 #include <vector>
 
 #include "alpha_driver/device_id.hpp"
@@ -51,19 +49,19 @@ public:
   Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char> data);
 
   /**
-   * @brief
-   *
-   * @param data
-   * @return Packet
-   */
-  // static Packet Decode(const std::vector<unsigned char> & data);
-
-  /**
-   * @brief
+   * @brief Encode the packet's data using the BPL packet structure specification.
    *
    * @return std::vector<unsigned char>
    */
   auto Encode() const -> std::vector<unsigned char>;
+
+  /**
+   * @brief Decode a packet that has been encoded using the BPL communication specification.
+   *
+   * @param data
+   * @return Packet
+   */
+  static auto Decode(const std::vector<unsigned char> & data) -> Packet;
 
 private:
   PacketId packet_id_;
