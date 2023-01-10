@@ -18,25 +18,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "alpha_driver/serial_client.hpp"
+#include <gmock/gmock.h>
 
 #include "alpha_driver/packet.hpp"
 
-namespace alpha_driver
+namespace test_alpha_driver
 {
 
-SerialClient::SerialClient()
-: Node("SerialClient")
-{
-}
+TEST(PacketTest, TestPacketEncode) {}
 
-}  // namespace alpha_driver
+TEST(PacketTest, TestPacketDecode) {}
 
-auto main(int argc, char ** argv) -> int
-{
-  rclcpp::init(argc, argv);
-  auto node = std::make_shared<alpha_driver::SerialClient>();
-  rclcpp::spin(node);
-  rclcpp::shutdown();
-  return 0;
-}
+}  // namespace test_alpha_driver
