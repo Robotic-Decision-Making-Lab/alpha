@@ -31,7 +31,7 @@ TEST(CobsTest, EncodesData)
   const std::vector<unsigned char> encoded_data = {0x02, 0x23, 0x03, 0xD4, 0x81, 0x02, 0xFA, 0x00};
 
   ASSERT_THAT(alpha_driver::CobsEncode(data), ::testing::ElementsAreArray(encoded_data));
-};
+}
 
 TEST(CobsTest, DecodesData)
 {
@@ -39,7 +39,7 @@ TEST(CobsTest, DecodesData)
   const std::vector<unsigned char> decoded_data = {0x23, 0x00, 0xD4, 0x81, 0x00, 0xFA};
 
   ASSERT_THAT(alpha_driver::CobsDecode(encoded_data), ::testing::ElementsAreArray(decoded_data));
-};
+}
 
 }  // namespace alpha_driver_test
 
