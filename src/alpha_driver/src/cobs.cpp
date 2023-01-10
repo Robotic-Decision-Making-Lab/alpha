@@ -1,14 +1,13 @@
 #include "alpha_driver/cobs.hpp"
 
-#include <stdint.h>
-
+#include <cstdint>
 #include <stdexcept>
 #include <vector>
 
 namespace alpha_driver
 {
 
-std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data)
+auto CobsEncode(const std::vector<unsigned char> & data) -> std::vector<unsigned char>
 {
   // // Initialize the encoded data with 0x00 prepended
   // // this will be overwritten once the count to the next 0x00 is detemined
@@ -17,10 +16,10 @@ std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data)
   int block_start = 0;
   int current_block_size = 0;
 
-  for (auto it = data.begin(); it != data.end(); ++it) {
-    if (*it == 0x00) {
+  for (const unsigned char it : data) {
+    if (it == 0x00) {
       // Save the total number of elements before the next 0x00
-      encoded_data[block_start] = (uint8_t)(current_block_size + 1);
+      encoded_data[block_start] = static_cast<uint8_t>(current_block_size + 1);
 
       // Add a placeholder
       encoded_data.push_back(0x00);
@@ -30,14 +29,14 @@ std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data)
       current_block_size = 0;
     } else {
       // Copy over the data
-      encoded_data.push_back(*it);
+      encoded_data.push_back(it);
       current_block_size++;
 
       // Handle the case where the block size is 254 or greater
       // Note that the BPL specification dictates that packets may not be larger than 254
       // bytes including the footer; however, we handle this case for the sake of security.
       if (current_block_size >= 254) {
-        encoded_data[block_start] = (uint8_t)(current_block_size + 1);
+        encoded_data[block_start] = static_cast<uint8_t>(current_block_size + 1);
 
         // Add placeholder
         encoded_data.push_back(0x00);
@@ -49,23 +48,23 @@ std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data)
     }
   }
 
-  encoded_data[block_start] = (uint8_t)(current_block_size + 1);
+  encoded_data[block_start] = static_cast<uint8_t>(current_block_size + 1);
   encoded_data.push_back(0x00);
 
   return encoded_data;
 }
 
-std::vector<unsigned char> CobsDecode(const std::vector<unsigned char> & data)
+auto CobsDecode(const std::vector<unsigned char> & data) -> std::vector<unsigned char>
 {
   std::vector<unsigned char> decoded_data;
   std::vector<int>::size_type encoded_data_pos = 0;
 
   while (encoded_data_pos < data.size()) {
-    int block_size = data[encoded_data_pos] - 1;
+    const int block_size = data[encoded_data_pos] - 1;
     encoded_data_pos++;
 
     for (int i = 0; i < block_size; ++i) {
-      unsigned char byte = data[encoded_data_pos];
+      const unsigned char byte = data[encoded_data_pos];
 
       if (byte == 0x00) {
         throw std::runtime_error("Failed to decode the encoded data.");

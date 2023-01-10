@@ -1,16 +1,15 @@
 #include "alpha_driver/crc.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace alpha_driver
 {
 
-unsigned char Reflect(unsigned long data, int size)
+auto Reflect(std::uint64_t data, int size) -> unsigned char
 {
-  unsigned long reflection = 0x00000000;
-  unsigned char bit;
+  std::uint64_t reflection = 0x00000000;
 
-  for (bit = 0; bit < size; ++bit) {
+  for (int bit = 0; bit < size; ++bit) {
     if (data & 0x01) {
       reflection |= (1 << ((size - 1) - bit));
     }
@@ -18,40 +17,40 @@ unsigned char Reflect(unsigned long data, int size)
     data = (data >> 1);
   }
 
-  return (unsigned char)reflection;
+  return static_cast<unsigned char>(reflection);
 }
 
-unsigned char CalculateCrc8(
+auto CalculateCrc8(
   const std::vector<unsigned char> & data, unsigned char initial_value,
   unsigned char final_xor_value, bool input_reflected, bool result_reflected,
-  const std::array<unsigned char, 256> & lookup_table)
+  const std::array<unsigned char, 256> & lookup_table) -> unsigned char
 {
   unsigned char crc = initial_value;
   unsigned char value;
 
-  const int kWidth = (8 * sizeof(crc));
+  const int width = (8 * sizeof(crc));
 
-  for (std::vector<int>::size_type i = 0; i < data.size(); ++i) {
+  for (const unsigned char byte : data) {
     // Reflect the data
     if (input_reflected) {
-      value = Reflect(data[i], 8);
+      value = Reflect(byte, 8);
     } else {
-      value = data[i];
+      value = byte;
     }
 
-    value ^= crc >> (kWidth - 8);
+    value ^= crc >> (width - 8);
     crc = lookup_table[value] ^ (crc << 8);
   }
 
   // Reflect the result
   if (result_reflected) {
-    crc = Reflect(crc, kWidth);
+    crc = Reflect(crc, width);
   }
 
   return crc ^ final_xor_value;
 }
 
-unsigned char CalculateBplCrc8(const std::vector<unsigned char> & data)
+auto CalculateBplCrc8(const std::vector<unsigned char> & data) -> unsigned char
 {
   return CalculateCrc8(
     data, kInitialValue, kFinalXorValue, kInputReflected, kResultReflected, kCrc8LookupTable);

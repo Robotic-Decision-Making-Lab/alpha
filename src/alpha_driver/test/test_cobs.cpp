@@ -5,7 +5,7 @@
 namespace alpha_driver_test
 {
 
-TEST(CobsTest, EncodesData)
+TEST(CobsTest, EncodesData)  // NOLINT
 {
   std::vector<unsigned char> data = {0x23, 0x00, 0xD4, 0x81, 0x00, 0xFA};
   std::vector<unsigned char> encoded_data = {0x02, 0x23, 0x03, 0xD4, 0x81, 0x02, 0xFA, 0x00};
@@ -13,7 +13,7 @@ TEST(CobsTest, EncodesData)
   ASSERT_THAT(alpha_driver::CobsEncode(data), ::testing::ElementsAreArray(encoded_data));
 };
 
-TEST(CobsTest, DecodesData)
+TEST(CobsTest, DecodesData)  // NOLINT
 {
   std::vector<unsigned char> encoded_data = {0x02, 0x23, 0x03, 0xD4, 0x81, 0x02, 0xFA, 0x00};
   std::vector<unsigned char> decoded_data = {0x23, 0x00, 0xD4, 0x81, 0x00, 0xFA};
@@ -23,7 +23,7 @@ TEST(CobsTest, DecodesData)
 
 }  // namespace alpha_driver_test
 
-int main(int argc, char ** argv)
+auto main(int argc, char ** argv) -> int
 {
   ::testing::InitGoogleTest(&argc, argv);
   int result = RUN_ALL_TESTS();

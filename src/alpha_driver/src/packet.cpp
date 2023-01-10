@@ -1,7 +1,7 @@
 #include "alpha_driver/packet.hpp"
 
-#include <stdint.h>
-
+#include <cstdint>
+#include <utility>
 #include <vector>
 
 #include "alpha_driver/cobs.hpp"
@@ -10,22 +10,22 @@
 namespace alpha_driver
 {
 
-Packet::Packet(PacketId packet_id, DeviceId data_id)
+Packet::Packet(PacketId packet_id, DeviceId device_id)
 : packet_id_(packet_id),
-  device_id_(data_id)
+  device_id_(device_id)
 {
 }
 
-Packet::Packet(PacketId packet_id, DeviceId data_id, std::vector<unsigned char> data)
+Packet::Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char> data)
 : packet_id_(packet_id),
-  device_id_(data_id),
-  data_(data)
+  device_id_(device_id),
+  data_(std::move(data))
 {
 }
 
 // unsigned char Packet::Decode(const std::vector<unsigned char> & data){};
 
-std::vector<unsigned char> Packet::Encode() const
+auto Packet::Encode() const -> std::vector<unsigned char>
 {
   std::vector<unsigned char> data(data_);
 
@@ -41,10 +41,10 @@ std::vector<unsigned char> Packet::Encode() const
   // Calculate the CRC from the data and add it to the buffer
   data.push_back(CalculateBplCrc8(data_));
 
-  // auto encoded_data =
+  // Encode the data using COBS encoding
+  std::vector<unsigned char> encoded_data = CobsEncode(data);
 
-  // TODO: encode the COBS and add it to the buffer
-  // TODO: add the terminator (0x00) to the buffer
+  return encoded_data;
 }
 
 }  // namespace alpha_driver

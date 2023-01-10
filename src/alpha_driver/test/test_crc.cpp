@@ -15,7 +15,7 @@ TEST(CrcTest, CalculatesBplCrc)
 
 }  // namespace alpha_driver_test
 
-int main(int argc, char ** argv)
+auto main(int argc, char ** argv) -> int
 {
   ::testing::InitGoogleTest(&argc, argv);
   int result = RUN_ALL_TESTS();

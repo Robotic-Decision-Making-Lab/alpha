@@ -43,7 +43,7 @@ public:
    *
    * @return std::vector<unsigned char>
    */
-  std::vector<unsigned char> Encode() const;
+  auto Encode() const -> std::vector<unsigned char>;
 
 private:
   PacketId packet_id_;
