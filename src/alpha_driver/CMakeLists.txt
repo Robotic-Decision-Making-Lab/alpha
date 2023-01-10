@@ -56,7 +56,7 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 
-  # Specify unit tests to run
+  # Setup unit tests
   ament_add_gtest(
     test_crc
     test/test_crc.cpp
