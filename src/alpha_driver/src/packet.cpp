@@ -51,6 +51,7 @@ auto Packet::Encode() const -> std::vector<unsigned char>
       "Cannot encode an empty data packet. Please define the packet data before attempting to "
       "encode it.");
   }
+
   std::vector<unsigned char> data(data_);
 
   // Add the packet ID and the device ID
