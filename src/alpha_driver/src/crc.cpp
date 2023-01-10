@@ -22,22 +22,21 @@ unsigned char Reflect(unsigned long data, int size)
 }
 
 unsigned char CalculateCrc8(
-  const std::vector<unsigned char> & data, int size, unsigned char initial_value,
+  const std::vector<unsigned char> & data, unsigned char initial_value,
   unsigned char final_xor_value, bool input_reflected, bool result_reflected,
   const std::array<unsigned char, 256> & lookup_table)
 {
   unsigned char crc = initial_value;
   unsigned char value;
-  int byte;
 
   const int kWidth = (8 * sizeof(crc));
 
-  for (byte = 0; byte < size; ++byte) {
+  for (std::vector<int>::size_type i = 0; i < data.size(); ++i) {
     // Reflect the data
     if (input_reflected) {
-      value = Reflect(data[byte], 8);
+      value = Reflect(data[i], 8);
     } else {
-      value = data[byte];
+      value = data[i];
     }
 
     value ^= crc >> (kWidth - 8);
@@ -52,10 +51,10 @@ unsigned char CalculateCrc8(
   return crc ^ final_xor_value;
 }
 
-unsigned char CalculateBplCrc8(const std::vector<unsigned char> & data, int size)
+unsigned char CalculateBplCrc8(const std::vector<unsigned char> & data)
 {
   return CalculateCrc8(
-    data, size, kInitialValue, kFinalXorValue, kInputReflected, kResultReflected, kCrc8LookupTable);
+    data, kInitialValue, kFinalXorValue, kInputReflected, kResultReflected, kCrc8LookupTable);
 }
 
 }  // namespace alpha_driver

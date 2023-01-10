@@ -10,7 +10,7 @@ TEST(CrcTest, CalculatesCorrectBplCrc)
   std::vector<unsigned char> message = {0xFF, 0x12, 0xAD, 0x23, 0x56};
   const unsigned char expected_crc = 0xF3;
 
-  EXPECT_EQ(alpha_driver::CalculateBplCrc8(message, message.size()), expected_crc);
+  EXPECT_EQ(alpha_driver::CalculateBplCrc8(message), expected_crc);
 }
 
 }  // namespace alpha_driver_test

@@ -6,7 +6,7 @@ namespace alpha_driver
 {
 
 /**
- * @brief
+ * @brief encode the data using the consistent overhead bytes stuffing algorithm
  *
  * @param in
  * @return std::vector<unsigned char>

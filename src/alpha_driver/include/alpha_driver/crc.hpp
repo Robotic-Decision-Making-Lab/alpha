@@ -31,8 +31,8 @@ const bool kInputReflected = true;
 const bool kResultReflected = true;
 
 /**
- * @brief Define a lookup table for the CRC calculation. Table uses the
- * following parameters:
+ * @brief Define the lookup table for the CRC calculation. This is pre-computed to speed up the
+ * CRC calculation, and can be computed using the following parameters:
  *
  * Polynomial: 0x4D
  * Initial Value: 0x00
@@ -40,6 +40,9 @@ const bool kResultReflected = true;
  * Input Reflected: True
  * Result Reflected: True
  * Use Reflected Lookup Table: False
+ *
+ * The lookup table can be calculated using the handy-dandy calculator provided in the link below:
+ * http://www.sunshine2k.de/coding/javascript/crc/crc_js.html
  *
  */
 const std::array<unsigned char, 256> kCrc8LookupTable = {
@@ -79,7 +82,6 @@ unsigned char Reflect(unsigned long data, int size);
  * https://barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
  *
  * @param data message whose CRC should be calculated
- * @param size size of the message
  * @param initial_value CRC initial value
  * @param final_xor_value CRC final XOR value
  * @param input_reflected Reflect the input
@@ -88,7 +90,7 @@ unsigned char Reflect(unsigned long data, int size);
  * @return unsigned char
  */
 unsigned char CalculateCrc8(
-  const std::vector<unsigned char> & data, int size, unsigned char polynomial,
+  const std::vector<unsigned char> & data, unsigned char polynomial,
   unsigned char initial_value, unsigned char final_xor_value, bool input_reflected,
   bool result_reflected, const std::array<unsigned char, 256> & lookup_table);
 
@@ -97,9 +99,8 @@ unsigned char CalculateCrc8(
  * definition.
  *
  * @param data
- * @param size
  * @return unsigned char
  */
-unsigned char CalculateBplCrc8(const std::vector<unsigned char> & data, int size);
+unsigned char CalculateBplCrc8(const std::vector<unsigned char> & data);
 
 }  // namespace alpha_driver

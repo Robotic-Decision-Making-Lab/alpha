@@ -27,10 +27,12 @@ std::vector<unsigned char> Packet::Encode() const
   data.push_back(static_cast<std::underlying_type<PacketId>::type>(packet_id_));
   data.push_back(static_cast<std::underlying_type<DeviceId>::type>(device_id_));
 
-  // Length is the current buffer plus two (length and CRC)
+  // Length is the current buffer size plus two (length and CRC)
   data.push_back(data.size() + 2);
 
-  // TODO: calculate the CRC and add it to the buffer
+  // Calculate the CRC from the data and add it to the buffer
+  data.push_back(CalculateBplCrc8(data_));
+
   // TODO: encode the COBS and add it to the buffer
   // TODO: add the terminator (0x00) to the buffer
 }
