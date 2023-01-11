@@ -63,6 +63,27 @@ public:
    */
   static auto Decode(const std::vector<unsigned char> & data) -> Packet;
 
+  /**
+   * @brief Get the unique packet identifier for a given message.
+   *
+   * @return PacketId
+   */
+  auto packet_id() const -> PacketId;
+
+  /**
+   * @brief Get the unique device ID that the message targets.
+   *
+   * @return DeviceId
+   */
+  auto device_id() const -> DeviceId;
+
+  /**
+   * @brief Get the packet data.
+   *
+   * @return std::vector<unsigned char>
+   */
+  auto data() const -> std::vector<unsigned char>;
+
 private:
   PacketId packet_id_;
   DeviceId device_id_;

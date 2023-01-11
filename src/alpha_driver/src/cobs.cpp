@@ -29,8 +29,8 @@ namespace alpha_driver
 
 auto CobsEncode(const std::vector<unsigned char> & data) -> std::vector<unsigned char>
 {
-  // // Initialize the encoded data with 0x00 prepended
-  // // this will be overwritten once the count to the next 0x00 is detemined
+  // Initialize the encoded data with 0x00 prepended
+  // this will be overwritten once the count to the next 0x00 is detemined
   std::vector<unsigned char> encoded_data = {0x00};
 
   int block_start = 0;

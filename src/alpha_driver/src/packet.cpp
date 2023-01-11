@@ -46,7 +46,8 @@ Packet::Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char
 
 auto Packet::Encode() const -> std::vector<unsigned char>
 {
-  if (data_.empty()) {
+  if (data_.empty())
+  {
     throw std::runtime_error(
       "Cannot encode an empty data packet. Please define the packet data before attempting to "
       "encode it.");
@@ -64,7 +65,7 @@ auto Packet::Encode() const -> std::vector<unsigned char>
   data.push_back(data.size() + 2);
 
   // Calculate the CRC from the data and add it to the buffer
-  data.push_back(CalculateBplCrc8(data_));
+  data.push_back(CalculateBplCrc8(data));
 
   // Encode the data using COBS encoding
   std::vector<unsigned char> encoded_data = CobsEncode(data);
@@ -72,9 +73,10 @@ auto Packet::Encode() const -> std::vector<unsigned char>
   return encoded_data;
 }
 
-static auto Decode(const std::vector<unsigned char> & data) -> Packet
+auto Packet::Decode(const std::vector<unsigned char> & data) -> Packet
 {
-  if (data.empty()) {
+  if (data.empty())
+  {
     throw std::runtime_error("An empty data packet was received for decoding.");
   }
 
@@ -87,7 +89,8 @@ static auto Decode(const std::vector<unsigned char> & data) -> Packet
 
   const unsigned char expected_crc = CalculateBplCrc8(decoded_data);
 
-  if (actual_crc != expected_crc) {
+  if (actual_crc != expected_crc)
+  {
     throw std::runtime_error("The expected and actual CRC values do not match.");
   }
 
@@ -95,7 +98,8 @@ static auto Decode(const std::vector<unsigned char> & data) -> Packet
   const int length = static_cast<int>(decoded_data.back());
   decoded_data.pop_back();
 
-  if (decoded_data.size() != length) {
+  if ((decoded_data.size() + 2) != length)
+  {
     throw std::runtime_error("The specified payload size is not equal to the actual payload size.");
   }
 
@@ -109,5 +113,11 @@ static auto Decode(const std::vector<unsigned char> & data) -> Packet
 
   return Packet(static_cast<PacketId>(packet_id), static_cast<DeviceId>(device_id), decoded_data);
 }
+
+auto Packet::packet_id() const -> PacketId { return packet_id_; }
+
+auto Packet::device_id() const -> DeviceId { return device_id_; };
+
+auto Packet::data() const -> std::vector<unsigned char> { return data_; }
 
 }  // namespace alpha_driver
