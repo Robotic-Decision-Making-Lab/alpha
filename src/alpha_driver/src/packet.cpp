@@ -46,8 +46,7 @@ Packet::Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char
 
 auto Packet::Encode() const -> std::vector<unsigned char>
 {
-  if (data_.empty())
-  {
+  if (data_.empty()) {
     throw std::runtime_error(
       "Cannot encode an empty data packet. Please define the packet data before attempting to "
       "encode it.");
@@ -75,8 +74,7 @@ auto Packet::Encode() const -> std::vector<unsigned char>
 
 auto Packet::Decode(const std::vector<unsigned char> & data) -> Packet
 {
-  if (data.empty())
-  {
+  if (data.empty()) {
     throw std::runtime_error("An empty data packet was received for decoding.");
   }
 
@@ -89,17 +87,15 @@ auto Packet::Decode(const std::vector<unsigned char> & data) -> Packet
 
   const unsigned char expected_crc = CalculateBplCrc8(decoded_data);
 
-  if (actual_crc != expected_crc)
-  {
+  if (actual_crc != expected_crc) {
     throw std::runtime_error("The expected and actual CRC values do not match.");
   }
 
   // Pop the packet length to ensure that a packet of the correct size was provided
-  const int length = static_cast<int>(decoded_data.back());
+  const auto length = static_cast<std::vector<unsigned char>::size_type>(decoded_data.back());
   decoded_data.pop_back();
 
-  if ((decoded_data.size() + 2) != length)
-  {
+  if ((decoded_data.size() + 2) != length) {
     throw std::runtime_error("The specified payload size is not equal to the actual payload size.");
   }
 

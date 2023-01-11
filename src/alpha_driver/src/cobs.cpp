@@ -77,7 +77,7 @@ auto CobsEncode(const std::vector<unsigned char> & data) -> std::vector<unsigned
 auto CobsDecode(const std::vector<unsigned char> & data) -> std::vector<unsigned char>
 {
   std::vector<unsigned char> decoded_data;
-  std::vector<int>::size_type encoded_data_pos = 0;
+  std::vector<unsigned char>::size_type encoded_data_pos = 0;
 
   while (encoded_data_pos < data.size()) {
     const int block_size = data[encoded_data_pos] - 1;
