@@ -25,9 +25,10 @@ namespace alpha_driver
 
 /**
  * @brief A Packet ID is a unique identifer used to determine how to interpret
- * the packet data. For more information regarding each packet ID and its
- * respective data, please refer to the Reach System Communication Protocol
- * specification.
+ * the packet data.
+ *
+ * @note For more information regarding each packet ID and its respective data, please refer to
+ * the Reach System Communication Protocol specification.
  *
  */
 enum class PacketId : unsigned char

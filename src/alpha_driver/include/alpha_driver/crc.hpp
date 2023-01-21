@@ -52,8 +52,10 @@ const bool kInputReflected = true;
 const bool kResultReflected = true;
 
 /**
- * @brief Define the lookup table for the CRC calculation. This is pre-computed to speed up the
- * CRC calculation, and can be computed using the following parameters:
+ * @brief Define the lookup table for the CRC calculation.
+ *
+ * @note This is pre-computed to speed up the CRC calculation, and can be computed using the
+ * following parameters:
  *
  * Polynomial: 0x4D
  * Initial Value: 0x00
@@ -85,9 +87,10 @@ const std::array<unsigned char, 256> kCrc8LookupTable = {
   0xF4, 0xB9, 0x6E, 0x23, 0x8D, 0xC0, 0x17, 0x5A, 0x06, 0x4B, 0x9C, 0xD1, 0x7F, 0x32, 0xE5, 0xA8};
 
 /**
- * @brief Reflect the data about the center bit. This implementation has been
- * inspired by Micheal Barr's "CRC Series, Part 3: CRC Implementation Code in
- * C/C++" (2000), retrieved Jan 6, 2023:
+ * @brief Reflect the data about the center bit.
+ *
+ * @note This implementation has been inspired by Micheal Barr's "CRC Series, Part 3: CRC
+ * Implementation Code in C/C++" (2000), retrieved Jan 6, 2023:
  * https://barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
  *
  * @param data data to reflect
@@ -97,8 +100,9 @@ const std::array<unsigned char, 256> kCrc8LookupTable = {
 auto Reflect(std::uint64_t data, int size) -> unsigned char;
 
 /**
- * @brief Calculate the CRC value for a message using the CRC8 algorithm. This
- * implementation has been inspired by Micheal Barr's "CRC Series, Part 3: CRC
+ * @brief Calculate the CRC value for a message using the CRC8 algorithm.
+ *
+ * @note This implementation has been inspired by Micheal Barr's "CRC Series, Part 3: CRC
  * Implementation Code in C/C++" (2000), retrieved Jan 6, 2023:
  * https://barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
  *
