@@ -68,7 +68,8 @@ public:
 
   /**
    * @brief Indicates whether or not the arm connection is currently active. To be considered
-   * 'active' there must be an open serial connection and the arm must have a regular heartbeat.
+   * 'active' there must be an open serial connection and the client must be actively receiving
+   * heartbeat packets from the Reach Alpha manipulator.
    *
    * @return true
    * @return false

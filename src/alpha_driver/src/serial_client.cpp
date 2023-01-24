@@ -122,4 +122,11 @@ auto SerialClient::Receive(const PacketId packet_type, const std::function<void(
   callbacks_[packet_type].push_back(callback);
 }
 
+auto SerialClient::active() const -> bool
+{
+  return (
+    client_status_ == ClientState::kRunning && port_status_ == PortState::kOpen &&
+    heartbeat_status_ == HeartbeatState::kBeating);
+}
+
 }  // namespace alpha_driver
