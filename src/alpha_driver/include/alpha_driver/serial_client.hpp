@@ -36,22 +36,12 @@ class SerialClient
 {
 public:
   /**
-   * @brief Represents the current state of the serial client. Can be either running or stopped.
-   *
-   */
-  enum class Status
-  {
-    kRunning,
-    kStopped,
-  };
-
-  /**
    * @brief Construct a new Serial Client object
    *
-   * @param device serial port to connect to
-   * @param baudrate baudrate of the serial connection
+   * @param device
+   * @param timeout_ms
    */
-  SerialClient(const std::string & device, const int baudrate);
+  SerialClient(const std::string & device, const int timeout_ms = 500);
 
   /**
    * @brief Destroy the Serial Client object. This shuts down all threads.
@@ -62,9 +52,10 @@ public:
   /**
    * @brief Send a packet over the serial connection.
    *
-   * @param packet message to send to the Reach Alpha manipulator
+   * @param packet message to send to the Reach Alpha manipulator; the data should not yet be
+   * encoded.
    */
-  void Send(const Packet & packet);
+  auto Send(const Packet & packet) const -> void;
 
   /**
    * @brief Register a new callback function to a specified packet type.
@@ -72,18 +63,61 @@ public:
    * @param packet_type type of packet that the callback should be signaled on
    * @param callback function that should be executed when a message of a given type is received
    */
-  void Receive(const PacketId packet_type, std::function<void(Packet)> callback);
+  auto Receive(const PacketId packet_type, const std::function<void(Packet)> & callback) -> void;
+
+  /**
+   * @brief Indicates whether or not the arm connection is currently active. To be considered
+   * 'active' there must be an open serial connection and the arm must have a regular heartbeat.
+   *
+   * @return true
+   * @return false
+   */
+  auto active() const -> bool;
 
 private:
+  /**
+   * @brief Current state of the serial client.
+   *
+   * @note This is used to manage the polling of the RX thread and helps us shutdown cleanly.
+   *
+   */
+  enum class ClientState
+  {
+    kRunning,  // The serial client is running
+    kStopped   // The serial client is stopped; signal thread destruction
+  };
+
+  /**
+   * @brief Defines the current state of the serial port.
+   *
+   */
+  enum class PortState
+  {
+    kOpen,   // The serial port is currently open
+    kClosed  // The serial port is currently closed
+  };
+
+  /**
+   * @brief Defines the current state of the Reach Alpha heartbeat.
+   *
+   */
+  enum class HeartbeatState
+  {
+    kBeating,  // The arm is actively sending heartbeat messages
+    kTimeout,  // The arm was beating but timed out
+    kDead      // The arm heartbeat was never started
+  };
+
   // Map used to store the callback functions for messages. Keys should be the ID for a message,
   // and the values are the callback functions to execute when a message is received.
   std::unordered_map<PacketId, std::vector<std::function<void(Packet)>>> callbacks_;
 
-  // Serial port pointer
+  // Serial port file descriptor
   int fd_;
 
-  // Flag indicating whether the serial client is running
-  Status running_;
+  ClientState client_status_;  // Serial client is currently running or not; used to stop thread
+  PortState port_status_;      // Status of the serial port; should be either open or closed
+  HeartbeatState heartbeat_status_;  // Status of the arm heartbeat;
 
   // Thread responsible for receiving incoming data and executing the respective callbacks
   std::thread rx_worker_;

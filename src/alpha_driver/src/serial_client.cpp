@@ -25,14 +25,19 @@
 #include <unistd.h>
 
 #include <cerrno>
+#include <iostream>
 #include <stdexcept>
+#include <vector>
 
 #include "alpha_driver/packet.hpp"
 
 namespace alpha_driver
 {
 
-SerialClient::SerialClient(const std::string & device, const int baudrate)
+SerialClient::SerialClient(const std::string & device, const int timeout_ms)
+: client_status_(ClientState::kStopped),
+  port_status_(PortState::kOpen),
+  heartbeat_status_(HeartbeatState::kDead)
 {
   if (device.empty()) {
     throw std::runtime_error("Attempted to open file for unassigned file path.");
@@ -47,6 +52,9 @@ SerialClient::SerialClient(const std::string & device, const int baudrate)
       "that you have read/write permissions");
   }
 
+  // Set the serial port status to open
+  port_status_ = PortState::kOpen;
+
   // Configure the linux file for serial communication
   struct termios tty;
 
@@ -55,11 +63,64 @@ SerialClient::SerialClient(const std::string & device, const int baudrate)
     throw std::runtime_error("Unable to get the current terminal configurations.");
   }
 
-  // TODO: Configure termios settings
+  // Set the baudrate to 115200 as defined by the Alpha Reach specification
+  cfsetispeed(&tty, B115200);
+  cfsetospeed(&tty, B115200);
 
-  running_ = Status::kRunning;
+  tty.c_cflag |= (CLOCAL | CREAD);  // Enable the receiver and set the mode to local mode
+  tty.c_cflag &= ~CSIZE;            // Mask the character size bits
+  tty.c_cflag |= CS8;               // Use 8 data bits per byte
+  tty.c_cflag &= ~PARENB;           // Disable parity
+  tty.c_cflag &= ~CSTOPB;           // Only one stop bit is used
+  tty.c_cflag &= ~CRTSCTS;          // Disable RTS/CTS hardware flow control
 
-  // TODO: Start a new thread to receive data
+  // These settings are obtained from the following source:
+  // https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
+  tty.c_lflag &= ~ICANON;                  // Disable canonical input
+  tty.c_lflag &= ~ECHO;                    // Disable echo
+  tty.c_lflag &= ~ECHOE;                   // Disable erasure
+  tty.c_lflag &= ~ECHONL;                  // Disable new-line echo
+  tty.c_lflag &= ~ISIG;                    // Disable interpretation of INTR, QUIT and SUSP
+  tty.c_iflag &= ~(IXON | IXOFF | IXANY);  // Turn off io control
+  tty.c_iflag &=
+    ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR |
+      ICRNL);  // Disable special handling of received bytes
+
+  tty.c_oflag &= ~OPOST;  // Prevent special interpretation of output bytes
+  tty.c_oflag &= ~ONLCR;  // Prevent conversion of newline to carriage return/line feed
+
+  tty.c_cc[VTIME] = static_cast<cc_t>(timeout_ms / 100);  // Set the timeout
+  tty.c_cc[VMIN] = 0;                                     // Use just a pure timeout approach
+
+  // Save the configurations
+  if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
+    throw std::runtime_error("Unable to save the terminal configurations.");
+  }
+
+  // TODO(evan-palmer): Register a callback to handle the heartbeat status for the arm
+
+  // TODO(evan-palmer): Start a new thread to receive data
+}
+
+auto SerialClient::Send(const Packet & packet) const -> void
+{
+  if (port_status_ != PortState::kOpen) {
+    throw std::runtime_error("Cannot send messages without first opening the serial port.");
+  }
+
+  std::vector<unsigned char> encoded_data = packet.Encode();
+
+  if (write(fd_, encoded_data.data(), encoded_data.size()) < 0) {
+    // TODO(evan-palmer): integrate GLOG instead of using cout
+    std::cout << "An error occurred when attempting to write a message." << std::endl;
+  }
+}
+
+auto SerialClient::Receive(const PacketId packet_type, const std::function<void(Packet)> & callback)
+  -> void
+{
+  // Register the callback
+  callbacks_[packet_type].push_back(callback);
 }
 
 }  // namespace alpha_driver
