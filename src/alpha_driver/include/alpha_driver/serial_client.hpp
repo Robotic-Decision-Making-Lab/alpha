@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <functional>
 #include <string>
 #include <thread>
@@ -40,7 +41,7 @@ public:
    *
    * @param device
    * @param timeout_ms
-   * @param blocking
+   * @param blocking This might need to be removed depending on whether this causes a resource leak.
    */
   SerialClient(const std::string & device, const int timeout_ms = 500, const bool blocking = false);
 
@@ -64,7 +65,7 @@ public:
    * @param packet_type type of packet that the callback should be signaled on
    * @param callback function that should be executed when a message of a given type is received
    */
-  auto Receive(const PacketId packet_type, const std::function<void(Packet)> & callback) -> void;
+  auto Receive(PacketId packet_type, const std::function<void(Packet)> & callback) -> void;
 
   /**
    * @brief Indicates whether or not the arm connection is currently active. To be considered
@@ -110,6 +111,22 @@ private:
     kDead      // The arm heartbeat was never started
   };
 
+  /**
+   * @brief Callback function used to monitor Reach Alpha connectivity.
+   *
+   * @param packet
+   */
+  auto MonitorHeartbeat(Packet packet) -> void;
+
+  /**
+   * @brief Method used to poll the serial line for incoming data.
+   *
+   * @note This method is executed by the RX thread. Furthermore, this method is a blocking method
+   * that runs indefinitely. The main loop is terminated by the client status flag.
+   *
+   */
+  auto Read() -> void;
+
   // Map used to store the callback functions for messages. Keys should be the ID for a message,
   // and the values are the callback functions to execute when a message is received.
   std::unordered_map<PacketId, std::vector<std::function<void(Packet)>>> callbacks_;
@@ -117,7 +134,8 @@ private:
   // Serial port file descriptor
   int fd_;
 
-  ClientState client_status_;  // Serial client is currently running or not; used to stop thread
+  std::atomic<bool> running_;  // Flag indicating whether or not the serial client is currently
+                               // running; used to stop RX thread
   PortState port_status_;      // Status of the serial port; should be either open or closed
   HeartbeatState heartbeat_status_;  // Status of the arm heartbeat;
 

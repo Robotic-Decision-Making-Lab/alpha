@@ -35,7 +35,7 @@ namespace alpha_driver
 {
 
 SerialClient::SerialClient(const std::string & device, const int timeout_ms, const bool blocking)
-: client_status_(ClientState::kStopped),
+: running_(false),
   port_status_(PortState::kOpen),
   heartbeat_status_(HeartbeatState::kDead)
 {
@@ -115,7 +115,7 @@ auto SerialClient::Send(const Packet & packet) const -> void
   }
 }
 
-auto SerialClient::Receive(const PacketId packet_type, const std::function<void(Packet)> & callback)
+auto SerialClient::Receive(PacketId packet_type, const std::function<void(Packet)> & callback)
   -> void
 {
   // Register the callback
@@ -125,8 +125,16 @@ auto SerialClient::Receive(const PacketId packet_type, const std::function<void(
 auto SerialClient::active() const -> bool
 {
   return (
-    client_status_ == ClientState::kRunning && port_status_ == PortState::kOpen &&
-    heartbeat_status_ == HeartbeatState::kBeating);
+    running_ && port_status_ == PortState::kOpen && heartbeat_status_ == HeartbeatState::kBeating);
+}
+
+auto SerialClient::Read() -> void
+{
+  running_ = true;
+
+  while (running_.load()) {
+    /* do stuff */
+  }
 }
 
 }  // namespace alpha_driver
