@@ -34,7 +34,7 @@
 namespace alpha_driver
 {
 
-SerialClient::SerialClient(const std::string & device, const int timeout_ms)
+SerialClient::SerialClient(const std::string & device, const int timeout_ms, const bool blocking)
 : client_status_(ClientState::kStopped),
   port_status_(PortState::kOpen),
   heartbeat_status_(HeartbeatState::kDead)
@@ -75,22 +75,21 @@ SerialClient::SerialClient(const std::string & device, const int timeout_ms)
   tty.c_cflag &= ~CRTSCTS;          // Disable RTS/CTS hardware flow control
 
   // These settings are obtained from the following source:
-  // https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
   tty.c_lflag &= ~ICANON;                  // Disable canonical input
   tty.c_lflag &= ~ECHO;                    // Disable echo
   tty.c_lflag &= ~ECHOE;                   // Disable erasure
   tty.c_lflag &= ~ECHONL;                  // Disable new-line echo
-  tty.c_lflag &= ~ISIG;                    // Disable interpretation of INTR, QUIT and SUSP
+  tty.c_lflag &= ~ISIG;                    // Disable signals
   tty.c_iflag &= ~(IXON | IXOFF | IXANY);  // Turn off io control
   tty.c_iflag &=
     ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR |
       ICRNL);  // Disable special handling of received bytes
 
-  tty.c_oflag &= ~OPOST;  // Prevent special interpretation of output bytes
-  tty.c_oflag &= ~ONLCR;  // Prevent conversion of newline to carriage return/line feed
+  tty.c_oflag &= ~OPOST;  // Disable output post-processing
+  tty.c_oflag &= ~ONLCR;  // Disable conversion of newline to carriage return
 
   tty.c_cc[VTIME] = static_cast<cc_t>(timeout_ms / 100);  // Set the timeout
-  tty.c_cc[VMIN] = 0;                                     // Use just a pure timeout approach
+  tty.c_cc[VMIN] = blocking ? 1 : 0;                      // Block until data is received
 
   // Save the configurations
   if (tcsetattr(fd_, TCSANOW, &tty) != 0) {

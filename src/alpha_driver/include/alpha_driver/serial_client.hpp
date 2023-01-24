@@ -36,12 +36,13 @@ class SerialClient
 {
 public:
   /**
-   * @brief Construct a new Serial Client object
+   * @brief Construct a new Serial Client object.
    *
    * @param device
    * @param timeout_ms
+   * @param blocking
    */
-  SerialClient(const std::string & device, const int timeout_ms = 500);
+  SerialClient(const std::string & device, const int timeout_ms = 500, const bool blocking = false);
 
   /**
    * @brief Destroy the Serial Client object. This shuts down all threads.
