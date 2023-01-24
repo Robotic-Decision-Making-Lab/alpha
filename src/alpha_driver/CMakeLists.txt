@@ -33,14 +33,15 @@ add_library(${PROJECT_NAME} SHARED
   src/cobs.cpp
   src/crc.cpp
   src/packet.cpp
+  src/serial_client.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
-add_executable(serial_driver_node src/serial_client.cpp)
-target_include_directories(serial_driver_node PRIVATE include)
-target_link_libraries(serial_driver_node ${PROJECT_NAME})
-ament_target_dependencies(serial_driver_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
+add_executable(alpha_driver_node src/driver.cpp)
+target_include_directories(alpha_driver_node PRIVATE include)
+target_link_libraries(alpha_driver_node ${PROJECT_NAME})
+ament_target_dependencies(alpha_driver_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION bin
