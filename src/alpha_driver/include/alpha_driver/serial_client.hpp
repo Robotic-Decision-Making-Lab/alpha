@@ -43,7 +43,7 @@ public:
    * @param timeout_ms
    * @param blocking This might need to be removed depending on whether this causes a resource leak.
    */
-  SerialClient(const std::string & device, const int timeout_ms = 500, const bool blocking = false);
+  explicit SerialClient(const std::string & device, int timeout_ms = 500, bool blocking = false);
 
   /**
    * @brief Destroy the Serial Client object. This shuts down all threads.
@@ -75,7 +75,7 @@ public:
    * @return true
    * @return false
    */
-  auto active() const -> bool;
+  auto active() const -> bool;  // NOLINT
 
 private:
   /**
