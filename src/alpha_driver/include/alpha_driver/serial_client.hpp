@@ -29,6 +29,7 @@
 
 #include "alpha_driver/packet.hpp"
 #include "alpha_driver/packet_id.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 namespace alpha_driver
 {
@@ -79,18 +80,6 @@ public:
 
 private:
   /**
-   * @brief Current state of the serial client.
-   *
-   * @note This is used to manage the polling of the RX thread and helps us shutdown cleanly.
-   *
-   */
-  enum class ClientState
-  {
-    kRunning,  // The serial client is running
-    kStopped   // The serial client is stopped; signal thread destruction
-  };
-
-  /**
    * @brief Defines the current state of the serial port.
    *
    */
@@ -98,17 +87,6 @@ private:
   {
     kOpen,   // The serial port is currently open
     kClosed  // The serial port is currently closed
-  };
-
-  /**
-   * @brief Defines the current state of the Reach Alpha heartbeat.
-   *
-   */
-  enum class HeartbeatState
-  {
-    kBeating,  // The arm is actively sending heartbeat messages
-    kTimeout,  // The arm was beating but timed out
-    kDead      // The arm heartbeat was never started
   };
 
   /**
@@ -134,16 +112,18 @@ private:
   // Serial port file descriptor
   int fd_;
 
-  std::atomic<bool> running_;  // Flag indicating whether or not the serial client is currently
-                               // running; used to stop RX thread
-  PortState port_status_;      // Status of the serial port; should be either open or closed
-  HeartbeatState heartbeat_status_;  // Status of the arm heartbeat;
+  std::atomic<bool> running_ = false;  // This flag is used to stop the RX main loop
+  PortState port_status_ = PortState::kClosed;
 
   // Thread responsible for receiving incoming data and executing the respective callbacks
   std::thread rx_worker_;
 
   // Incoming data buffer
   std::vector<unsigned char> buffer_;
+
+  // We use the built-in ROS logger here for the sake of logging consistency
+  // This logger also uses spdlog which was what I would have used anyway
+  rclcpp::Logger logger_ = rclcpp::get_logger("SerialClient");
 };
 
 }  // namespace alpha_driver

@@ -87,7 +87,8 @@ public:
 private:
   PacketId packet_id_;
   DeviceId device_id_;
-  std::vector<unsigned char> data_;
+  std::vector<unsigned char> data_ = {};  // Make sure to initialize in the class because we provide
+                                          // a constructor that doesn't initialize this
 };
 
 }  // namespace alpha_driver

@@ -34,10 +34,7 @@
 namespace alpha_driver
 {
 
-SerialClient::SerialClient(const std::string & device, const int timeout_ms, const bool blocking)
-: running_(false),
-  port_status_(PortState::kOpen),
-  heartbeat_status_(HeartbeatState::kDead)
+SerialClient::SerialClient(const std::string & device, int timeout_ms, bool blocking)
 {
   if (device.empty()) {
     throw std::runtime_error("Attempted to open file for unassigned file path.");
@@ -48,8 +45,8 @@ SerialClient::SerialClient(const std::string & device, const int timeout_ms, con
 
   if (fd_ == -1) {
     throw std::runtime_error(
-      "Could not open specified serial device. Please verify that the device name is correct and "
-      "that you have read/write permissions");
+      "Could not open specified serial device. Please verify that the device is not already being "
+      "used and that you have configured read/write permissions.");
   }
 
   // Set the serial port status to open
@@ -96,22 +93,21 @@ SerialClient::SerialClient(const std::string & device, const int timeout_ms, con
     throw std::runtime_error("Unable to save the terminal configurations.");
   }
 
-  // TODO(evan-palmer): Register a callback to handle the heartbeat status for the arm
-
   // TODO(evan-palmer): Start a new thread to receive data
+
+  // If the constructor fails to provide an object that can be used, we need to raise an exception.
+  // This is done in accordance with C.42 of the CPP Core Guidelines.
+  if (!active()) {
+    throw std::runtime_error("An error occurred while attempting to construct the serial client.");
+  }
 }
 
 auto SerialClient::Send(const Packet & packet) const -> void
 {
-  if (port_status_ != PortState::kOpen) {
-    throw std::runtime_error("Cannot send messages without first opening the serial port.");
-  }
-
   std::vector<unsigned char> encoded_data = packet.Encode();
 
   if (write(fd_, encoded_data.data(), encoded_data.size()) < 0) {
-    // TODO(evan-palmer): integrate GLOG instead of using cout
-    std::cout << "An error occurred when attempting to write a message." << std::endl;
+    RCLCPP_WARN(logger_, "An error occurred while attempting to write a message.");  // NOLINT
   }
 }
 
@@ -124,8 +120,7 @@ auto SerialClient::Receive(PacketId packet_type, const std::function<void(Packet
 
 auto SerialClient::active() const -> bool
 {
-  return (
-    running_ && port_status_ == PortState::kOpen && heartbeat_status_ == HeartbeatState::kBeating);
+  return (running_.load() && port_status_ == PortState::kOpen);
 }
 
 auto SerialClient::Read() -> void
@@ -133,7 +128,8 @@ auto SerialClient::Read() -> void
   running_ = true;
 
   while (running_.load()) {
-    /* do stuff */
+    // TODO(evan-palmer): implement the read method, parse the output to a packet, and call the
+    // respective callback functions
   }
 }
 
