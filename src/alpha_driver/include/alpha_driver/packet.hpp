@@ -49,40 +49,42 @@ public:
   Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char> data);
 
   /**
-   * @brief Encode the packet's data using the BPL packet structure specification.
+   * @brief Encode the packet's data using the BPL packet structure
+   * specification.
    *
    * @return std::vector<unsigned char>
    */
-  auto Encode() const -> std::vector<unsigned char>;
+  std::vector<unsigned char> Encode() const;
 
   /**
-   * @brief Decode a packet that has been encoded using the BPL communication specification.
+   * @brief Decode a packet that has been encoded using the BPL communication
+   * specification.
    *
    * @param data
    * @return Packet
    */
-  static auto Decode(const std::vector<unsigned char> & data) -> Packet;
+  static Packet Decode(const std::vector<unsigned char> & data);
 
   /**
    * @brief Get the unique packet identifier for a given message.
    *
    * @return PacketId
    */
-  auto packet_id() const -> PacketId;
+  PacketId packet_id() const;
 
   /**
    * @brief Get the unique device ID that the message targets.
    *
    * @return DeviceId
    */
-  auto device_id() const -> DeviceId;
+  DeviceId device_id() const;
 
   /**
    * @brief Get the packet data.
    *
    * @return std::vector<unsigned char>
    */
-  auto data() const -> std::vector<unsigned char>;
+  std::vector<unsigned char> data() const;
 
 private:
   PacketId packet_id_;

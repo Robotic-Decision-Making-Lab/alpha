@@ -23,7 +23,7 @@
 namespace alpha_driver
 {
 
-auto Reflect(std::uint64_t data, int size) -> unsigned char
+unsigned char Reflect(std::uint64_t data, int size)
 {
   std::uint64_t reflection = 0x00000000;
 
@@ -38,10 +38,10 @@ auto Reflect(std::uint64_t data, int size) -> unsigned char
   return static_cast<unsigned char>(reflection);
 }
 
-auto CalculateCrc8(
+unsigned char CalculateCrc8(
   const std::vector<unsigned char> & data, unsigned char initial_value,
   unsigned char final_xor_value, bool input_reflected, bool result_reflected,
-  const std::array<unsigned char, 256> & lookup_table) -> unsigned char
+  const std::array<unsigned char, 256> & lookup_table)
 {
   unsigned char crc = initial_value;
   unsigned char value;
@@ -68,7 +68,7 @@ auto CalculateCrc8(
   return crc ^ final_xor_value;
 }
 
-auto CalculateBplCrc8(const std::vector<unsigned char> & data) -> unsigned char
+unsigned char CalculateBplCrc8(const std::vector<unsigned char> & data)
 {
   return CalculateCrc8(
     data, kInitialValue, kFinalXorValue, kInputReflected, kResultReflected, kCrc8LookupTable);

@@ -34,13 +34,12 @@
 namespace alpha_driver
 {
 
-SerialClient::SerialClient(const std::string & device, int timeout_ms, bool blocking)
+SerialClient::SerialClient(const std::string & device, int timeout_ms)
 {
   if (device.empty()) {
-    throw std::runtime_error("Attempted to open file for unassigned file path.");
+    throw std::runtime_error("Attempted to open file using an unassigned file path.");
   }
 
-  // Open the serial port
   fd_ = open(device.c_str(), O_RDWR);
 
   if (fd_ == -1) {
@@ -49,13 +48,11 @@ SerialClient::SerialClient(const std::string & device, int timeout_ms, bool bloc
       "used and that you have configured read/write permissions.");
   }
 
-  // Set the serial port status to open
   port_status_ = PortState::kOpen;
 
-  // Configure the linux file for serial communication
   struct termios tty;
 
-  // Get the existing settings
+  // Get the terminal existing settings
   if (tcgetattr(fd_, &tty) < 0) {
     throw std::runtime_error("Unable to get the current terminal configurations.");
   }
@@ -85,24 +82,31 @@ SerialClient::SerialClient(const std::string & device, int timeout_ms, bool bloc
   tty.c_oflag &= ~OPOST;  // Disable output post-processing
   tty.c_oflag &= ~ONLCR;  // Disable conversion of newline to carriage return
 
-  tty.c_cc[VTIME] = static_cast<cc_t>(timeout_ms / 100);  // Set the timeout
-  tty.c_cc[VMIN] = blocking ? 1 : 0;                      // Block until data is received
+  tty.c_cc[VTIME] = static_cast<cc_t>(timeout_ms / 100);  // Set the timeout; convert to deciseconds
+  tty.c_cc[VMIN] = 0;  // We can't set this in a thread otherwise it may block indefinitely
 
   // Save the configurations
   if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
     throw std::runtime_error("Unable to save the terminal configurations.");
   }
 
-  // TODO(evan-palmer): Start a new thread to receive data
+  // Start reading data from the serial port
+  rx_worker_ = std::thread(&SerialClient::Read, this);
 
-  // If the constructor fails to provide an object that can be used, we need to raise an exception.
-  // This is done in accordance with C.42 of the CPP Core Guidelines.
+  // If the constructor fails to provide an object that can be used, we need to
+  // raise an exception.
   if (!active()) {
     throw std::runtime_error("An error occurred while attempting to construct the serial client.");
   }
 }
 
-auto SerialClient::Send(const Packet & packet) const -> void
+void SerialClient::Close()
+{
+  running_ = false;
+  rx_worker_.join();
+}
+
+void SerialClient::Send(const Packet & packet) const
 {
   std::vector<unsigned char> encoded_data = packet.Encode();
 
@@ -111,25 +115,39 @@ auto SerialClient::Send(const Packet & packet) const -> void
   }
 }
 
-auto SerialClient::Receive(PacketId packet_type, const std::function<void(Packet)> & callback)
-  -> void
+void SerialClient::Receive(PacketId packet_type, const std::function<void(Packet)> & callback)
 {
-  // Register the callback
   callbacks_[packet_type].push_back(callback);
 }
 
-auto SerialClient::active() const -> bool
-{
-  return (running_.load() && port_status_ == PortState::kOpen);
-}
+bool SerialClient::active() const { return (running_.load() && port_status_ == PortState::kOpen); }
 
-auto SerialClient::Read() -> void
+void SerialClient::Read()
 {
   running_ = true;
 
   while (running_.load()) {
-    // TODO(evan-palmer): implement the read method, parse the output to a packet, and call the
-    // respective callback functions
+    buffer_.clear();
+
+    const int size = read(fd_, buffer_.data(), buffer_.size());
+
+    if (size < 0) {
+      RCLCPP_WARN(  // NOLINT
+        logger_, "An error occurred while attempting to read a message from the serial port.");
+    }
+
+    if (size > 0) {
+      try {
+        const Packet data = Packet::Decode(buffer_);
+
+        for (auto & callback : callbacks_[data.packet_id()]) {
+          callback(data);
+        }
+      }
+      catch (const std::exception & e) {
+        RCLCPP_WARN(logger_, e.what());  // NOLINT
+      }
+    }
   }
 }
 

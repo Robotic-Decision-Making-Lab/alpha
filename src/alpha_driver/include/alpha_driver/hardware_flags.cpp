@@ -24,7 +24,8 @@ namespace alpha_driver
 {
 
 /**
- * @brief Hardware status flags that are transmitted at a frequence of 1 Hz if any errors are set.
+ * @brief Hardware status flags that are transmitted at a frequence of 1 Hz if
+ * any errors are set.
  *
  */
 enum class HardwareStatusFlag : unsigned char

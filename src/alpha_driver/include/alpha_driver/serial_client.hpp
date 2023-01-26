@@ -42,41 +42,48 @@ public:
    *
    * @param device
    * @param timeout_ms
-   * @param blocking This might need to be removed depending on whether this causes a resource leak.
    */
-  explicit SerialClient(const std::string & device, int timeout_ms = 500, bool blocking = false);
+  explicit SerialClient(const std::string & device, int timeout_ms = 500);
 
   /**
-   * @brief Destroy the Serial Client object. This shuts down all threads.
+   * @brief Shutdown the serial client.
+   *
+   * @note The main intention for this method is to shutdown the RX thread. While we could
+   * accomplish this in the destructor, that might not be safe if the thread experiences unknown
+   * behavior on shutdown. In the future, if this ultimately demonstrates itself to be safe, then
+   * this method will be eliminated in favor of shutting down in the destructor for usability
+   * purposes.
    *
    */
-  ~SerialClient();
+  void Close();
 
   /**
    * @brief Send a packet over the serial connection.
    *
-   * @param packet message to send to the Reach Alpha manipulator; the data should not yet be
-   * encoded.
+   * @param packet message to send to the Reach Alpha manipulator; the data
+   * should not yet be encoded.
    */
-  auto Send(const Packet & packet) const -> void;
+  void Send(const Packet & packet) const;
 
   /**
    * @brief Register a new callback function to a specified packet type.
    *
    * @param packet_type type of packet that the callback should be signaled on
-   * @param callback function that should be executed when a message of a given type is received
+   * @param callback function that should be executed when a message of a given
+   * type is received
    */
-  auto Receive(PacketId packet_type, const std::function<void(Packet)> & callback) -> void;
+  void Receive(PacketId packet_type, const std::function<void(Packet)> & callback);
 
   /**
-   * @brief Indicates whether or not the arm connection is currently active. To be considered
-   * 'active' there must be an open serial connection and the client must be actively receiving
-   * heartbeat packets from the Reach Alpha manipulator.
+   * @brief Indicates whether or not the arm connection is currently active.
+   *
+   * @note To be considered 'active' there must be an open serial connection and the
+   * client must be actively receiving heartbeat packets from the Reach Alpha manipulator.
    *
    * @return true
    * @return false
    */
-  auto active() const -> bool;  // NOLINT
+  bool active() const;  // NOLINT
 
 private:
   /**
@@ -90,23 +97,18 @@ private:
   };
 
   /**
-   * @brief Callback function used to monitor Reach Alpha connectivity.
-   *
-   * @param packet
-   */
-  auto MonitorHeartbeat(Packet packet) -> void;
-
-  /**
    * @brief Method used to poll the serial line for incoming data.
    *
-   * @note This method is executed by the RX thread. Furthermore, this method is a blocking method
-   * that runs indefinitely. The main loop is terminated by the client status flag.
+   * @note This method is executed by the RX thread. Furthermore, this method is
+   * a blocking method that runs indefinitely. The main loop is terminated by
+   * the client status flag.
    *
    */
-  auto Read() -> void;
+  void Read();
 
-  // Map used to store the callback functions for messages. Keys should be the ID for a message,
-  // and the values are the callback functions to execute when a message is received.
+  // Map used to store the callback functions for messages.
+  // Keys should be the ID of a message and the values are the callback
+  // functions to execute when a message the respective packet ID is received.
   std::unordered_map<PacketId, std::vector<std::function<void(Packet)>>> callbacks_;
 
   // Serial port file descriptor
@@ -115,11 +117,12 @@ private:
   std::atomic<bool> running_ = false;  // This flag is used to stop the RX main loop
   PortState port_status_ = PortState::kClosed;
 
-  // Thread responsible for receiving incoming data and executing the respective callbacks
+  // Thread responsible for receiving incoming data and executing the respective
+  // callbacks
   std::thread rx_worker_;
 
-  // Incoming data buffer
-  std::vector<unsigned char> buffer_;
+  // Create an incoming data buffer of size 256
+  std::vector<unsigned char> buffer_ = std::vector<unsigned char>(256);
 
   // We use the built-in ROS logger here for the sake of logging consistency
   // This logger also uses spdlog which was what I would have used anyway

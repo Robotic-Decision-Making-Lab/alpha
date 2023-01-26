@@ -44,7 +44,7 @@ Packet::Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char
 {
 }
 
-auto Packet::Encode() const -> std::vector<unsigned char>
+std::vector<unsigned char> Packet::Encode() const
 {
   if (data_.empty()) {
     throw std::runtime_error(
@@ -72,7 +72,7 @@ auto Packet::Encode() const -> std::vector<unsigned char>
   return encoded_data;
 }
 
-auto Packet::Decode(const std::vector<unsigned char> & data) -> Packet
+Packet Packet::Decode(const std::vector<unsigned char> & data)
 {
   if (data.empty()) {
     throw std::runtime_error("An empty data packet was received for decoding.");
@@ -91,7 +91,8 @@ auto Packet::Decode(const std::vector<unsigned char> & data) -> Packet
     throw std::runtime_error("The expected and actual CRC values do not match.");
   }
 
-  // Pop the packet length to ensure that a packet of the correct size was provided
+  // Pop the packet length to ensure that a packet of the correct size was
+  // provided
   const auto length = static_cast<std::vector<unsigned char>::size_type>(decoded_data.back());
   decoded_data.pop_back();
 
@@ -110,10 +111,10 @@ auto Packet::Decode(const std::vector<unsigned char> & data) -> Packet
   return Packet(static_cast<PacketId>(packet_id), static_cast<DeviceId>(device_id), decoded_data);
 }
 
-auto Packet::packet_id() const -> PacketId { return packet_id_; }
+PacketId Packet::packet_id() const { return packet_id_; }
 
-auto Packet::device_id() const -> DeviceId { return device_id_; };
+DeviceId Packet::device_id() const { return device_id_; }
 
-auto Packet::data() const -> std::vector<unsigned char> { return data_; }
+std::vector<unsigned char> Packet::data() const { return data_; }
 
 }  // namespace alpha_driver

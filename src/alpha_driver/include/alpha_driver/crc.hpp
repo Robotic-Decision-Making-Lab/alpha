@@ -54,8 +54,8 @@ const bool kResultReflected = true;
 /**
  * @brief Define the lookup table for the CRC calculation.
  *
- * @note This is pre-computed to speed up the CRC calculation, and can be computed using the
- * following parameters:
+ * @note This is pre-computed to speed up the CRC calculation, and can be
+ * computed using the following parameters:
  *
  * Polynomial: 0x4D
  * Initial Value: 0x00
@@ -64,8 +64,8 @@ const bool kResultReflected = true;
  * Result Reflected: True
  * Use Reflected Lookup Table: False
  *
- * The lookup table can be calculated using the handy-dandy calculator provided in the link below:
- * http://www.sunshine2k.de/coding/javascript/crc/crc_js.html
+ * The lookup table can be calculated using the handy-dandy calculator provided
+ * in the link below: http://www.sunshine2k.de/coding/javascript/crc/crc_js.html
  *
  */
 const std::array<unsigned char, 256> kCrc8LookupTable = {
@@ -89,21 +89,21 @@ const std::array<unsigned char, 256> kCrc8LookupTable = {
 /**
  * @brief Reflect the data about the center bit.
  *
- * @note This implementation has been inspired by Micheal Barr's "CRC Series, Part 3: CRC
- * Implementation Code in C/C++" (2000), retrieved Jan 6, 2023:
+ * @note This implementation has been inspired by Micheal Barr's "CRC Series,
+ * Part 3: CRC Implementation Code in C/C++" (2000), retrieved Jan 6, 2023:
  * https://barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
  *
  * @param data data to reflect
  * @param size size of the data being reflected
  * @return unsigned char
  */
-auto Reflect(std::uint64_t data, int size) -> unsigned char;
+unsigned char Reflect(std::uint64_t data, int size);
 
 /**
  * @brief Calculate the CRC value for a message using the CRC8 algorithm.
  *
- * @note This implementation has been inspired by Micheal Barr's "CRC Series, Part 3: CRC
- * Implementation Code in C/C++" (2000), retrieved Jan 6, 2023:
+ * @note This implementation has been inspired by Micheal Barr's "CRC Series,
+ * Part 3: CRC Implementation Code in C/C++" (2000), retrieved Jan 6, 2023:
  * https://barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
  *
  * @param data message whose CRC should be calculated
@@ -114,10 +114,10 @@ auto Reflect(std::uint64_t data, int size) -> unsigned char;
  * @param lookup_table Lookup table used for CRC calculation
  * @return unsigned char
  */
-auto CalculateCrc8(
+unsigned char CalculateCrc8(
   const std::vector<unsigned char> & data, unsigned char polynomial, unsigned char initial_value,
   unsigned char final_xor_value, bool input_reflected, bool result_reflected,
-  const std::array<unsigned char, 256> & lookup_table) -> unsigned char;
+  const std::array<unsigned char, 256> & lookup_table);
 
 /**
  * @brief Calculate the CRC value for a message using the BPL protocol
@@ -126,6 +126,6 @@ auto CalculateCrc8(
  * @param data
  * @return unsigned char
  */
-auto CalculateBplCrc8(const std::vector<unsigned char> & data) -> unsigned char;
+unsigned char CalculateBplCrc8(const std::vector<unsigned char> & data);
 
 }  // namespace alpha_driver

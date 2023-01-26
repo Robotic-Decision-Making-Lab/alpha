@@ -31,7 +31,8 @@ TEST(PacketTest, TestPacketEncode)
 {
   const std::vector<unsigned char> data = {0x01, 0x02, 0x03, 0x04};
 
-  // Create an encoded test packet using the BPL structure based off of the test data
+  // Create an encoded test packet using the BPL structure based off of the test
+  // data
   const std::vector<unsigned char> expected_encoding = {0x09, 0x01, 0x02, 0x03, 0x04,
                                                         0x01, 0xFF, 0x08, 0x5D, 0x00};
 
@@ -56,7 +57,7 @@ TEST(PacketTest, TestPacketDecode)
 
 }  // namespace test_alpha_driver
 
-auto main(int argc, char ** argv) -> int
+int main(int argc, char ** argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
   const int result = RUN_ALL_TESTS();

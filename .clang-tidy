@@ -14,7 +14,7 @@ Checks: >
   -google-runtime-references,
   -misc-non-private-member-variables-in-classes,
   -modernize-return-braced-init-list,
-  -modernize-avoid-c-arrays,
+  -modernize-use-trailing-return-type,
   -performance-move-const-arg,
   -readability-braces-around-statements,
   -readability-identifier-length,

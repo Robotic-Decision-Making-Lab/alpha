@@ -27,7 +27,7 @@
 namespace alpha_driver
 {
 
-auto CobsEncode(const std::vector<unsigned char> & data) -> std::vector<unsigned char>
+std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data)
 {
   // Initialize the encoded data with 0x00 prepended
   // this will be overwritten once the count to the next 0x00 is detemined
@@ -53,8 +53,9 @@ auto CobsEncode(const std::vector<unsigned char> & data) -> std::vector<unsigned
       current_block_size++;
 
       // Handle the case where the block size is 254 or greater
-      // Note that the BPL specification dictates that packets may not be larger than 254
-      // bytes including the footer; however, we handle this case for the sake of security.
+      // Note that the BPL specification dictates that packets may not be larger
+      // than 254 bytes including the footer; however, we handle this case for
+      // the sake of security.
       if (current_block_size >= 254) {
         encoded_data[block_start] = static_cast<uint8_t>(current_block_size + 1);
 
@@ -74,7 +75,7 @@ auto CobsEncode(const std::vector<unsigned char> & data) -> std::vector<unsigned
   return encoded_data;
 }
 
-auto CobsDecode(const std::vector<unsigned char> & data) -> std::vector<unsigned char>
+std::vector<unsigned char> CobsDecode(const std::vector<unsigned char> & data)
 {
   std::vector<unsigned char> decoded_data;
   std::vector<unsigned char>::size_type encoded_data_pos = 0;
