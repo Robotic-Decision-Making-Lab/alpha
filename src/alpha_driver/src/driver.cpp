@@ -20,12 +20,22 @@
 
 #include "alpha_driver/driver.hpp"
 
+#include <chrono>
+
+using namespace std::chrono_literals;
+
 namespace alpha_driver
 {
 
-Driver::Driver(/* args */)
+Driver::Driver()
 : Node("AlphaDriver")
 {
+  // Request the state from the manipulator at a frequency of 1hz
+  request_state_timer_ = this->create_wall_timer(1000ms, std::bind(&Driver::RequestState, this));
+}
+
+void Driver::RequestState()
+{ /* cool implementation */
 }
 
 }  // namespace alpha_driver

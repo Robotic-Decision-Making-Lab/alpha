@@ -20,7 +20,11 @@
 
 #pragma once
 
+#include "alpha_driver/packet.hpp"
+#include "alpha_driver/serial_client.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/string.hpp"
 
 namespace alpha_driver
 {
@@ -28,10 +32,16 @@ namespace alpha_driver
 class Driver : public rclcpp::Node
 {
 public:
-  Driver(/* args */);
+  Driver();
 
 private:
-  /* data */
+  void PublishState(Packet & packet);
+  void RequestState();
+
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr state_publisher_;
+
+  rclcpp::TimerBase::SharedPtr request_state_timer_;
 };
 
 }  // namespace alpha_driver
