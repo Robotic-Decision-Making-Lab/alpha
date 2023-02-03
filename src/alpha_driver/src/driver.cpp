@@ -25,6 +25,8 @@
 #include "alpha_driver/device_id.hpp"
 #include "alpha_driver/packet_id.hpp"
 
+using namespace std::chrono_literals;
+
 namespace alpha_driver
 {
 
@@ -61,9 +63,24 @@ Driver::Driver()
   // Configure the new heartbeat request
   EnableHeartbeat(state_freq);
 
-  // Connect a callback to republish received state data
-  // client_.RegisterCallback(
-  //   PacketId::kPosition, std::bind(&Driver::PublishState, this, std::placeholders::_1));
+  last_heartbeat_ = std::chrono::steady_clock::now();
+
+  // Setup a timer to make sure that we have an active connection with the arm
+  check_heartbeat_timer_ =
+    this->create_wall_timer(1000ms, std::bind(&Driver::MonitorHeartbeatCb, this));
+
+  // Connect packet callbacks
+  client_.RegisterCallback(
+    PacketId::kPosition, std::bind(&Driver::ProxyJointPositionCb, this, std::placeholders::_1));
+
+  client_.RegisterCallback(
+    PacketId::kVelocity, std::bind(&Driver::ProxyJointVelocityCb, this, std::placeholders::_1));
+
+  client_.RegisterCallback(
+    PacketId::kMode, std::bind(&Driver::ProxyModeCb, this, std::placeholders::_1));
+
+  client_.RegisterCallback(
+    PacketId::kMode, std::bind(&Driver::UpdateLastHeartbeatCb, this, std::placeholders::_1));
 }
 
 Driver::~Driver()
@@ -95,6 +112,32 @@ void Driver::SetHeartbeatFreq(const int freq)
 }
 
 void Driver::DisableHeartbeat() { SetHeartbeatFreq(0); }
+
+void Driver::ProxyJointPositionCb(const Packet & packet)
+{ /* do cool things here */
+}
+
+void Driver::ProxyJointVelocityCb(const Packet & packet)
+{ /* do cool things here */
+}
+
+void Driver::ProxyModeCb(const Packet & packet)
+{ /* do cool things here */
+}
+
+void Driver::UpdateLastHeartbeatCb(const Packet &)
+{
+  last_heartbeat_ = std::chrono::steady_clock::now();
+}
+
+void Driver::MonitorHeartbeatCb()
+{
+  if (std::chrono::steady_clock::now() - last_heartbeat_ > 5s) {
+    RCLCPP_WARN(  // NOLINT
+      this->get_logger(),
+      "Timeout occurred; the system has not received a heartbeat message in the last 5 seconds");
+  }
+}
 
 }  // namespace alpha_driver
 

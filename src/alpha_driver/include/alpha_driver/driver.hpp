@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include "alpha_driver/packet.hpp"
 #include "alpha_driver/serial_client.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -74,14 +76,32 @@ private:
    * with a frequency of 0.
    */
   void DisableHeartbeat();
+
   void ProxyJointPositionCb(const Packet & packet);
   void ProxyJointVelocityCb(const Packet & packet);
   void ProxyModeCb(const Packet & packet);
-  void MonitorHeartbeatCb(const Packet & packet);
+
+  /**
+   * @brief Update the @ref last_heartbeat_ timestamp
+   *
+   * @param packet heartbeat packet
+   */
+  void UpdateLastHeartbeatCb(const Packet & packet);
+
+  /**
+   * @brief Verify that a heartbeat packet has been received in the last 5 seconds
+   *
+   * @note If a heartbeat has occurred, it is the user's responsibility to handle the timeout. This
+   * method is not intended to act as a watchdog.
+   */
+  void MonitorHeartbeatCb();
+
+  SerialClient client_;
 
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr state_publisher_;
 
-  SerialClient client_;
+  rclcpp::TimerBase::SharedPtr check_heartbeat_timer_;
+  std::chrono::time_point<std::chrono::steady_clock> last_heartbeat_;
 };
 
 }  // namespace alpha_driver
