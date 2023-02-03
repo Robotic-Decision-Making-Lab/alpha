@@ -32,31 +32,24 @@ class Packet
 {
 public:
   /**
-   * @brief
-   *
-   * @param packet_id
-   * @param device_id
-   */
-  Packet(PacketId packet_id, DeviceId device_id);
-
-  /**
-   * @brief
-   *
+   * @brief Use the default copy constructor for Packets
    */
   Packet(const Packet &) = default;
 
   /**
-   * @brief
+   * @brief Create a new Packet.
    *
-   * @param packet_id
-   * @param device_id
-   * @param data
+   * @remark Each packet has been designed to be immutable, and, therefore, requires the packet
+   * data to be provided at construction.
+   *
+   * @param packet_id type of packet
+   * @param device_id ID of the device that the data represents
+   * @param data packet data
    */
   Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char> data);
 
   /**
-   * @brief Encode the packet's data using the BPL packet structure
-   * specification.
+   * @brief Encode the packet's data using the BPL packet structure specification.
    *
    * @return std::vector<unsigned char>
    */
@@ -79,7 +72,7 @@ public:
   PacketId packet_id() const;
 
   /**
-   * @brief Get the unique device ID that the message targets.
+   * @brief Get the unique device ID that the data represents.
    *
    * @return DeviceId
    */
@@ -95,8 +88,7 @@ public:
 private:
   PacketId packet_id_;
   DeviceId device_id_;
-  std::vector<unsigned char> data_ = {};  // Make sure to initialize in the class because we provide
-                                          // a constructor that doesn't initialize this
+  std::vector<unsigned char> data_;
 };
 
 }  // namespace alpha_driver

@@ -117,10 +117,15 @@ void SerialClient::DisconnectClient()
 
 void SerialClient::Send(const Packet & packet) const
 {
-  std::vector<unsigned char> encoded_data = packet.Encode();
+  try {
+    std::vector<unsigned char> encoded_data = packet.Encode();
 
-  if (write(fd_, encoded_data.data(), encoded_data.size()) < 0) {
-    RCLCPP_WARN(logger_, "An error occurred while attempting to write a message.");  // NOLINT
+    if (write(fd_, encoded_data.data(), encoded_data.size()) < 0) {
+      RCLCPP_WARN(logger_, "An error occurred while attempting to write a message.");  // NOLINT
+    }
+  }
+  catch (const std::exception & e) {
+    RCLCPP_WARN(logger_, e.what());  // NOLINT
   }
 }
 

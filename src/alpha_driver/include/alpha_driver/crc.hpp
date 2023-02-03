@@ -52,21 +52,20 @@ const bool kInputReflected = true;
 const bool kResultReflected = true;
 
 /**
- * @brief Define the lookup table for the CRC calculation.
+ * @brief Lookup table used for the CRC calculation.
  *
- * @note This is pre-computed to speed up the CRC calculation, and can be
- * computed using the following parameters:
+ * @note This is pre-computed to speed up the CRC calculation.
  *
- * Polynomial: 0x4D
- * Initial Value: 0x00
- * Final XOR Value: 0xFF
- * Input Reflected: True
- * Result Reflected: True
- * Use Reflected Lookup Table: False
- *
- * The lookup table can be calculated using the handy-dandy calculator provided
- * in the link below: http://www.sunshine2k.de/coding/javascript/crc/crc_js.html
- *
+ * @remarks To recompute by hand, use the following parameters:
+ *   - Polynomial: 0x4D
+ *   - Initial Value: 0x00
+ *   - Final XOR Value: 0xFF
+ *   - Input Reflected: True
+ *   - Result Reflected: True
+ *   - Use Reflected Lookup Table: False \n
+ *   \n
+ *   For help computing the lookup table, you can use the handy-dandy calculator provided
+ *   in the link below: http://www.sunshine2k.de/coding/javascript/crc/crc_js.html
  */
 const std::array<unsigned char, 256> kCrc8LookupTable = {
   0x00, 0x4D, 0x9A, 0xD7, 0x79, 0x34, 0xE3, 0xAE, 0xF2, 0xBF, 0x68, 0x25, 0x8B, 0xC6, 0x11, 0x5C,
@@ -87,9 +86,9 @@ const std::array<unsigned char, 256> kCrc8LookupTable = {
   0xF4, 0xB9, 0x6E, 0x23, 0x8D, 0xC0, 0x17, 0x5A, 0x06, 0x4B, 0x9C, 0xD1, 0x7F, 0x32, 0xE5, 0xA8};
 
 /**
- * @brief Reflect the data about the center bit.
+ * @brief Reflect data about the center bit.
  *
- * @note This implementation has been inspired by Micheal Barr's "CRC Series,
+ * @remark This implementation has been inspired by Micheal Barr's "CRC Series,
  * Part 3: CRC Implementation Code in C/C++" (2000), retrieved Jan 6, 2023:
  * https://barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
  *
@@ -102,11 +101,11 @@ unsigned char Reflect(std::uint64_t data, int size);
 /**
  * @brief Calculate the CRC value for a message using the CRC8 algorithm.
  *
- * @note This implementation has been inspired by Micheal Barr's "CRC Series,
+ * @remark This implementation has been inspired by Micheal Barr's "CRC Series,
  * Part 3: CRC Implementation Code in C/C++" (2000), retrieved Jan 6, 2023:
  * https://barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
  *
- * @param data message whose CRC should be calculated
+ * @param data packet whose CRC should be calculated
  * @param initial_value CRC initial value
  * @param final_xor_value CRC final XOR value
  * @param input_reflected Reflect the input
@@ -115,15 +114,14 @@ unsigned char Reflect(std::uint64_t data, int size);
  * @return unsigned char
  */
 unsigned char CalculateCrc8(
-  const std::vector<unsigned char> & data, unsigned char polynomial, unsigned char initial_value,
+  const std::vector<unsigned char> & data, unsigned char initial_value,
   unsigned char final_xor_value, bool input_reflected, bool result_reflected,
   const std::array<unsigned char, 256> & lookup_table);
 
 /**
- * @brief Calculate the CRC value for a message using the BPL protocol
- * definition.
+ * @brief Calculate the CRC value for a packet using the BPL protocol specification.
  *
- * @param data
+ * @param data packet whose CRC should be calculated using the BPL specification
  * @return unsigned char
  */
 unsigned char CalculateBplCrc8(const std::vector<unsigned char> & data);

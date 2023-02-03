@@ -31,12 +31,6 @@
 namespace alpha_driver
 {
 
-Packet::Packet(PacketId packet_id, DeviceId device_id)
-: packet_id_(packet_id),
-  device_id_(device_id)
-{
-}
-
 Packet::Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char> data)
 : packet_id_(packet_id),
   device_id_(device_id),

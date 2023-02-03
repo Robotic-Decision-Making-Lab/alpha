@@ -38,30 +38,28 @@ class SerialClient
 {
 public:
   /**
-   * @brief Use the default constructor for the serial client
+   * @brief Construct a new Serial Client object
    *
-   * @note We will use the @ref ConnectClient method to handle most of our setup
+   * @remark We use the @ref ConnectClient method to handle most of our setup
    *
+   * @param logger logger provided for use by a ROS2 node
    */
   explicit SerialClient(const rclcpp::Logger & logger);
 
   /**
-   * @brief
+   * @brief Attempt to establish a connection with the Alpha manipulator.
    *
-   * @param device
-   * @param timeout_ms
+   * @remark This configures the serial port for R/W operation at a baudrate of 115200.
+   *
+   * @param device full path to the serial device file
+   * @param timeout_ms timeout (ms) between serial port reads; used for VTIME
    */
   void ConnectClient(const std::string & device, int timeout_ms = 500);
 
   /**
    * @brief Shutdown the serial client.
    *
-   * @note The main intention for this method is to shutdown the RX thread. While we could
-   * accomplish this in the destructor, that might not be safe if the thread experiences unknown
-   * behavior on shutdown. In the future, if this ultimately demonstrates itself to be safe, then
-   * this method will be eliminated in favor of shutting down in the destructor for usability
-   * purposes.
-   *
+   * @remark The main intention for this method is to shutdown the RX thread.
    */
   void DisconnectClient();
 
@@ -74,11 +72,10 @@ public:
   void Send(const Packet & packet) const;
 
   /**
-   * @brief Register a new callback function to a specified packet type.
+   * @brief Register a new callback function for a specified packet type.
    *
-   * @param packet_type type of packet that the callback should be signaled on
-   * @param callback function that should be executed when a message of a given
-   * type is received
+   * @param packet_type type of packet that the callback should be registered to
+   * @param callback function that should be executed when a message of a given type is received
    */
   void RegisterCallback(PacketId packet_type, const std::function<void(Packet)> & callback);
 
@@ -96,7 +93,6 @@ public:
 private:
   /**
    * @brief Defines the current state of the serial port.
-   *
    */
   enum class PortState
   {
@@ -109,24 +105,25 @@ private:
    *
    * @note This method is executed by the RX thread. Furthermore, this method is
    * a blocking method that runs indefinitely. The main loop is terminated by
-   * the client status flag.
-   *
+   * the atomic @ref running_ flag.
    */
   void Read();
 
-  // Map used to store the callback functions for messages.
-  // Keys should be the ID of a message and the values are the callback
-  // functions to execute when a message the respective packet ID is received.
+  /**
+   * @brief Map used to store the callback functions for messages.
+   *
+   * @note Keys should be the ID of a message and the values are the callback functions to execute
+   * when a message the respective packet ID is received.
+   */
   std::unordered_map<PacketId, std::vector<std::function<void(Packet)>>> callbacks_;
 
   // Serial port file descriptor
   int fd_;
 
-  std::atomic<bool> running_{false};  // This flag is used to stop the RX main loop
+  std::atomic<bool> running_{false};  // This flag is used to control the RX main loop
   PortState port_status_ = PortState::kClosed;
 
-  // Thread responsible for receiving incoming data and executing the respective
-  // callbacks
+  // Thread responsible for receiving incoming data and executing the respective callbacks
   std::thread rx_worker_;
 
   // We use the built-in ROS logger here for the sake of logging consistency

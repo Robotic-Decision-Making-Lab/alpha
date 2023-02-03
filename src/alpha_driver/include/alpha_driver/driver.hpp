@@ -32,14 +32,52 @@ namespace alpha_driver
 class Driver : public rclcpp::Node
 {
 public:
+  /**
+   * @brief Construct a new Driver object.
+   */
   Driver();
+
+  /**
+   * @brief Destroy the Driver object.
+   *
+   * @note Overrides the default destructor to shut down the serial client.
+   */
   ~Driver();
 
 private:
+  /**
+   * @brief Enable heartbeat messages from the Alpha manipulator.
+   *
+   * @note Heartbeat messages are defined by the BPL protocol simply as messages that are
+   * automatically sent by the manipulator - not as a unique packet type. The messages requested for
+   * automatic sending include velocity, position, and mode messages. These messages are sent by
+   * all devices.
+   *
+   * @param freq frequency that the heartbeat messages should be sent at
+   */
   void EnableHeartbeat(const int freq);
+
+  /**
+   * @brief Set the frequency that heartbeat messages are sent at.
+   *
+   * @note Heartbeat messages can be sent at frequencies in the range [0, 255]. If the frequency is
+   * set to 0, then the heartbeat will be disabled.
+   *
+   * @param freq
+   */
   void SetHeartbeatFreq(const int freq);
+
+  /**
+   * @brief Disable heartbeat messages.
+   *
+   * @remark This is implemented for usability purposes and simply calls the @ref SetHeartbeatFreq
+   * with a frequency of 0.
+   */
   void DisableHeartbeat();
-  void HeartbeatMonitorCb(const Packet & packet);
+  void ProxyJointPositionCb(const Packet & packet);
+  void ProxyJointVelocityCb(const Packet & packet);
+  void ProxyModeCb(const Packet & packet);
+  void MonitorHeartbeatCb(const Packet & packet);
 
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr state_publisher_;
 

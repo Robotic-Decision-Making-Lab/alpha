@@ -47,7 +47,7 @@ Driver::Driver()
 
   try {
     // Attempt to connect the serial client
-    // We don't expose the timeout to the user API to help avoid usability concerns
+    // We don't expose the timeout to the user API to avoid usability concerns
     client_.ConnectClient(address);
   }
   catch (const std::exception & e) {
@@ -68,10 +68,7 @@ Driver::Driver()
 
 Driver::~Driver()
 {
-  // Disable the heartbeat
   DisableHeartbeat();
-
-  // Close the serial client
   client_.DisconnectClient();
 }
 

@@ -24,9 +24,7 @@ namespace alpha_driver
 {
 
 /**
- * @brief The device ID is a unique identifier used to denote each of the
- * manipulator's joints.
- *
+ * @brief The device ID is a unique identifier used to denote each of the manipulator's joints.
  */
 enum class DeviceId : unsigned char
 {
