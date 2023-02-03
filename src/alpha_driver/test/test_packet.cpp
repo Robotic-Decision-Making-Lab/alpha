@@ -23,22 +23,23 @@
 #include "alpha_driver/crc.hpp"
 #include "alpha_driver/packet.hpp"
 #include "alpha_driver/packet_id.hpp"
+#include "alpha_driver/serial_client.hpp"
 
 namespace test_alpha_driver
 {
 
 TEST(PacketTest, TestPacketEncode)
 {
-  const std::vector<unsigned char> data = {0x01, 0x02, 0x03, 0x04};
+  const std::vector<unsigned char> data = {
+    static_cast<unsigned char>(alpha_driver::PacketId::kPosition)};
 
   // Create an encoded test packet using the BPL structure based off of the test
   // data
-  const std::vector<unsigned char> expected_encoding = {0x09, 0x01, 0x02, 0x03, 0x04,
-                                                        0x01, 0xFF, 0x08, 0x5D, 0x00};
+  const std::vector<unsigned char> expected_encoding = {0x06, 0x03, 0x60, 0x01, 0x05, 0x52, 0x00};
 
   // Construct a new packet using the data and the expected IDs
-  auto packet =
-    alpha_driver::Packet(alpha_driver::PacketId::kMode, alpha_driver::DeviceId::kAllJoints, data);
+  auto packet = alpha_driver::Packet(
+    alpha_driver::PacketId::kRequest, alpha_driver::DeviceId::kLinearJaws, data);
 
   ASSERT_THAT(packet.Encode(), ::testing::ElementsAreArray(expected_encoding));
 }

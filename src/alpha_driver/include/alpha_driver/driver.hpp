@@ -22,8 +22,8 @@
 
 #include "alpha_driver/packet.hpp"
 #include "alpha_driver/serial_client.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/string.hpp"
 
 namespace alpha_driver
@@ -35,13 +35,14 @@ public:
   Driver();
 
 private:
-  void PublishState(Packet & packet);
+  void PublishState(const Packet & packet);
   void RequestState();
 
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
-  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr state_publisher_;
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr state_publisher_;
 
   rclcpp::TimerBase::SharedPtr request_state_timer_;
+
+  SerialClient client_;
 };
 
 }  // namespace alpha_driver

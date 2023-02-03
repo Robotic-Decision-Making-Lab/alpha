@@ -42,6 +42,12 @@ public:
   /**
    * @brief
    *
+   */
+  Packet(const Packet &) = default;
+
+  /**
+   * @brief
+   *
    * @param packet_id
    * @param device_id
    * @param data

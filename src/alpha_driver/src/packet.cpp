@@ -81,6 +81,10 @@ Packet Packet::Decode(const std::vector<unsigned char> & data)
   // Note that an exception will be raised if the decoding fails
   std::vector<unsigned char> decoded_data = CobsDecode(data);
 
+  if (decoded_data.empty()) {
+    throw std::runtime_error("Decoded data is empty");
+  }
+
   // Pop the CRC and make sure that it is defined correctly
   const unsigned char actual_crc = decoded_data.back();
   decoded_data.pop_back();

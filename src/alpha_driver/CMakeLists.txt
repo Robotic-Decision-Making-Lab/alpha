@@ -17,6 +17,8 @@ endif()
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp
+  geometry_msgs
+  sensor_msgs
 )
 
 find_package(ament_cmake)
@@ -42,6 +44,12 @@ add_executable(alpha_driver_node src/driver.cpp)
 target_include_directories(alpha_driver_node PRIVATE include)
 target_link_libraries(alpha_driver_node ${PROJECT_NAME})
 ament_target_dependencies(alpha_driver_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
+
+install(
+  TARGETS
+  alpha_driver_node
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION bin

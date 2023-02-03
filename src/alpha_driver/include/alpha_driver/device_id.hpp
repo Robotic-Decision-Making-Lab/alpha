@@ -36,6 +36,8 @@ enum class DeviceId : unsigned char
   kBendShoulder = 0x04,
   kRotateBase = 0x05,
   kAllJoints = 0xFF,
+  kHeartbeat = 0x07,
+  kTest = 0x0a,
 };
 
 }  // namespace alpha_driver

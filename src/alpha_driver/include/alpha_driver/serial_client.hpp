@@ -38,12 +38,20 @@ class SerialClient
 {
 public:
   /**
-   * @brief Construct a new Serial Client object.
+   * @brief Use the default constructor for the serial client
+   *
+   * @note We will use the @ref ConnectClient method to handle most of our setup
+   *
+   */
+  explicit SerialClient(const rclcpp::Logger & logger);
+
+  /**
+   * @brief
    *
    * @param device
    * @param timeout_ms
    */
-  explicit SerialClient(const std::string & device, int timeout_ms = 500);
+  void ConnectClient(const std::string & device, int timeout_ms);
 
   /**
    * @brief Shutdown the serial client.
@@ -55,7 +63,7 @@ public:
    * purposes.
    *
    */
-  void Close();
+  void DisconnectClient();
 
   /**
    * @brief Send a packet over the serial connection.
@@ -72,7 +80,7 @@ public:
    * @param callback function that should be executed when a message of a given
    * type is received
    */
-  void Receive(PacketId packet_type, const std::function<void(Packet)> & callback);
+  void RegisterCallback(PacketId packet_type, const std::function<void(Packet)> & callback);
 
   /**
    * @brief Indicates whether or not the arm connection is currently active.
@@ -114,7 +122,7 @@ private:
   // Serial port file descriptor
   int fd_;
 
-  std::atomic<bool> running_ = false;  // This flag is used to stop the RX main loop
+  std::atomic<bool> running_{false};  // This flag is used to stop the RX main loop
   PortState port_status_ = PortState::kClosed;
 
   // Thread responsible for receiving incoming data and executing the respective
@@ -126,7 +134,7 @@ private:
 
   // We use the built-in ROS logger here for the sake of logging consistency
   // This logger also uses spdlog which was what I would have used anyway
-  rclcpp::Logger logger_ = rclcpp::get_logger("SerialClient");
+  rclcpp::Logger logger_;
 };
 
 }  // namespace alpha_driver
