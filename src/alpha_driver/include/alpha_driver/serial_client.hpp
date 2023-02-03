@@ -51,7 +51,7 @@ public:
    * @param device
    * @param timeout_ms
    */
-  void ConnectClient(const std::string & device, int timeout_ms);
+  void ConnectClient(const std::string & device, int timeout_ms = 500);
 
   /**
    * @brief Shutdown the serial client.
@@ -128,9 +128,6 @@ private:
   // Thread responsible for receiving incoming data and executing the respective
   // callbacks
   std::thread rx_worker_;
-
-  // Create an incoming data buffer of size 256
-  std::vector<unsigned char> buffer_ = std::vector<unsigned char>(256);
 
   // We use the built-in ROS logger here for the sake of logging consistency
   // This logger also uses spdlog which was what I would have used anyway

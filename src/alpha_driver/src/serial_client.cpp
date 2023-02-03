@@ -24,6 +24,7 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include <array>
 #include <cerrno>
 #include <chrono>
 #include <iostream>
@@ -135,31 +136,49 @@ void SerialClient::Read()
 {
   running_.store(true);
 
+  std::array<unsigned char, 1> data;
+
+  // Start by waiting for the end of a packet
+  // Once we have reached the end of the packet then we can start processing data like normal
   while (running_.load()) {
-    buffer_.clear();
+    const int size = read(fd_, &data, 1);
 
-    // We need to make sure to resize each time
-    buffer_.resize(256);
+    if (size > 0 && data[0] == 0) {
+      break;
+    }
+  }
 
-    const int size = read(fd_, buffer_.data(), buffer_.size());
+  // Create a buffer to store incoming data
+  std::vector<unsigned char> buffer;
+
+  // Now we can start processing data
+  while (running_.load()) {
+    // Note that we have to read byte-by-byte. This is because the BPL protocol doesn't include
+    // a header which defines the size of the packet. Instead we have to read until there is a
+    // packet delimiter (0x00) and process that data.
+    const int size = read(fd_, &data, 1);
 
     if (size < 0) {
       RCLCPP_WARN(  // NOLINT
         logger_, "An error occurred while attempting to read a message from the serial port.");
-    }
+    } else if (size > 0) {
+      buffer.push_back(data[0]);
 
-    buffer_.resize(size);
+      // We have reached the end of the packet; now try to decode it
+      if (data[0] == 0) {
+        try {
+          const Packet packet = Packet::Decode(buffer);
 
-    if (size > 0) {
-      try {
-        const Packet data = Packet::Decode(buffer_);
-
-        for (auto & callback : callbacks_[data.packet_id()]) {
-          callback(data);
+          for (auto & callback : callbacks_[packet.packet_id()]) {
+            callback(packet);
+          }
         }
-      }
-      catch (const std::exception & e) {
-        RCLCPP_WARN(logger_, e.what());  // NOLINT
+        catch (const std::exception & e) {
+          RCLCPP_WARN(logger_, e.what());  // NOLINT
+        }
+
+        // Empty the buffer before we start reading the next packet
+        buffer.clear();
       }
     }
   }

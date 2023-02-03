@@ -33,14 +33,15 @@ class Driver : public rclcpp::Node
 {
 public:
   Driver();
+  ~Driver();
 
 private:
-  void PublishState(const Packet & packet);
-  void RequestState();
+  void EnableHeartbeat(const int freq);
+  void SetHeartbeatFreq(const int freq);
+  void DisableHeartbeat();
+  void HeartbeatMonitorCb(const Packet & packet);
 
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr state_publisher_;
-
-  rclcpp::TimerBase::SharedPtr request_state_timer_;
 
   SerialClient client_;
 };

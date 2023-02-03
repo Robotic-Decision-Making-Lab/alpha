@@ -20,13 +20,10 @@
 
 #include "alpha_driver/driver.hpp"
 
-#include <chrono>
 #include <vector>
 
 #include "alpha_driver/device_id.hpp"
 #include "alpha_driver/packet_id.hpp"
-
-using namespace std::chrono_literals;
 
 namespace alpha_driver
 {
@@ -35,50 +32,72 @@ Driver::Driver()
 : Node("AlphaDriver"),
   client_(this->get_logger())
 {
-  // Define the parameter descriptors for our ROS parameters
   auto address_desc = rcl_interfaces::msg::ParameterDescriptor{};
   address_desc.description = "Full path to the serial port file";
 
-  auto timeout_desc = rcl_interfaces::msg::ParameterDescriptor{};
-  timeout_desc.description =
-    "Maximum time (ms) to wait for serial data before attempting a new read";
+  auto state_freq_desc = rcl_interfaces::msg::ParameterDescriptor{};
+  state_freq_desc.description = "Frequency that the robot state should be published at";
 
-  // Declare ROS parameters
   this->declare_parameter("address", "", address_desc);
-  this->declare_parameter("timeout", 500, timeout_desc);
+  this->declare_parameter("freq", 1, state_freq_desc);
 
-  // Read our parameter values to use for the serial client
   const std::string address =
     this->get_parameter("address").get_parameter_value().get<std::string>();
-  const int timeout = this->get_parameter("timeout").get_parameter_value().get<int>();
+  const int state_freq = this->get_parameter("freq").get_parameter_value().get<int>();
 
-  // Attempt to connect the serial client
-  client_.ConnectClient(address, timeout);
+  try {
+    // Attempt to connect the serial client
+    // We don't expose the timeout to the user API to help avoid usability concerns
+    client_.ConnectClient(address);
+  }
+  catch (const std::exception & e) {
+    RCLCPP_ERROR(this->get_logger(), e.what());  // NOLINT
+    return;
+  }
+
+  // Disable any previous heartbeat configurations
+  DisableHeartbeat();
+
+  // Configure the new heartbeat request
+  EnableHeartbeat(state_freq);
 
   // Connect a callback to republish received state data
-  client_.RegisterCallback(
-    PacketId::kPosition, std::bind(&Driver::PublishState, this, std::placeholders::_1));
-
-  // Request the state from the manipulator at a frequency of 1hz
-  request_state_timer_ = this->create_wall_timer(1000ms, std::bind(&Driver::RequestState, this));
+  // client_.RegisterCallback(
+  //   PacketId::kPosition, std::bind(&Driver::PublishState, this, std::placeholders::_1));
 }
 
-void Driver::PublishState(const Packet & packet)
+Driver::~Driver()
 {
-  for (auto data : packet.data()) {
-    RCLCPP_INFO(this->get_logger(), "data: 0x%02hhx", data);
-  }
+  // Disable the heartbeat
+  DisableHeartbeat();
+
+  // Close the serial client
+  client_.DisconnectClient();
 }
 
-void Driver::RequestState()
+void Driver::EnableHeartbeat(const int freq)
 {
-  const std::vector<unsigned char> data = {
-    static_cast<unsigned char>(alpha_driver::PacketId::kPosition)};
+  // Specify that we want the position, velocity, and mode to be sent automatically
+  const std::vector<unsigned char> heartbeat_config = {
+    static_cast<unsigned char>(alpha_driver::PacketId::kPosition),
+    static_cast<unsigned char>(alpha_driver::PacketId::kVelocity),
+    static_cast<unsigned char>(alpha_driver::PacketId::kMode)};
 
-  const Packet packet(PacketId::kRequest, DeviceId::kLinearJaws, data);
+  const Packet heartbeat_request(PacketId::kHeartbeatSet, DeviceId::kAllJoints, heartbeat_config);
 
-  client_.Send(packet);
+  client_.Send(heartbeat_request);
+
+  SetHeartbeatFreq(freq);
 }
+
+void Driver::SetHeartbeatFreq(const int freq)
+{
+  const std::vector<unsigned char> heartbeat_frequency = {static_cast<unsigned char>(freq)};
+  const Packet request(PacketId::kHeartbeatFreqency, DeviceId::kAllJoints, heartbeat_frequency);
+  client_.Send(request);
+}
+
+void Driver::DisableHeartbeat() { SetHeartbeatFreq(0); }
 
 }  // namespace alpha_driver
 

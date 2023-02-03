@@ -54,8 +54,7 @@ std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data)
 
       // Handle the case where the block size is 254 or greater
       // Note that the BPL specification dictates that packets may not be larger
-      // than 254 bytes including the footer; however, we handle this case for
-      // the sake of security.
+      // than 254 bytes including the footer; however, we handle this case as a sanity check
       if (current_block_size >= 254) {
         encoded_data[block_start] = static_cast<uint8_t>(current_block_size + 1);
 
