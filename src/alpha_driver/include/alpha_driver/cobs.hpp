@@ -34,7 +34,7 @@ namespace alpha_driver
  * @param data
  * @return std::vector<unsigned char>
  */
-std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data);
+std::vector<unsigned char> cobs_encode(const std::vector<unsigned char> & data);
 
 /**
  * @brief Decode a data packet that has been encoded using the COBS algorithm.
@@ -45,6 +45,6 @@ std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data);
  * @param data serial data that is encoded with COBS encoding and now needs to be decoded
  * @return std::vector<unsigned char>
  */
-std::vector<unsigned char> CobsDecode(const std::vector<unsigned char> & data);
+std::vector<unsigned char> cobs_decode(const std::vector<unsigned char> & data);
 
 }  // namespace alpha_driver

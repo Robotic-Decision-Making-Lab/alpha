@@ -50,7 +50,7 @@ Driver::Driver()
   try {
     // Attempt to connect the serial client
     // We don't expose the timeout to the user API to avoid usability concerns
-    client_.ConnectClient(address);
+    client_.connect_client(address);
   }
   catch (const std::exception & e) {
     RCLCPP_ERROR(this->get_logger(), e.what());  // NOLINT
@@ -58,38 +58,35 @@ Driver::Driver()
   }
 
   // Disable any previous heartbeat configurations
-  DisableHeartbeat();
+  disable_heartbeat();
 
   // Configure the new heartbeat request
-  EnableHeartbeat(state_freq);
+  enable_heartbeat(state_freq);
 
   last_heartbeat_ = std::chrono::steady_clock::now();
 
   // Setup a timer to make sure that we have an active connection with the arm
   check_heartbeat_timer_ =
-    this->create_wall_timer(1000ms, std::bind(&Driver::MonitorHeartbeatCb, this));
+    this->create_wall_timer(1000ms, std::bind(&Driver::monitor_heartbeat_cb, this));
 
   // Connect packet callbacks
-  client_.RegisterCallback(
-    PacketId::kPosition, std::bind(&Driver::ProxyJointPositionCb, this, std::placeholders::_1));
+  client_.register_callback(
+    PacketId::kPosition, std::bind(&Driver::proxy_joint_position_cb, this, std::placeholders::_1));
 
-  client_.RegisterCallback(
-    PacketId::kVelocity, std::bind(&Driver::ProxyJointVelocityCb, this, std::placeholders::_1));
+  client_.register_callback(
+    PacketId::kVelocity, std::bind(&Driver::proxy_joint_velocity_cb, this, std::placeholders::_1));
 
-  client_.RegisterCallback(
-    PacketId::kMode, std::bind(&Driver::ProxyModeCb, this, std::placeholders::_1));
-
-  client_.RegisterCallback(
-    PacketId::kMode, std::bind(&Driver::UpdateLastHeartbeatCb, this, std::placeholders::_1));
+  client_.register_callback(
+    PacketId::kMode, std::bind(&Driver::update_last_heartbeat_cb, this, std::placeholders::_1));
 }
 
 Driver::~Driver()
 {
-  DisableHeartbeat();
-  client_.DisconnectClient();
+  disable_heartbeat();
+  client_.disconnect_client();
 }
 
-void Driver::EnableHeartbeat(const int freq)
+void Driver::enable_heartbeat(const int freq)
 {
   // Specify that we want the position, velocity, and mode to be sent automatically
   const std::vector<unsigned char> heartbeat_config = {
@@ -99,38 +96,47 @@ void Driver::EnableHeartbeat(const int freq)
 
   const Packet heartbeat_request(PacketId::kHeartbeatSet, DeviceId::kAllJoints, heartbeat_config);
 
-  client_.Send(heartbeat_request);
+  client_.send(heartbeat_request);
 
-  SetHeartbeatFreq(freq);
+  set_heartbeat_freq(freq);
 }
 
-void Driver::SetHeartbeatFreq(const int freq)
+void Driver::set_heartbeat_freq(const int freq)
 {
   const std::vector<unsigned char> heartbeat_frequency = {static_cast<unsigned char>(freq)};
   const Packet request(PacketId::kHeartbeatFreqency, DeviceId::kAllJoints, heartbeat_frequency);
-  client_.Send(request);
+  client_.send(request);
 }
 
-void Driver::DisableHeartbeat() { SetHeartbeatFreq(0); }
+void Driver::disable_heartbeat() { set_heartbeat_freq(0); }
 
-void Driver::ProxyJointPositionCb(const Packet & packet)
-{ /* do cool things here */
+void Driver::proxy_joint_position_cb(const Packet & packet)
+{
+  // The data was improperly formatted - we won't be able to cast to a float
+  if (packet.data().size() != 4) {
+    return;
+  }
+
+  float position;
+  std::memcpy(&position, &packet.data()[0], sizeof(position));  // NOLINT
 }
 
-void Driver::ProxyJointVelocityCb(const Packet & packet)
-{ /* do cool things here */
+void Driver::proxy_joint_velocity_cb(const Packet & packet)
+{
+  if (packet.data().size() != 4) {
+    return;
+  }
+
+  float velocity;
+  std::memcpy(&velocity, &packet.data()[0], sizeof(velocity));  // NOLINT
 }
 
-void Driver::ProxyModeCb(const Packet & packet)
-{ /* do cool things here */
-}
-
-void Driver::UpdateLastHeartbeatCb(const Packet &)
+void Driver::update_last_heartbeat_cb(const Packet &)
 {
   last_heartbeat_ = std::chrono::steady_clock::now();
 }
 
-void Driver::MonitorHeartbeatCb()
+void Driver::monitor_heartbeat_cb()
 {
   if (std::chrono::steady_clock::now() - last_heartbeat_ > 5s) {
     RCLCPP_WARN(  // NOLINT

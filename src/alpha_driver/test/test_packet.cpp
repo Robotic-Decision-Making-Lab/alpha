@@ -41,7 +41,7 @@ TEST(PacketTest, TestPacketEncode)
   auto packet = alpha_driver::Packet(
     alpha_driver::PacketId::kRequest, alpha_driver::DeviceId::kLinearJaws, data);
 
-  ASSERT_THAT(packet.Encode(), ::testing::ElementsAreArray(expected_encoding));
+  ASSERT_THAT(packet.encode(), ::testing::ElementsAreArray(expected_encoding));
 }
 
 TEST(PacketTest, TestPacketDecode)
@@ -51,7 +51,7 @@ TEST(PacketTest, TestPacketDecode)
 
   const std::vector<unsigned char> decoded_data = {0x01, 0x02, 0x03, 0x04};
 
-  const alpha_driver::Packet packet = alpha_driver::Packet::Decode(encoded_data);
+  const alpha_driver::Packet packet = alpha_driver::Packet::decode(encoded_data);
 
   ASSERT_THAT(packet.data(), ::testing::ElementsAreArray(decoded_data));
 }

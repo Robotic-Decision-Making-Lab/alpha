@@ -26,7 +26,6 @@
 #include "alpha_driver/serial_client.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
-#include "std_msgs/msg/string.hpp"
 
 namespace alpha_driver
 {
@@ -47,6 +46,12 @@ public:
   ~Driver();
 
 private:
+  enum class UpdateState
+  {
+    kReady,
+    kStale,
+  };
+
   /**
    * @brief Enable heartbeat messages from the Alpha manipulator.
    *
@@ -57,7 +62,7 @@ private:
    *
    * @param freq frequency that the heartbeat messages should be sent at
    */
-  void EnableHeartbeat(const int freq);
+  void enable_heartbeat(const int freq);
 
   /**
    * @brief Set the frequency that heartbeat messages are sent at.
@@ -67,7 +72,7 @@ private:
    *
    * @param freq
    */
-  void SetHeartbeatFreq(const int freq);
+  void set_heartbeat_freq(const int freq);
 
   /**
    * @brief Disable heartbeat messages.
@@ -75,18 +80,17 @@ private:
    * @remark This is implemented for usability purposes and simply calls the @ref SetHeartbeatFreq
    * with a frequency of 0.
    */
-  void DisableHeartbeat();
+  void disable_heartbeat();
 
-  void ProxyJointPositionCb(const Packet & packet);
-  void ProxyJointVelocityCb(const Packet & packet);
-  void ProxyModeCb(const Packet & packet);
+  void proxy_joint_position_cb(const Packet & packet);
+  void proxy_joint_velocity_cb(const Packet & packet);
 
   /**
    * @brief Update the @ref last_heartbeat_ timestamp
    *
    * @param packet heartbeat packet
    */
-  void UpdateLastHeartbeatCb(const Packet & packet);
+  void update_last_heartbeat_cb(const Packet & packet);
 
   /**
    * @brief Verify that a heartbeat packet has been received in the last 5 seconds
@@ -94,10 +98,11 @@ private:
    * @note If a heartbeat has occurred, it is the user's responsibility to handle the timeout. This
    * method is not intended to act as a watchdog.
    */
-  void MonitorHeartbeatCb();
+  void monitor_heartbeat_cb();
 
   SerialClient client_;
 
+  sensor_msgs::msg::JointState state_msg_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr state_publisher_;
 
   rclcpp::TimerBase::SharedPtr check_heartbeat_timer_;

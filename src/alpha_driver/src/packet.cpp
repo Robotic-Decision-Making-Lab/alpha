@@ -38,7 +38,7 @@ Packet::Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char
 {
 }
 
-std::vector<unsigned char> Packet::Encode() const
+std::vector<unsigned char> Packet::encode() const
 {
   if (data_.empty()) {
     throw std::runtime_error(
@@ -58,22 +58,22 @@ std::vector<unsigned char> Packet::Encode() const
   data.push_back(data.size() + 2);
 
   // Calculate the CRC from the data and add it to the buffer
-  data.push_back(CalculateBplCrc8(data));
+  data.push_back(calculate_bpl_crc8(data));
 
   // Encode the data using COBS encoding
-  std::vector<unsigned char> encoded_data = CobsEncode(data);
+  std::vector<unsigned char> encoded_data = cobs_encode(data);
 
   return encoded_data;
 }
 
-Packet Packet::Decode(const std::vector<unsigned char> & data)
+Packet Packet::decode(const std::vector<unsigned char> & data)
 {
   if (data.empty()) {
     throw std::runtime_error("An empty data packet was received for decoding.");
   }
 
   // Note that an exception will be raised if the decoding fails
-  std::vector<unsigned char> decoded_data = CobsDecode(data);
+  std::vector<unsigned char> decoded_data = cobs_decode(data);
 
   if (decoded_data.empty()) {
     throw std::runtime_error("Decoded data is empty");
@@ -83,7 +83,7 @@ Packet Packet::Decode(const std::vector<unsigned char> & data)
   const unsigned char actual_crc = decoded_data.back();
   decoded_data.pop_back();
 
-  const unsigned char expected_crc = CalculateBplCrc8(decoded_data);
+  const unsigned char expected_crc = calculate_bpl_crc8(decoded_data);
 
   if (actual_crc != expected_crc) {
     throw std::runtime_error("The expected and actual CRC values do not match.");

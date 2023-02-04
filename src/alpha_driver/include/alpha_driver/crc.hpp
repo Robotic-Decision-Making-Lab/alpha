@@ -96,7 +96,7 @@ const std::array<unsigned char, 256> kCrc8LookupTable = {
  * @param size size of the data being reflected
  * @return unsigned char
  */
-unsigned char Reflect(std::uint64_t data, int size);
+unsigned char reflect(std::uint64_t data, int size);
 
 /**
  * @brief Calculate the CRC value for a message using the CRC8 algorithm.
@@ -113,7 +113,7 @@ unsigned char Reflect(std::uint64_t data, int size);
  * @param lookup_table Lookup table used for CRC calculation
  * @return unsigned char
  */
-unsigned char CalculateCrc8(
+unsigned char calculate_crc8(
   const std::vector<unsigned char> & data, unsigned char initial_value,
   unsigned char final_xor_value, bool input_reflected, bool result_reflected,
   const std::array<unsigned char, 256> & lookup_table);
@@ -124,6 +124,6 @@ unsigned char CalculateCrc8(
  * @param data packet whose CRC should be calculated using the BPL specification
  * @return unsigned char
  */
-unsigned char CalculateBplCrc8(const std::vector<unsigned char> & data);
+unsigned char calculate_bpl_crc8(const std::vector<unsigned char> & data);
 
 }  // namespace alpha_driver

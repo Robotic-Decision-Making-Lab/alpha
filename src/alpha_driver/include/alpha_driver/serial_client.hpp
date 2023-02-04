@@ -54,14 +54,14 @@ public:
    * @param device full path to the serial device file
    * @param timeout_ms timeout (ms) between serial port reads; used for VTIME
    */
-  void ConnectClient(const std::string & device, int timeout_ms = 500);
+  void connect_client(const std::string & device, int timeout_ms = 500);
 
   /**
    * @brief Shutdown the serial client.
    *
    * @remark The main intention for this method is to shutdown the RX thread.
    */
-  void DisconnectClient();
+  void disconnect_client();
 
   /**
    * @brief Send a packet over the serial connection.
@@ -69,7 +69,7 @@ public:
    * @param packet message to send to the Reach Alpha manipulator; the data
    * should not yet be encoded.
    */
-  void Send(const Packet & packet) const;
+  void send(const Packet & packet) const;
 
   /**
    * @brief Register a new callback function for a specified packet type.
@@ -77,7 +77,7 @@ public:
    * @param packet_type type of packet that the callback should be registered to
    * @param callback function that should be executed when a message of a given type is received
    */
-  void RegisterCallback(PacketId packet_type, const std::function<void(Packet)> & callback);
+  void register_callback(PacketId packet_type, const std::function<void(Packet)> & callback);
 
   /**
    * @brief Indicates whether or not the arm connection is currently active.
@@ -107,7 +107,7 @@ private:
    * a blocking method that runs indefinitely. The main loop is terminated by
    * the atomic @ref running_ flag.
    */
-  void Read();
+  void read_port();
 
   /**
    * @brief Map used to store the callback functions for messages.

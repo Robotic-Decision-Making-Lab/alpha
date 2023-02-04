@@ -41,7 +41,7 @@ SerialClient::SerialClient(const rclcpp::Logger & logger)
 {
 }
 
-void SerialClient::ConnectClient(const std::string & device, int timeout_ms)
+void SerialClient::connect_client(const std::string & device, int timeout_ms)
 {
   if (device.empty()) {
     throw std::runtime_error("Attempted to open file using an unassigned file path.");
@@ -96,7 +96,7 @@ void SerialClient::ConnectClient(const std::string & device, int timeout_ms)
   }
 
   // Start reading data from the serial port
-  rx_worker_ = std::thread(&SerialClient::Read, this);
+  rx_worker_ = std::thread(&SerialClient::read_port, this);
 
   // Give the RX thread a few ms to start up
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -108,17 +108,17 @@ void SerialClient::ConnectClient(const std::string & device, int timeout_ms)
   }
 }
 
-void SerialClient::DisconnectClient()
+void SerialClient::disconnect_client()
 {
   running_.store(false);
   rx_worker_.join();
   close(fd_);
 }
 
-void SerialClient::Send(const Packet & packet) const
+void SerialClient::send(const Packet & packet) const
 {
   try {
-    std::vector<unsigned char> encoded_data = packet.Encode();
+    std::vector<unsigned char> encoded_data = packet.encode();
 
     if (write(fd_, encoded_data.data(), encoded_data.size()) < 0) {
       RCLCPP_WARN(logger_, "An error occurred while attempting to write a message.");  // NOLINT
@@ -129,7 +129,7 @@ void SerialClient::Send(const Packet & packet) const
   }
 }
 
-void SerialClient::RegisterCallback(
+void SerialClient::register_callback(
   PacketId packet_type, const std::function<void(Packet)> & callback)
 {
   callbacks_[packet_type].push_back(callback);
@@ -137,7 +137,7 @@ void SerialClient::RegisterCallback(
 
 bool SerialClient::active() const { return (running_.load() && port_status_ == PortState::kOpen); }
 
-void SerialClient::Read()
+void SerialClient::read_port()
 {
   running_.store(true);
 
@@ -172,7 +172,7 @@ void SerialClient::Read()
       // We have reached the end of the packet; now try to decode it
       if (data[0] == 0) {
         try {
-          const Packet packet = Packet::Decode(buffer);
+          const Packet packet = Packet::decode(buffer);
 
           for (auto & callback : callbacks_[packet.packet_id()]) {
             callback(packet);

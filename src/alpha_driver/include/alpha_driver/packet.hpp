@@ -53,7 +53,7 @@ public:
    *
    * @return std::vector<unsigned char>
    */
-  std::vector<unsigned char> Encode() const;
+  std::vector<unsigned char> encode() const;
 
   /**
    * @brief Decode a packet that has been encoded using the BPL communication
@@ -62,7 +62,7 @@ public:
    * @param data
    * @return Packet
    */
-  static Packet Decode(const std::vector<unsigned char> & data);
+  static Packet decode(const std::vector<unsigned char> & data);
 
   /**
    * @brief Get the unique packet identifier for a given message.

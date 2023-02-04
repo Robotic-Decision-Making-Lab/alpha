@@ -27,7 +27,7 @@
 namespace alpha_driver
 {
 
-std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data)
+std::vector<unsigned char> cobs_encode(const std::vector<unsigned char> & data)
 {
   // Initialize the encoded data with 0x00 prepended
   // this will be overwritten once the count to the next 0x00 is detemined
@@ -74,7 +74,7 @@ std::vector<unsigned char> CobsEncode(const std::vector<unsigned char> & data)
   return encoded_data;
 }
 
-std::vector<unsigned char> CobsDecode(const std::vector<unsigned char> & data)
+std::vector<unsigned char> cobs_decode(const std::vector<unsigned char> & data)
 {
   std::vector<unsigned char> decoded_data;
   std::vector<unsigned char>::size_type encoded_data_pos = 0;
