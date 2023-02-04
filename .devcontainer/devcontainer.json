@@ -17,79 +17,83 @@
   "containerEnv": {
     "DISPLAY": "${localEnv:DISPLAY}"
   },
-  "settings": {
-    "terminal.integrated.profiles.linux": {
-      "bash": {
-        "path": "/bin/bash"
-      }
-    },
-    "terminal.integrated.defaultProfile.linux": "bash",
-    "files.eol": "\n",
-    "files.insertFinalNewline": true,
-    "files.trimTrailingWhitespace": true,
-    "editor.tabSize": 2,
-    "editor.rulers": [
-      80
-    ],
-    "editor.formatOnSave": true,
-    "editor.autoIndent": "keep",
-    "editor.detectIndentation": false,
-    "C_Cpp.default.intelliSenseMode": "linux-gcc-x86",
-    "C_Cpp.clang_format_fallbackStyle": "Google",
-    "C_Cpp.codeAnalysis.clangTidy.enabled": true,
-    "C_Cpp.codeAnalysis.clangTidy.runAutomatically": true,
-    "uncrustify.configPath.linux": "/opt/ros/humble/lib/python3.10/site-packages/ament_uncrustify/configuration/ament_code_style.cfg",
-    "[cpp]": {
-      "editor.wordBasedSuggestions": false,
-      "editor.suggest.insertMode": "replace",
-      "editor.semanticHighlighting.enabled": true,
-      "editor.rulers": [
-        100
-      ]
-    },
-    "[dockerfile]": {
-      "editor.quickSuggestions": {
-        "strings": true
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash"
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "files.eol": "\n",
+        "files.insertFinalNewline": true,
+        "files.trimTrailingWhitespace": true,
+        "editor.tabSize": 2,
+        "editor.rulers": [
+          80
+        ],
+        "editor.formatOnSave": true,
+        "editor.autoIndent": "keep",
+        "editor.detectIndentation": false,
+        "C_Cpp.default.intelliSenseMode": "linux-gcc-x86",
+        "C_Cpp.clang_format_fallbackStyle": "Google",
+        "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+        "C_Cpp.codeAnalysis.clangTidy.runAutomatically": true,
+        "uncrustify.configPath.linux": "/opt/ros/humble/lib/python3.10/site-packages/ament_uncrustify/configuration/ament_code_style.cfg",
+        "[cpp]": {
+          "editor.wordBasedSuggestions": false,
+          "editor.suggest.insertMode": "replace",
+          "editor.semanticHighlighting.enabled": true,
+          "editor.rulers": [
+            100
+          ]
+        },
+        "[dockerfile]": {
+          "editor.quickSuggestions": {
+            "strings": true
+          },
+          "editor.defaultFormatter": "ms-azuretools.vscode-docker",
+          "editor.tabSize": 4
+        },
+        "[json]": {
+          "editor.quickSuggestions": {
+            "strings": true
+          },
+          "editor.suggest.insertMode": "replace",
+          "editor.defaultFormatter": "ZainChen.json"
+        },
+        "[xml]": {
+          "editor.defaultFormatter": "redhat.vscode-xml"
+        },
+        "[yaml]": {
+          "editor.insertSpaces": true,
+          "editor.tabSize": 2,
+          "editor.autoIndent": "advanced",
+          "editor.defaultFormatter": "redhat.vscode-yaml"
+        },
+        "xml.format.maxLineWidth": 80,
+        "json.format.maxLineWidth": 80,
+        "search.exclude": {
+          "**/node_modules": true,
+          "**/bower_components": true,
+          "**/*.code-search": true,
+          "**/build": true,
+          "**/install": true,
+          "**/log": true
+        }
       },
-      "editor.defaultFormatter": "ms-azuretools.vscode-docker",
-      "editor.tabSize": 4
-    },
-    "[json]": {
-      "editor.quickSuggestions": {
-        "strings": true
-      },
-      "editor.suggest.insertMode": "replace",
-      "editor.defaultFormatter": "ZainChen.json"
-    },
-    "[xml]": {
-      "editor.defaultFormatter": "redhat.vscode-xml"
-    },
-    "[yaml]": {
-      "editor.insertSpaces": true,
-      "editor.tabSize": 2,
-      "editor.autoIndent": "advanced",
-      "editor.defaultFormatter": "redhat.vscode-yaml"
-    },
-    "xml.format.maxLineWidth": 80,
-    "json.format.maxLineWidth": 80,
-    "search.exclude": {
-      "**/node_modules": true,
-      "**/bower_components": true,
-      "**/*.code-search": true,
-      "**/build": true,
-      "**/install": true,
-      "**/log": true
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.cpptools",
+        "ZainChen.json",
+        "ms-vscode.cmake-tools",
+        "redhat.vscode-xml",
+        "redhat.vscode-yaml",
+        "ms-vscode.cpptools-extension-pack",
+        "cschlosser.doxdocgen",
+        "josetr.cmake-language-support-vscode"
+      ]   
     }
-  },
-  "extensions": [
-    "ms-azuretools.vscode-docker",
-    "ms-vscode.cpptools",
-    "ZainChen.json",
-    "ms-vscode.cmake-tools",
-    "redhat.vscode-xml",
-    "redhat.vscode-yaml",
-    "ms-vscode.cpptools-extension-pack",
-    "cschlosser.doxdocgen",
-    "josetr.cmake-language-support-vscode"
-  ]
+  }
 }

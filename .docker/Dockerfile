@@ -6,6 +6,7 @@ LABEL license="MIT"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install general apt dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-utils \
     software-properties-common \
@@ -15,11 +16,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
+# Install required ROS dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-humble-ros2-control \
+    ros-humble-ros2-controllers \
+    && apt-get autoremove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
+
 FROM base as develop
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    apt-utils \
-    software-properties-common \
     iputils-ping \
     net-tools \
     lsb-release \

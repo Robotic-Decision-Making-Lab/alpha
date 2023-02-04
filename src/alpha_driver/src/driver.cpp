@@ -112,7 +112,6 @@ void Driver::disable_heartbeat() { set_heartbeat_freq(0); }
 
 void Driver::proxy_joint_position_cb(const Packet & packet)
 {
-  // The data was improperly formatted - we won't be able to cast to a float
   if (packet.data().size() != 4) {
     return;
   }
