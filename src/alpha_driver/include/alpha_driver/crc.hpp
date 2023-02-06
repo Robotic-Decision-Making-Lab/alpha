@@ -121,6 +121,9 @@ unsigned char calculate_crc8(
 /**
  * @brief Calculate the CRC value for a packet using the BPL protocol specification.
  *
+ * @remark This is a wrapper for the @ref calculate_crc8 method defined using the BPL specifications
+ * to help improve usability.
+ *
  * @param data packet whose CRC should be calculated using the BPL specification
  * @return unsigned char
  */

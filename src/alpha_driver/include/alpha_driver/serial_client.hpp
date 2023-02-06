@@ -29,7 +29,6 @@
 
 #include "alpha_driver/packet.hpp"
 #include "alpha_driver/packet_id.hpp"
-#include "rclcpp/rclcpp.hpp"
 
 namespace alpha_driver
 {
@@ -40,11 +39,9 @@ public:
   /**
    * @brief Construct a new Serial Client object
    *
-   * @remark We use the @ref ConnectClient method to handle most of our setup
-   *
-   * @param logger logger provided for use by a ROS2 node
+   * @remark We use the @ref connect method to handle most of our setup
    */
-  explicit SerialClient(const rclcpp::Logger & logger);
+  SerialClient() = default;
 
   /**
    * @brief Attempt to establish a connection with the Alpha manipulator.
@@ -52,19 +49,20 @@ public:
    * @remark This configures the serial port for R/W operation at a baudrate of 115200.
    *
    * @param device full path to the serial device file
-   * @param timeout_ms timeout (ms) between serial port reads; used for VTIME
+   * @param polling_timeout timeout (ms) between serial port reads; used for VTIME
    */
-  void connect_client(const std::string & device, int timeout_ms = 500);
+  void connect(const std::string & device, int polling_timeout);
 
   /**
    * @brief Shutdown the serial client.
-   *
-   * @remark The main intention for this method is to shutdown the RX thread.
    */
-  void disconnect_client();
+  void disconnect();
 
   /**
    * @brief Send a packet over the serial connection.
+   *
+   * @note This method performs packet encoding. It is not necessary to encode the data before
+   * calling this method.
    *
    * @param packet message to send to the Reach Alpha manipulator; the data
    * should not yet be encoded.
@@ -101,13 +99,13 @@ private:
   };
 
   /**
-   * @brief Method used to poll the serial line for incoming data.
+   * @brief Poll the serial line for incoming data.
    *
    * @note This method is executed by the RX thread. Furthermore, this method is
    * a blocking method that runs indefinitely. The main loop is terminated by
    * the atomic @ref running_ flag.
    */
-  void read_port();
+  void poll();
 
   /**
    * @brief Map used to store the callback functions for messages.
@@ -118,17 +116,13 @@ private:
   std::unordered_map<PacketId, std::vector<std::function<void(Packet)>>> callbacks_;
 
   // Serial port file descriptor
-  int fd_;
+  int handle_;
 
   std::atomic<bool> running_{false};  // This flag is used to control the RX main loop
   PortState port_status_ = PortState::kClosed;
 
   // Thread responsible for receiving incoming data and executing the respective callbacks
   std::thread rx_worker_;
-
-  // We use the built-in ROS logger here for the sake of logging consistency
-  // This logger also uses spdlog which was what I would have used anyway
-  rclcpp::Logger logger_;
 };
 
 }  // namespace alpha_driver

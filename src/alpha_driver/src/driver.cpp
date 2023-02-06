@@ -24,6 +24,7 @@
 
 #include "alpha_driver/device_id.hpp"
 #include "alpha_driver/packet_id.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 using namespace std::chrono_literals;
 
@@ -31,44 +32,7 @@ namespace alpha_driver
 {
 
 Driver::Driver()
-: Node("AlphaDriver"),
-  client_(this->get_logger())
 {
-  auto address_desc = rcl_interfaces::msg::ParameterDescriptor{};
-  address_desc.description = "Full path to the serial port file";
-
-  auto state_freq_desc = rcl_interfaces::msg::ParameterDescriptor{};
-  state_freq_desc.description = "Frequency that the robot state should be published at";
-
-  this->declare_parameter("address", "", address_desc);
-  this->declare_parameter("freq", 1, state_freq_desc);
-
-  const std::string address =
-    this->get_parameter("address").get_parameter_value().get<std::string>();
-  const int state_freq = this->get_parameter("freq").get_parameter_value().get<int>();
-
-  try {
-    // Attempt to connect the serial client
-    // We don't expose the timeout to the user API to avoid usability concerns
-    client_.connect_client(address);
-  }
-  catch (const std::exception & e) {
-    RCLCPP_ERROR(this->get_logger(), e.what());  // NOLINT
-    return;
-  }
-
-  // Disable any previous heartbeat configurations
-  disable_heartbeat();
-
-  // Configure the new heartbeat request
-  enable_heartbeat(state_freq);
-
-  last_heartbeat_ = std::chrono::steady_clock::now();
-
-  // Setup a timer to make sure that we have an active connection with the arm
-  check_heartbeat_timer_ =
-    this->create_wall_timer(1000ms, std::bind(&Driver::monitor_heartbeat_cb, this));
-
   // Connect packet callbacks
   client_.register_callback(
     PacketId::kPosition, std::bind(&Driver::proxy_joint_position_cb, this, std::placeholders::_1));
@@ -80,10 +44,37 @@ Driver::Driver()
     PacketId::kMode, std::bind(&Driver::update_last_heartbeat_cb, this, std::placeholders::_1));
 }
 
-Driver::~Driver()
+bool Driver::start(
+  const std::string & serial_port, const int state_update_freq, const int polling_timeout)
+{
+  try {
+    // Attempt to connect the serial client
+    // We don't expose the timeout to the user API to avoid usability concerns
+    client_.connect(serial_port, polling_timeout);
+  }
+  catch (const std::exception & e) {
+    RCLCPP_ERROR(rclcpp::get_logger("AlphaDriver"), e.what());  // NOLINT
+    return false;
+  }
+
+  // Disable any previous heartbeat configurations
+  disable_heartbeat();
+
+  // Configure the new heartbeat request
+  enable_heartbeat(state_update_freq);
+
+  last_heartbeat_ = std::chrono::steady_clock::now();
+
+  // TODO (evan-palmer): spawn a new thread that checks the heartbeat status
+  // TODO (evan-palmer): add a mutex to restrict access to the `last_heartbeat_` variable
+
+  return true;
+}
+
+void Driver::stop()
 {
   disable_heartbeat();
-  client_.disconnect_client();
+  client_.disconnect();
 }
 
 void Driver::enable_heartbeat(const int freq)
@@ -139,18 +130,9 @@ void Driver::monitor_heartbeat_cb()
 {
   if (std::chrono::steady_clock::now() - last_heartbeat_ > 5s) {
     RCLCPP_WARN(  // NOLINT
-      this->get_logger(),
+      rclcpp::get_logger("AlphaDriver"),
       "Timeout occurred; the system has not received a heartbeat message in the last 5 seconds");
   }
 }
 
 }  // namespace alpha_driver
-
-int main(int argc, char ** argv)
-{
-  rclcpp::init(argc, argv);
-  auto node = std::make_shared<alpha_driver::Driver>();
-  rclcpp::spin(node);
-  rclcpp::shutdown();
-  return 0;
-}

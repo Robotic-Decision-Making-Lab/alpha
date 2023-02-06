@@ -19,6 +19,9 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp
   geometry_msgs
   sensor_msgs
+  rclcpp_lifecycle
+  pluginlib
+  hardware_interface
 )
 
 find_package(ament_cmake)

@@ -24,13 +24,11 @@
 
 #include "alpha_driver/packet.hpp"
 #include "alpha_driver/serial_client.hpp"
-#include "rclcpp/rclcpp.hpp"
-#include "sensor_msgs/msg/joint_state.hpp"
 
 namespace alpha_driver
 {
 
-class Driver : public rclcpp::Node
+class Driver
 {
 public:
   /**
@@ -38,20 +36,12 @@ public:
    */
   Driver();
 
-  /**
-   * @brief Destroy the Driver object.
-   *
-   * @note Overrides the default destructor to shut down the serial client.
-   */
-  ~Driver();
+  bool start(
+    const std::string & serial_port, const int state_update_freq, const int polling_timeout = 500);
+
+  void stop();
 
 private:
-  enum class UpdateState
-  {
-    kReady,
-    kStale,
-  };
-
   /**
    * @brief Enable heartbeat messages from the Alpha manipulator.
    *
@@ -70,7 +60,7 @@ private:
    * @note Heartbeat messages can be sent at frequencies in the range [0, 255]. If the frequency is
    * set to 0, then the heartbeat will be disabled.
    *
-   * @param freq
+   * @param freq frequency that heartbeat messages should be sent at
    */
   void set_heartbeat_freq(const int freq);
 
@@ -102,10 +92,6 @@ private:
 
   SerialClient client_;
 
-  sensor_msgs::msg::JointState state_msg_;
-  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr state_publisher_;
-
-  rclcpp::TimerBase::SharedPtr check_heartbeat_timer_;
   std::chrono::time_point<std::chrono::steady_clock> last_heartbeat_;
 };
 

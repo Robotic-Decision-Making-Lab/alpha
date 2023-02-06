@@ -32,24 +32,20 @@
 #include <vector>
 
 #include "alpha_driver/packet.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 namespace alpha_driver
 {
 
-SerialClient::SerialClient(const rclcpp::Logger & logger)
-: logger_(logger)
-{
-}
-
-void SerialClient::connect_client(const std::string & device, int timeout_ms)
+void SerialClient::connect(const std::string & device, int polling_timeout)
 {
   if (device.empty()) {
-    throw std::runtime_error("Attempted to open file using an unassigned file path.");
+    throw std::logic_error("Attempted to open file using an unassigned file path.");
   }
 
-  fd_ = open(device.c_str(), O_RDWR);
+  handle_ = open(device.c_str(), O_RDWR);
 
-  if (fd_ == -1) {
+  if (handle_ == -1) {
     throw std::runtime_error(
       "Could not open specified serial device. Please verify that the device is not already being "
       "used and that you have configured read/write permissions.");
@@ -60,7 +56,7 @@ void SerialClient::connect_client(const std::string & device, int timeout_ms)
   struct termios tty;
 
   // Get the terminal existing settings
-  if (tcgetattr(fd_, &tty) < 0) {
+  if (tcgetattr(handle_, &tty) < 0) {
     throw std::runtime_error("Unable to get the current terminal configurations.");
   }
 
@@ -87,16 +83,17 @@ void SerialClient::connect_client(const std::string & device, int timeout_ms)
   tty.c_oflag &= ~OPOST;  // Disable output post-processing
   tty.c_oflag &= ~ONLCR;  // Disable conversion of newline to carriage return
 
-  tty.c_cc[VTIME] = static_cast<cc_t>(timeout_ms / 100);  // Set the timeout; convert to deciseconds
+  tty.c_cc[VTIME] =
+    static_cast<cc_t>(polling_timeout / 100);  // Set the timeout; convert to deciseconds
   tty.c_cc[VMIN] = 0;  // We can't set this in a thread otherwise it may block indefinitely
 
   // Save the configurations
-  if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
+  if (tcsetattr(handle_, TCSANOW, &tty) != 0) {
     throw std::runtime_error("Unable to save the terminal configurations.");
   }
 
   // Start reading data from the serial port
-  rx_worker_ = std::thread(&SerialClient::read_port, this);
+  rx_worker_ = std::thread(&SerialClient::poll, this);
 
   // Give the RX thread a few ms to start up
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -108,11 +105,14 @@ void SerialClient::connect_client(const std::string & device, int timeout_ms)
   }
 }
 
-void SerialClient::disconnect_client()
+void SerialClient::disconnect()
 {
   running_.store(false);
   rx_worker_.join();
-  close(fd_);
+
+  if (handle_ != NULL) {
+    close(handle_);
+  }
 }
 
 void SerialClient::send(const Packet & packet) const
@@ -120,12 +120,14 @@ void SerialClient::send(const Packet & packet) const
   try {
     std::vector<unsigned char> encoded_data = packet.encode();
 
-    if (write(fd_, encoded_data.data(), encoded_data.size()) < 0) {
-      RCLCPP_WARN(logger_, "An error occurred while attempting to write a message.");  // NOLINT
+    if (write(handle_, encoded_data.data(), encoded_data.size()) < 0) {
+      RCLCPP_WARN(  // NOLINT
+        rclcpp::get_logger("SerialClient"),
+        "An error occurred while attempting to write a message.");
     }
   }
   catch (const std::exception & e) {
-    RCLCPP_WARN(logger_, e.what());  // NOLINT
+    RCLCPP_WARN(rclcpp::get_logger("SerialClient"), e.what());  // NOLINT
   }
 }
 
@@ -137,7 +139,7 @@ void SerialClient::register_callback(
 
 bool SerialClient::active() const { return (running_.load() && port_status_ == PortState::kOpen); }
 
-void SerialClient::read_port()
+void SerialClient::poll()
 {
   running_.store(true);
 
@@ -146,7 +148,7 @@ void SerialClient::read_port()
   // Start by waiting for the end of a packet
   // Once we have reached the end of the packet then we can start processing data like normal
   while (running_.load()) {
-    const int size = read(fd_, &data, 1);
+    const int size = read(handle_, &data, 1);
 
     if (size > 0 && data[0] == 0) {
       break;
@@ -161,11 +163,12 @@ void SerialClient::read_port()
     // Note that we have to read byte-by-byte. This is because the BPL protocol doesn't include
     // a header which defines the size of the packet. Instead we have to read until there is a
     // packet delimiter (0x00) and process that data.
-    const int size = read(fd_, &data, 1);
+    const int size = read(handle_, &data, 1);
 
     if (size < 0) {
       RCLCPP_WARN(  // NOLINT
-        logger_, "An error occurred while attempting to read a message from the serial port.");
+        rclcpp::get_logger("SerialClient"),
+        "An error occurred while attempting to read a message from the serial port.");
     } else if (size > 0) {
       buffer.push_back(data[0]);
 
@@ -179,7 +182,7 @@ void SerialClient::read_port()
           }
         }
         catch (const std::exception & e) {
-          RCLCPP_WARN(logger_, e.what());  // NOLINT
+          RCLCPP_WARN(rclcpp::get_logger("SerialClient"), e.what());  // NOLINT
         }
 
         // Empty the buffer before we start reading the next packet
