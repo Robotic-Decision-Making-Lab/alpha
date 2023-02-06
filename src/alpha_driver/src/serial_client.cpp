@@ -34,10 +34,12 @@
 #include "alpha_driver/packet.hpp"
 #include "rclcpp/rclcpp.hpp"
 
+using namespace std::chrono_literals;
+
 namespace alpha_driver
 {
 
-void SerialClient::connect(const std::string & device, int polling_timeout)
+void SerialClient::connect(const std::string & device, const int polling_timeout_ms)
 {
   if (device.empty()) {
     throw std::logic_error("Attempted to open file using an unassigned file path.");
@@ -75,7 +77,7 @@ void SerialClient::connect(const std::string & device, int polling_timeout)
   tty.c_lflag &= ~ECHOE;                   // Disable erasure
   tty.c_lflag &= ~ECHONL;                  // Disable new-line echo
   tty.c_lflag &= ~ISIG;                    // Disable signals
-  tty.c_iflag &= ~(IXON | IXOFF | IXANY);  // Turn off io control
+  tty.c_iflag &= ~(IXON | IXOFF | IXANY);  // Turn off IO control
   tty.c_iflag &=
     ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR |
       ICRNL);  // Disable special handling of received bytes
@@ -84,7 +86,7 @@ void SerialClient::connect(const std::string & device, int polling_timeout)
   tty.c_oflag &= ~ONLCR;  // Disable conversion of newline to carriage return
 
   tty.c_cc[VTIME] =
-    static_cast<cc_t>(polling_timeout / 100);  // Set the timeout; convert to deciseconds
+    static_cast<cc_t>(polling_timeout_ms / 100);  // Set the timeout; convert to deciseconds
   tty.c_cc[VMIN] = 0;  // We can't set this in a thread otherwise it may block indefinitely
 
   // Save the configurations
@@ -92,11 +94,15 @@ void SerialClient::connect(const std::string & device, int polling_timeout)
     throw std::runtime_error("Unable to save the terminal configurations.");
   }
 
+  // Indicate that we are now running
+  // Used by the rx_worker_ main loop
+  running_.store(true);
+
   // Start reading data from the serial port
   rx_worker_ = std::thread(&SerialClient::poll, this);
 
   // Give the RX thread a few ms to start up
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  std::this_thread::sleep_for(10ms);
 
   // Final check to make sure that the client was properly connected
   if (!active()) {
@@ -139,10 +145,8 @@ void SerialClient::register_callback(
 
 bool SerialClient::active() const { return (running_.load() && port_status_ == PortState::kOpen); }
 
-void SerialClient::poll()
+void SerialClient::poll() const
 {
-  running_.store(true);
-
   std::array<unsigned char, 1> data;
 
   // Start by waiting for the end of a packet
@@ -177,7 +181,11 @@ void SerialClient::poll()
         try {
           const Packet packet = Packet::decode(buffer);
 
-          for (auto & callback : callbacks_[packet.packet_id()]) {
+          // We need to use the find method here instead of a normal [] indexing operation because
+          // the [] does not have const overloading which we want for this to be thread-safe
+          auto it = callbacks_.find(packet.packet_id());
+
+          for (const auto & callback : it->second) {
             callback(packet);
           }
         }

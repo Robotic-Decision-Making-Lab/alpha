@@ -24,16 +24,15 @@ namespace alpha_driver
 {
 
 /**
- * @brief The device ID is a unique identifier used to denote each of the manipulator's joints.
+ * @brief Possible operating modes for each device.
  */
-enum class DeviceId : unsigned char
+enum class Mode : unsigned char
 {
-  kLinearJaws = 0x01,
-  kRotateEndEffector = 0x02,
-  kBendElbow = 0x03,
-  kBendShoulder = 0x04,
-  kRotateBase = 0x05,
-  kAllJoints = 0xFF,
+  kStandby = 0x00,
+  kDisable = 0x01,
+  kPosition = 0x02,
+  kVelocity = 0x03,
+  kCurrent = 0x04,
 };
 
 }  // namespace alpha_driver

@@ -20,9 +20,14 @@
 
 #pragma once
 
+#include <atomic>
 #include <chrono>
+#include <mutex>
+#include <thread>
 
+#include "alpha_driver/mode.hpp"
 #include "alpha_driver/packet.hpp"
+#include "alpha_driver/packet_id.hpp"
 #include "alpha_driver/serial_client.hpp"
 
 namespace alpha_driver
@@ -31,66 +36,46 @@ namespace alpha_driver
 class Driver
 {
 public:
-  /**
-   * @brief Construct a new Driver object.
-   */
   Driver();
 
-  bool start(
-    const std::string & serial_port, const int state_update_freq, const int polling_timeout = 500);
+  bool start(const std::string & serial_port, const int heartbeat_timeout_ms = 3000);
 
   void stop();
 
+  void set_mode(Mode mode, DeviceId device) const;
+
+  void set_velocity(float velocity, DeviceId device) const;
+
+  void set_position(float position, DeviceId device) const;
+
+  void set_relative_position(float relative_position, DeviceId device) const;
+
+  void set_indexed_position(float indexed_position, DeviceId device) const;
+
+  void set_current(float current, DeviceId device) const;
+
+  void request(PacketId packet_type, DeviceId device) const;
+
+  void subscribe(PacketId packet_type, const std::function<void(Packet)> & callback);
+
 private:
-  /**
-   * @brief Enable heartbeat messages from the Alpha manipulator.
-   *
-   * @note Heartbeat messages are defined by the BPL protocol simply as messages that are
-   * automatically sent by the manipulator - not as a unique packet type. The messages requested for
-   * automatic sending include velocity, position, and mode messages. These messages are sent by
-   * all devices.
-   *
-   * @param freq frequency that the heartbeat messages should be sent at
-   */
+  void send_float(float value, PacketId packet_type, DeviceId device) const;
+
   void enable_heartbeat(const int freq);
 
-  /**
-   * @brief Set the frequency that heartbeat messages are sent at.
-   *
-   * @note Heartbeat messages can be sent at frequencies in the range [0, 255]. If the frequency is
-   * set to 0, then the heartbeat will be disabled.
-   *
-   * @param freq frequency that heartbeat messages should be sent at
-   */
-  void set_heartbeat_freq(const int freq);
-
-  /**
-   * @brief Disable heartbeat messages.
-   *
-   * @remark This is implemented for usability purposes and simply calls the @ref SetHeartbeatFreq
-   * with a frequency of 0.
-   */
   void disable_heartbeat();
 
-  void proxy_joint_position_cb(const Packet & packet);
-  void proxy_joint_velocity_cb(const Packet & packet);
+  void set_heartbeat_freq(const int freq);
 
-  /**
-   * @brief Update the @ref last_heartbeat_ timestamp
-   *
-   * @param packet heartbeat packet
-   */
   void update_last_heartbeat_cb(const Packet & packet);
 
-  /**
-   * @brief Verify that a heartbeat packet has been received in the last 5 seconds
-   *
-   * @note If a heartbeat has occurred, it is the user's responsibility to handle the timeout. This
-   * method is not intended to act as a watchdog.
-   */
-  void monitor_heartbeat_cb();
+  void monitor_heartbeat(const int heartbeat_timeout_ms) const;
 
   SerialClient client_;
+
+  std::thread heartbeat_worker_;
+  std::atomic<bool> running_{false};
+  mutable std::mutex last_heartbeat_lock_;
 
   std::chrono::time_point<std::chrono::steady_clock> last_heartbeat_;
 };

@@ -37,21 +37,14 @@ class SerialClient
 {
 public:
   /**
-   * @brief Construct a new Serial Client object
-   *
-   * @remark We use the @ref connect method to handle most of our setup
-   */
-  SerialClient() = default;
-
-  /**
    * @brief Attempt to establish a connection with the Alpha manipulator.
    *
    * @remark This configures the serial port for R/W operation at a baudrate of 115200.
    *
    * @param device full path to the serial device file
-   * @param polling_timeout timeout (ms) between serial port reads; used for VTIME
+   * @param polling_timeout_ms timeout (ms) between serial port reads; used for VTIME
    */
-  void connect(const std::string & device, int polling_timeout);
+  void connect(const std::string & device, const int polling_timeout_ms = 500);
 
   /**
    * @brief Shutdown the serial client.
@@ -105,7 +98,7 @@ private:
    * a blocking method that runs indefinitely. The main loop is terminated by
    * the atomic @ref running_ flag.
    */
-  void poll();
+  void poll() const;
 
   /**
    * @brief Map used to store the callback functions for messages.
