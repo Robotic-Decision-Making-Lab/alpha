@@ -26,6 +26,7 @@
 #include "alpha_driver/device_id.hpp"
 #include "alpha_driver/mode.hpp"
 #include "alpha_driver/packet_id.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 namespace alpha_hardware
 {
@@ -33,9 +34,17 @@ namespace alpha_hardware
 hardware_interface::CallbackReturn AlphaHardware::on_init(
   const hardware_interface::HardwareInfo & info)
 {
+  RCLCPP_INFO(  // NOLINT
+    rclcpp::get_logger("AlphaHardware"),
+    "Initializing AlphaHardware system interface for ros2_control.");
+
   if (
     hardware_interface::SystemInterface::on_init(info) !=
     hardware_interface::CallbackReturn::SUCCESS) {
+    RCLCPP_ERROR(  // NOLINT
+      rclcpp::get_logger("AlphaHardware"),
+      "Failed to initialize the AlphaHardware system interface.");
+
     return hardware_interface::CallbackReturn::ERROR;
   }
 
@@ -50,6 +59,10 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
 
   // Start the driver
   if (!driver_.start(serial_port_, heartbeat_timeout_)) {
+    RCLCPP_ERROR(  // NOLINT
+      rclcpp::get_logger("AlphaHardware"),
+      "Failed to initialize the serial driver for the AlphaHardware system interface.");
+
     return hardware_interface::CallbackReturn::ERROR;
   }
 
@@ -66,11 +79,18 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
   running_.store(true);
   state_request_worker_ = std::thread(&AlphaHardware::poll_state, this, state_update_freq_);
 
+  RCLCPP_INFO(  // NOLINT
+    rclcpp::get_logger("AlphaHardware"),
+    "Successfully initialized the AlphaHardware system interface!");
+
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
 hardware_interface::CallbackReturn AlphaHardware::on_cleanup(const rclcpp_lifecycle::State &)
 {
+  RCLCPP_INFO(  // NOLINT
+    rclcpp::get_logger("AlphaHardware"), "Shutting down the AlphaHardware system interface.");
+
   running_.store(false);
   state_request_worker_.join();
   driver_.stop();
@@ -88,13 +108,30 @@ std::vector<hardware_interface::CommandInterface> AlphaHardware::export_command_
 
 hardware_interface::CallbackReturn AlphaHardware::on_activate(const rclcpp_lifecycle::State &)
 {
-  driver_.set_mode(alpha_driver::Mode::kVelocity, alpha_driver::DeviceId::kAllJoints);
+  try {
+    driver_.set_mode(alpha_driver::Mode::kStandby, alpha_driver::DeviceId::kAllJoints);
+  }
+  catch (const std::exception & e) {
+    RCLCPP_ERROR(  // NOLINT
+      rclcpp::get_logger("AlphaHardware"), "Failed to activate the Reach Alpha manipulator.");
+    return hardware_interface::CallbackReturn::ERROR;
+  }
+
+  return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-hardware_interface::CallbackReturn AlphaHardware::on_deactivate(
-  const rclcpp_lifecycle::State & previous_state)
+hardware_interface::CallbackReturn AlphaHardware::on_deactivate(const rclcpp_lifecycle::State &)
 {
-  /* data */
+  try {
+    driver_.set_mode(alpha_driver::Mode::kDisable, alpha_driver::DeviceId::kAllJoints);
+  }
+  catch (const std::exception & e) {
+    RCLCPP_ERROR(  // NOLINT
+      rclcpp::get_logger("AlphaHardware"), "Failed to deactivate the Reach Alpha manipulator.");
+    return hardware_interface::CallbackReturn::ERROR;
+  }
+
+  return hardware_interface::CallbackReturn::SUCCESS;
 }
 
 hardware_interface::return_type AlphaHardware::read(

@@ -44,7 +44,7 @@ public:
    * @param device full path to the serial device file
    * @param polling_timeout_ms timeout (ms) between serial port reads; used for VTIME
    */
-  void connect(const std::string & device, const int polling_timeout_ms = 500);
+  void connect(const std::string & device, int polling_timeout_ms = 500);
 
   /**
    * @brief Shutdown the serial client.
