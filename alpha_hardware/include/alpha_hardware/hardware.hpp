@@ -20,7 +20,9 @@
 
 #pragma once
 
+#include <atomic>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "alpha_driver/driver.hpp"
@@ -77,14 +79,19 @@ public:
 private:
   void update_position_cb(const alpha_driver::Packet & packet);
   void update_velocity_cb(const alpha_driver::Packet & packet);
+  void poll_state(const int freq) const;
 
+  // Driver things
   alpha_driver::Driver driver_;
+  std::thread state_request_worker_;
+  std::atomic<bool> running_{false};
 
   // ROS parameters
   std::string serial_port_;
   int heartbeat_timeout_;
   int state_update_freq_;
 
+  // ros2_control interfaces
   std::vector<double> hw_commands_;
   std::vector<double> hw_states_position_, hw_states_velocity_;
 };

@@ -20,7 +20,10 @@
 
 #include "alpha_hardware/hardware.hpp"
 
+#include <chrono>
 #include <limits>
+
+#include "alpha_driver/packet_id.hpp"
 
 namespace alpha_hardware
 {
@@ -48,16 +51,27 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
-  // TODO (evan-palmer): register callbacks for joint states
-  // TODO (evan-palmer): Start a thread to request state updates
+  // Register callbacks for joint states
+  driver_.subscribe(
+    alpha_driver::PacketId::kPosition,
+    std::bind(&AlphaHardware::update_position_cb, this, std::placeholders::_1));
+
+  driver_.subscribe(
+    alpha_driver::PacketId::kVelocity,
+    std::bind(&AlphaHardware::update_velocity_cb, this, std::placeholders::_1));
+
+  // Start a thread to request state updates
+  running_.store(true);
+  state_request_worker_ = std::thread(&AlphaHardware::poll_state, this, state_update_freq_);
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-hardware_interface::CallbackReturn AlphaHardware::on_cleanup(
-  const rclcpp_lifecycle::State & previous_state)
+hardware_interface::CallbackReturn AlphaHardware::on_cleanup(const rclcpp_lifecycle::State &)
 {
-  /* data */
+  running_.store(false);
+  state_request_worker_.join();
+  driver_.stop();
 }
 
 std::vector<hardware_interface::StateInterface> AlphaHardware::export_state_interfaces()
@@ -90,6 +104,26 @@ hardware_interface::return_type AlphaHardware::write(
   const rclcpp::Time & time, const rclcpp::Duration & period)
 {
   /* data */
+}
+
+void AlphaHardware::update_position_cb(const alpha_driver::Packet & packet)
+{ /* data */
+}
+
+void AlphaHardware::update_velocity_cb(const alpha_driver::Packet & packet)
+{ /* data */
+}
+
+void AlphaHardware::poll_state(const int freq) const
+{
+  // Request position and velocity state information
+  std::vector<alpha_driver::PacketId> packets = {
+    alpha_driver::PacketId::kPosition, alpha_driver::PacketId::kVelocity};
+
+  while (running_.load()) {
+    driver_.request(packets, alpha_driver::DeviceId::kAllJoints);
+    std::this_thread::sleep_for(std::chrono::seconds(1 / freq));
+  }
 }
 
 }  // namespace alpha_hardware
