@@ -23,6 +23,8 @@
 #include <chrono>
 #include <limits>
 
+#include "alpha_driver/device_id.hpp"
+#include "alpha_driver/mode.hpp"
 #include "alpha_driver/packet_id.hpp"
 
 namespace alpha_hardware
@@ -72,6 +74,8 @@ hardware_interface::CallbackReturn AlphaHardware::on_cleanup(const rclcpp_lifecy
   running_.store(false);
   state_request_worker_.join();
   driver_.stop();
+
+  return hardware_interface::CallbackReturn::SUCCESS;
 }
 
 std::vector<hardware_interface::StateInterface> AlphaHardware::export_state_interfaces()
@@ -82,10 +86,9 @@ std::vector<hardware_interface::CommandInterface> AlphaHardware::export_command_
 { /* data */
 }
 
-hardware_interface::CallbackReturn AlphaHardware::on_activate(
-  const rclcpp_lifecycle::State & previous_state)
+hardware_interface::CallbackReturn AlphaHardware::on_activate(const rclcpp_lifecycle::State &)
 {
-  /* data */
+  driver_.set_mode(alpha_driver::Mode::kVelocity, alpha_driver::DeviceId::kAllJoints);
 }
 
 hardware_interface::CallbackReturn AlphaHardware::on_deactivate(
