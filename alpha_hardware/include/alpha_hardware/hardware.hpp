@@ -42,7 +42,7 @@ namespace alpha_hardware
 class AlphaHardware : public hardware_interface::SystemInterface
 {
 public:
-  RCLCPP_SHARED_PTR_DEFINITIONS(AlphaHardware);
+  RCLCPP_SHARED_PTR_DEFINITIONS(AlphaHardware)
 
   HARDWARE_INTERFACE_PUBLIC
   hardware_interface::CallbackReturn on_init(
@@ -87,6 +87,7 @@ private:
   // ROS parameters
   std::string serial_port_;
   int heartbeat_timeout_;
+  int state_update_freq_;
 
   std::vector<double> hw_commands_;
   std::vector<double> hw_states_position_, hw_states_velocity_;
