@@ -49,10 +49,6 @@ public:
     const hardware_interface::HardwareInfo & info) override;
 
   HARDWARE_INTERFACE_PUBLIC
-  hardware_interface::CallbackReturn on_configure(
-    const rclcpp_lifecycle::State & previous_state) override;
-
-  HARDWARE_INTERFACE_PUBLIC
   hardware_interface::CallbackReturn on_cleanup(
     const rclcpp_lifecycle::State & previous_state) override;
 
