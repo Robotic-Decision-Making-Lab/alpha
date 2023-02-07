@@ -17,14 +17,8 @@ endif()
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp
-  geometry_msgs
-  sensor_msgs
-  rclcpp_lifecycle
-  pluginlib
-  hardware_interface
+  ament_cmake
 )
-
-find_package(ament_cmake)
 
 foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
@@ -39,29 +33,25 @@ add_library(${PROJECT_NAME} SHARED
   src/crc.cpp
   src/packet.cpp
   src/serial_client.cpp
+  src/driver.cpp
 )
+
+target_link_libraries(${PROJECT_NAME} ${rclcpp_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
-add_executable(alpha_driver_node src/driver.cpp)
-target_include_directories(alpha_driver_node PRIVATE include)
-target_link_libraries(alpha_driver_node ${PROJECT_NAME})
-ament_target_dependencies(alpha_driver_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
-
 install(
-  TARGETS
-  alpha_driver_node
-  DESTINATION lib/${PROJECT_NAME}
+  DIRECTORY include/
+  DESTINATION include
 )
 
-install(TARGETS ${PROJECT_NAME}
+install(
+  TARGETS ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
-)
-
-install(DIRECTORY include/
-  DESTINATION include
+  INCLUDES DESTINATION include
 )
 
 if(BUILD_TESTING)
@@ -95,8 +85,7 @@ if(BUILD_TESTING)
   target_link_libraries(test_packet ${PROJECT_NAME})
 endif()
 
-ament_export_include_directories(include)
-ament_export_libraries(${PROJECT_NAME})
+ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 ament_package()

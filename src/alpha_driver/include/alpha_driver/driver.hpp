@@ -131,7 +131,7 @@ public:
    * @param packet_types vector of packet types that the manipulator should send
    * @param device device that should sent the packets
    */
-  void request(std::vector<PacketId> packet_types, DeviceId device) const;
+  void request(std::vector<PacketId> & packet_types, DeviceId device) const;
 
   /**
    * @brief Register a callback function to be executed when a packet of the specified type is

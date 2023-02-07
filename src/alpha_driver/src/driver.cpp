@@ -126,7 +126,7 @@ void Driver::request(PacketId packet_type, DeviceId device) const
   client_.send(packet);
 }
 
-void Driver::request(std::vector<PacketId> packet_types, DeviceId device) const
+void Driver::request(std::vector<PacketId> & packet_types, DeviceId device) const
 {
   if (packet_types.size() > 10) {
     throw std::logic_error("Cannot request more than 10 packets from a device at once.");
@@ -137,8 +137,13 @@ void Driver::request(std::vector<PacketId> packet_types, DeviceId device) const
       "Cannot send a request to the manipulator without an active connection!");
   }
 
-  // Cast to unsigned char types
-  const std::vector<unsigned char> request_types(packet_types.begin(), packet_types.end());
+  std::vector<unsigned char> request_types;
+  request_types.reserve(packet_types.size());
+
+  // Cast to unsigned char
+  for (auto type : packet_types) {
+    request_types.push_back(static_cast<unsigned char>(type));
+  }
 
   const Packet packet(PacketId::kRequest, device, request_types);
 

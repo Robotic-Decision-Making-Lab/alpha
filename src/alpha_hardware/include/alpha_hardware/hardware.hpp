@@ -20,8 +20,11 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
+#include "alpha_driver/driver.hpp"
 #include "alpha_driver/packet.hpp"
-#include "alpha_driver/serial_client.hpp"
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
 #include "hardware_interface/system_interface.hpp"
@@ -33,7 +36,7 @@
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 
-namespace alpha_driver
+namespace alpha_hardware
 {
 
 class AlphaHardware : public hardware_interface::SystemInterface
@@ -76,7 +79,17 @@ public:
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
-  /* data */
+  void update_position_cb(const alpha_driver::Packet & packet);
+  void update_velocity_cb(const alpha_driver::Packet & packet);
+
+  alpha_driver::Driver driver_;
+
+  // ROS parameters
+  std::string serial_port_;
+  int heartbeat_timeout_;
+
+  std::vector<double> hw_commands_;
+  std::vector<double> hw_states_position_, hw_states_velocity_;
 };
 
-}  // namespace alpha_driver
+}  // namespace alpha_hardware

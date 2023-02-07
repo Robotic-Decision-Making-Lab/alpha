@@ -115,10 +115,7 @@ void SerialClient::disconnect()
 {
   running_.store(false);
   rx_worker_.join();
-
-  if (handle_ != NULL) {
-    close(handle_);
-  }
+  close(handle_);
 }
 
 void SerialClient::send(const Packet & packet) const

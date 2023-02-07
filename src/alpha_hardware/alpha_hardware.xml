@@ -1,4 +1,4 @@
-<library path="hardware">
+<!-- <library path="hardware">
   <class name="hardware/AlphaHardware"
     type="alpha_driver::AlphaHardware"
     base_class_type="hardware_interface::SystemInterface">
@@ -6,4 +6,4 @@
       The ros2_control AlphaHardware using a system hardware interface-type.
     </description>
   </class>
-</library>
+</library> -->
