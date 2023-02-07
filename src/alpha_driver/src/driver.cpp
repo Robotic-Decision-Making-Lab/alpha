@@ -42,7 +42,7 @@ bool Driver::start(const std::string & serial_port, const int heartbeat_timeout_
 {
   try {
     // Attempt to connect the serial client
-    // We don't expose the timeout to the user API to avoid usability concerns
+    // We don't expose the VTIME timeout to the user API to avoid usability concerns
     client_.connect(serial_port);
   }
   catch (const std::exception & e) {
@@ -64,7 +64,7 @@ bool Driver::start(const std::string & serial_port, const int heartbeat_timeout_
 
   running_.store(true);
 
-  // Start the thread that monitors heartbeats from the arm
+  // Start the thread that monitors heartbeats from the manipulator
   heartbeat_worker_ = std::thread(&Driver::monitor_heartbeat, this, heartbeat_timeout_ms);
 
   return true;
@@ -73,9 +73,9 @@ bool Driver::start(const std::string & serial_port, const int heartbeat_timeout_
 void Driver::stop()
 {
   disable_heartbeat();
-  client_.disconnect();
   running_.store(false);
   heartbeat_worker_.join();
+  client_.disconnect();
 }
 
 void Driver::set_mode(Mode mode, DeviceId device) const
@@ -107,11 +107,6 @@ void Driver::set_relative_position(float relative_position, DeviceId device) con
   send_float(relative_position, PacketId::kRelativePosition, device);
 }
 
-void Driver::set_indexed_position(float indexed_position, DeviceId device) const
-{
-  send_float(indexed_position, PacketId::kIndexedPosition, device);
-}
-
 void Driver::set_current(float current, DeviceId device) const
 {
   send_float(current, PacketId::kCurrent, device);
@@ -127,6 +122,25 @@ void Driver::request(PacketId packet_type, DeviceId device) const
   const std::vector<unsigned char> request_type = {static_cast<unsigned char>(packet_type)};
 
   const Packet packet(PacketId::kRequest, device, request_type);
+
+  client_.send(packet);
+}
+
+void Driver::request(std::vector<PacketId> packet_types, DeviceId device) const
+{
+  if (packet_types.size() > 10) {
+    throw std::logic_error("Cannot request more than 10 packets from a device at once.");
+  }
+
+  if (!running_.load() || !client_.active()) {
+    throw std::runtime_error(
+      "Cannot send a request to the manipulator without an active connection!");
+  }
+
+  // Cast to unsigned char types
+  const std::vector<unsigned char> request_types(packet_types.begin(), packet_types.end());
+
+  const Packet packet(PacketId::kRequest, device, request_types);
 
   client_.send(packet);
 }

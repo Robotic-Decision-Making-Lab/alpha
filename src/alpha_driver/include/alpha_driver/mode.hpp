@@ -24,7 +24,10 @@ namespace alpha_driver
 {
 
 /**
- * @brief Possible operating modes for each device.
+ * @brief A possible operating mode for a device.
+ *
+ * @remark For more information regarding each mode, please refer to the Reach System
+ * Communication Protocol specification.
  */
 enum class Mode : unsigned char
 {

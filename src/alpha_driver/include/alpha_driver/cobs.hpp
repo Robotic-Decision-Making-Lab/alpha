@@ -26,23 +26,23 @@ namespace alpha_driver
 {
 
 /**
- * @brief Encode the data using the consistent overhead bytes stuffing (COBS) algorithm.
+ * @brief Encode serial data using the COBS algorithm.
  *
  * @remark This implementation has been inspired by the following source:
  * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L19
  *
- * @param data
+ * @param data serial data to encode
  * @return std::vector<unsigned char>
  */
 std::vector<unsigned char> cobs_encode(const std::vector<unsigned char> & data);
 
 /**
- * @brief Decode a data packet that has been encoded using the COBS algorithm.
+ * @brief Decode serial data that has been encoded with the COBS algorithm.
  *
  * @remark This implementation has been inspired by the following source:
  * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L74
  *
- * @param data serial data that is encoded with COBS encoding and now needs to be decoded
+ * @param data serial data to decode
  * @return std::vector<unsigned char>
  */
 std::vector<unsigned char> cobs_decode(const std::vector<unsigned char> & data);

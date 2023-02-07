@@ -39,7 +39,7 @@ public:
   /**
    * @brief Attempt to establish a connection with the Alpha manipulator.
    *
-   * @remark This configures the serial port for R/W operation at a baudrate of 115200.
+   * @note This configures the serial port for R/W operation at a baudrate of 115200.
    *
    * @param device full path to the serial device file
    * @param polling_timeout_ms timeout (ms) between serial port reads; used for VTIME
@@ -57,8 +57,8 @@ public:
    * @note This method performs packet encoding. It is not necessary to encode the data before
    * calling this method.
    *
-   * @param packet message to send to the Reach Alpha manipulator; the data
-   * should not yet be encoded.
+   * @param packet message to send to the Reach Alpha manipulator; the data should not yet be
+   * encoded.
    */
   void send(const Packet & packet) const;
 
@@ -71,10 +71,10 @@ public:
   void register_callback(PacketId packet_type, const std::function<void(Packet)> & callback);
 
   /**
-   * @brief Indicates whether or not the arm connection is currently active.
+   * @brief Indicates whether or not the serial client is currently active.
    *
-   * @note To be considered 'active' there must be an open serial connection and the
-   * client must be actively receiving heartbeat packets from the Reach Alpha manipulator.
+   * @note To be considered 'active' there must be an open serial connection and a worker should be
+   * polling the RX.
    *
    * @return true
    * @return false
@@ -83,7 +83,7 @@ public:
 
 private:
   /**
-   * @brief Defines the current state of the serial port.
+   * @brief Current state of the serial port.
    */
   enum class PortState
   {

@@ -29,25 +29,21 @@ namespace alpha_driver
 
 /**
  * @brief CRC initial value specified in the BPL protocol
- *
  */
 const unsigned char kInitialValue = 0x00;
 
 /**
  * @brief CRC final XOR value specified in the BPL protocol.
- *
  */
 const unsigned char kFinalXorValue = 0xFF;
 
 /**
  * @brief BPL protocol specifies that the CRC input should be reflected.
- *
  */
 const bool kInputReflected = true;
 
 /**
  * @brief BPL protocol specifies that the CRC result should be reflected.
- *
  */
 const bool kResultReflected = true;
 
@@ -64,8 +60,8 @@ const bool kResultReflected = true;
  *   - Result Reflected: True
  *   - Use Reflected Lookup Table: False \n
  *   \n
- *   For help computing the lookup table, you can use the handy-dandy calculator provided
- *   in the link below: http://www.sunshine2k.de/coding/javascript/crc/crc_js.html
+ *   For help computing the lookup table, you can use the handy-dandy calculator available
+ *   at this link below: http://www.sunshine2k.de/coding/javascript/crc/crc_js.html
  */
 const std::array<unsigned char, 256> kCrc8LookupTable = {
   0x00, 0x4D, 0x9A, 0xD7, 0x79, 0x34, 0xE3, 0xAE, 0xF2, 0xBF, 0x68, 0x25, 0x8B, 0xC6, 0x11, 0x5C,
@@ -105,7 +101,7 @@ unsigned char reflect(std::uint64_t data, int size);
  * Part 3: CRC Implementation Code in C/C++" (2000), retrieved Jan 6, 2023:
  * https://barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
  *
- * @param data packet whose CRC should be calculated
+ * @param data serial data whose CRC should be calculated
  * @param initial_value CRC initial value
  * @param final_xor_value CRC final XOR value
  * @param input_reflected Reflect the input
@@ -119,12 +115,12 @@ unsigned char calculate_crc8(
   const std::array<unsigned char, 256> & lookup_table);
 
 /**
- * @brief Calculate the CRC value for a packet using the BPL protocol specification.
+ * @brief Calculate the CRC value for a message using the BPL protocol specification.
  *
  * @remark This is a wrapper for the @ref calculate_crc8 method defined using the BPL specifications
  * to help improve usability.
  *
- * @param data packet whose CRC should be calculated using the BPL specification
+ * @param data serial data whose CRC should be calculated using the BPL specification
  * @return unsigned char
  */
 unsigned char calculate_bpl_crc8(const std::vector<unsigned char> & data);

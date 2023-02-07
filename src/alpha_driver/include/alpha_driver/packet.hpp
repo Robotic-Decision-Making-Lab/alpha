@@ -32,18 +32,13 @@ class Packet
 {
 public:
   /**
-   * @brief Use the default copy constructor for Packets
-   */
-  Packet(const Packet &) = default;
-
-  /**
    * @brief Create a new Packet.
    *
    * @remark Each packet has been designed to be immutable, and, therefore, requires the packet
    * data to be provided at construction.
    *
    * @param packet_id type of packet
-   * @param device_id ID of the device that the data represents
+   * @param device_id ID of the device that the data targets
    * @param data packet data
    */
   Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char> data);
@@ -56,8 +51,7 @@ public:
   std::vector<unsigned char> encode() const;
 
   /**
-   * @brief Decode a packet that has been encoded using the BPL communication
-   * specification.
+   * @brief Decode a packet that has been encoded using the BPL communication specification.
    *
    * @param data
    * @return Packet
@@ -65,14 +59,14 @@ public:
   static Packet decode(const std::vector<unsigned char> & data);
 
   /**
-   * @brief Get the unique packet identifier for a given message.
+   * @brief Get the unique packet identifier.
    *
    * @return PacketId
    */
   PacketId packet_id() const;
 
   /**
-   * @brief Get the unique device ID that the data represents.
+   * @brief Get the unique device identifier.
    *
    * @return DeviceId
    */
