@@ -82,9 +82,16 @@ public:
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
+  enum class control_mode : int
+  {
+    kUndefined = 0,
+    kVelocity = 1,
+    kPosition = 2,
+  };
+
   void update_position_cb(const alpha_driver::Packet & packet);
   void update_velocity_cb(const alpha_driver::Packet & packet);
-  void poll_state(const int freq) const;
+  void poll_state(int freq) const;
 
   // Driver things
   alpha_driver::Driver driver_;
@@ -96,9 +103,13 @@ private:
   int heartbeat_timeout_;
   int state_update_freq_;
 
-  // ros2_control interfaces
-  std::vector<double> hw_commands_velocities_, hw_commands_positions_;
-  std::vector<double> hw_states_position_, hw_states_velocity_;
+  // ros2_control command interfaces
+  std::vector<double> hw_commands_velocities_;
+  std::vector<double> hw_commands_positions_;
+
+  // ros2_control state interfaces
+  std::vector<double> hw_states_position_;
+  std::vector<double> hw_states_velocity_;
 };
 
 }  // namespace alpha_hardware
