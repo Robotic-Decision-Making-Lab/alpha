@@ -126,7 +126,7 @@ void SerialClient::send(const Packet & packet) const
     if (write(handle_, encoded_data.data(), encoded_data.size()) < 0) {
       RCLCPP_WARN(  // NOLINT
         rclcpp::get_logger("SerialClient"),
-        "An error occurred while attempting to write a message.");
+        "Failed to write the encoded packet to the serial port.");
     }
   }
   catch (const std::exception & e) {
