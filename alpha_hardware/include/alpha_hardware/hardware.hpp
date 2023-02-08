@@ -55,6 +55,11 @@ public:
     const rclcpp_lifecycle::State & previous_state) override;
 
   HARDWARE_INTERFACE_PUBLIC
+  hardware_interface::return_type prepare_command_mode_switch(
+    const std::vector<std::string> & start_interfaces,
+    const std::vector<std::string> & stop_interfaces) override;
+
+  HARDWARE_INTERFACE_PUBLIC
   std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
 
   HARDWARE_INTERFACE_PUBLIC
@@ -92,7 +97,7 @@ private:
   int state_update_freq_;
 
   // ros2_control interfaces
-  std::vector<double> hw_commands_;
+  std::vector<double> hw_commands_velocities_, hw_commands_positions_;
   std::vector<double> hw_states_position_, hw_states_velocity_;
 };
 

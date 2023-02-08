@@ -26,6 +26,7 @@
 #include "alpha_driver/device_id.hpp"
 #include "alpha_driver/mode.hpp"
 #include "alpha_driver/packet_id.hpp"
+#include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 namespace alpha_hardware
@@ -50,16 +51,60 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
 
   hw_states_position_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_states_velocity_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  hw_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  hw_commands_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  hw_commands_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
   // Load ROS params
   serial_port_ = std::stod(info_.hardware_parameters["serial_port"]);
   heartbeat_timeout_ = std::stod(info_.hardware_parameters["heartbeat_timeout"]);
   state_update_freq_ = std::stod(info_.hardware_parameters["state_update_frequency"]);
 
+  for (const hardware_interface::ComponentInfo & joint : info_.joints) {
+    // AlphaHardware has two command interfaces (position & velocity) and two state interfaces
+    // (position & velocity)
+    if (joint.command_interfaces.size() != 2) {
+      RCLCPP_FATAL(  // NOLINT
+        rclcpp::get_logger("AlphaHardware"),
+        "Joint '%s' has %zu command interfaces found. 2 expected.", joint.name.c_str(),
+        joint.command_interfaces.size());
+
+      return hardware_interface::CallbackReturn::ERROR;
+    }
+
+    if (!(joint.command_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
+          joint.command_interfaces[0].name == hardware_interface::HW_IF_VELOCITY)) {
+      RCLCPP_FATAL(  // NOLINT
+        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
+        "Joint '%s' has %s command interface. Expected %s or %s.", joint.name.c_str(),
+        joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
+        hardware_interface::HW_IF_VELOCITY);
+
+      return hardware_interface::CallbackReturn::ERROR;
+    }
+
+    if (joint.state_interfaces.size() != 2) {
+      RCLCPP_FATAL(  // NOLINT
+        rclcpp::get_logger("AlphaHardware"), "Joint '%s' has %zu state interface. 2 expected.",
+        joint.name.c_str(), joint.state_interfaces.size());
+
+      return hardware_interface::CallbackReturn::ERROR;
+    }
+
+    if (!(joint.state_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
+          joint.state_interfaces[0].name == hardware_interface::HW_IF_VELOCITY)) {
+      RCLCPP_FATAL(  // NOLINT
+        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
+        "Joint '%s' has %s state interface. Expected %s or %s.", joint.name.c_str(),
+        joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
+        hardware_interface::HW_IF_VELOCITY);
+
+      return hardware_interface::CallbackReturn::ERROR;
+    }
+  }
+
   // Start the driver
   if (!driver_.start(serial_port_, heartbeat_timeout_)) {
-    RCLCPP_ERROR(  // NOLINT
+    RCLCPP_FATAL(  // NOLINT
       rclcpp::get_logger("AlphaHardware"),
       "Failed to initialize the serial driver for the AlphaHardware system interface.");
 
@@ -96,6 +141,13 @@ hardware_interface::CallbackReturn AlphaHardware::on_cleanup(const rclcpp_lifecy
   driver_.stop();
 
   return hardware_interface::CallbackReturn::SUCCESS;
+}
+
+hardware_interface::return_type AlphaHardware::prepare_command_mode_switch(
+  const std::vector<std::string> & start_interfaces,
+  const std::vector<std::string> & stop_interfaces)
+{
+  /* data */
 }
 
 std::vector<hardware_interface::StateInterface> AlphaHardware::export_state_interfaces()
