@@ -108,8 +108,8 @@ private:
   std::vector<double> hw_commands_positions_;
 
   // ros2_control state interfaces
-  std::vector<double> hw_states_position_;
-  std::vector<double> hw_states_velocity_;
+  std::vector<double> hw_states_positions_;
+  std::vector<double> hw_states_velocities_;
 };
 
 }  // namespace alpha_hardware

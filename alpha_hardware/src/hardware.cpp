@@ -49,8 +49,8 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
-  hw_states_position_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  hw_states_velocity_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  hw_states_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  hw_states_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_commands_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_commands_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
@@ -75,7 +75,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
           joint.command_interfaces[0].name == hardware_interface::HW_IF_VELOCITY)) {
       RCLCPP_FATAL(  // NOLINT
         rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-        "Joint '%s' has %s command interface. Expected %s or %s.", joint.name.c_str(),
+        "Joint '%s' has a %s command interface. Expected %s or %s.", joint.name.c_str(),
         joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
         hardware_interface::HW_IF_VELOCITY);
 
@@ -84,7 +84,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
 
     if (joint.state_interfaces.size() != 2) {
       RCLCPP_FATAL(  // NOLINT
-        rclcpp::get_logger("AlphaHardware"), "Joint '%s' has %zu state interface. 2 expected.",
+        rclcpp::get_logger("AlphaHardware"), "Joint '%s' has %zu state interfaces. 2 expected.",
         joint.name.c_str(), joint.state_interfaces.size());
 
       return hardware_interface::CallbackReturn::ERROR;
@@ -94,7 +94,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
           joint.state_interfaces[0].name == hardware_interface::HW_IF_VELOCITY)) {
       RCLCPP_FATAL(  // NOLINT
         rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-        "Joint '%s' has %s state interface. Expected %s or %s.", joint.name.c_str(),
+        "Joint '%s' has a %s state interface. Expected %s or %s.", joint.name.c_str(),
         joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
         hardware_interface::HW_IF_VELOCITY);
 
@@ -144,18 +144,37 @@ hardware_interface::CallbackReturn AlphaHardware::on_cleanup(const rclcpp_lifecy
 }
 
 hardware_interface::return_type AlphaHardware::prepare_command_mode_switch(
-  const std::vector<std::string> & start_interfaces,
-  const std::vector<std::string> & stop_interfaces)
+  const std::vector<std::string> &, const std::vector<std::string> &)
 {
   /* data */
 }
 
 std::vector<hardware_interface::StateInterface> AlphaHardware::export_state_interfaces()
-{ /* data */
+{
+  std::vector<hardware_interface::StateInterface> state_interfaces;
+
+  for (std::size_t i = 0; i < info_.joints.size(); i++) {
+    state_interfaces.emplace_back(
+      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_positions_[i]);
+    state_interfaces.emplace_back(
+      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_states_velocities_[i]);
+  }
+
+  return state_interfaces;
 }
 
 std::vector<hardware_interface::CommandInterface> AlphaHardware::export_command_interfaces()
-{ /* data */
+{
+  std::vector<hardware_interface::CommandInterface> command_interfaces;
+
+  for (std::size_t i = 0; i < info_.joints.size(); i++) {
+    command_interfaces.emplace_back(
+      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_commands_positions_[i]);
+    command_interfaces.emplace_back(
+      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_states_velocities_[i]);
+  }
+
+  return command_interfaces;
 }
 
 hardware_interface::CallbackReturn AlphaHardware::on_activate(const rclcpp_lifecycle::State &)
