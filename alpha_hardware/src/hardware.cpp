@@ -103,8 +103,11 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
   }
 
   // Start the driver
-  if (!driver_.start(serial_port_, heartbeat_timeout_)) {
-    RCLCPP_FATAL(  // NOLINT
+  try {
+    driver_.start(serial_port_, heartbeat_timeout_);
+  }
+  catch (const std::exception & e) {
+    RCLCPP_ERROR(
       rclcpp::get_logger("AlphaHardware"),
       "Failed to initialize the serial driver for the AlphaHardware system interface.");
 
