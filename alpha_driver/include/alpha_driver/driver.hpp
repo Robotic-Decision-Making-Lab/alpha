@@ -171,7 +171,7 @@ private:
    *
    * @param freq frequency that the heartbeats should be sent at
    */
-  void enable_heartbeat(const int freq);
+  void enable_heartbeat(int freq);
 
   /**
    * @brief Disable heartbeat messages from the Alpha manipulator.
@@ -185,7 +185,7 @@ private:
    *
    * @param freq frequency that the heartbeat messages should be sent at
    */
-  void set_heartbeat_freq(const int freq);
+  void set_heartbeat_freq(int freq);
 
   /**
    * @brief Update the timestamp to indicate that a heartbeat was received.
@@ -202,7 +202,7 @@ private:
    * @param heartbeat_timeout_ms maximum allowable time between heartbeat messages before notifying
    * users that a timeout may have occurred.
    */
-  void monitor_heartbeat(const int heartbeat_timeout_ms) const;
+  void monitor_heartbeat(int heartbeat_timeout_ms) const;
 
   SerialClient client_;
 

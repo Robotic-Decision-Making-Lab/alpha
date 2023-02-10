@@ -164,7 +164,7 @@ void Driver::send_float(float value, PacketId packet_type, DeviceId device_id) c
   client_.send(packet);
 }
 
-void Driver::enable_heartbeat(const int freq)
+void Driver::enable_heartbeat(int freq)
 {
   // We request the model number as the heartbeat because there isn't an official heartbeat message
   const std::vector<unsigned char> heartbeat_config = {
@@ -179,7 +179,7 @@ void Driver::enable_heartbeat(const int freq)
 
 void Driver::disable_heartbeat() { set_heartbeat_freq(0); }
 
-void Driver::set_heartbeat_freq(const int freq)
+void Driver::set_heartbeat_freq(int freq)
 {
   const std::vector<unsigned char> heartbeat_frequency = {static_cast<unsigned char>(freq)};
   const Packet packet(PacketId::kHeartbeatFreqency, DeviceId::kAllJoints, heartbeat_frequency);
@@ -193,7 +193,7 @@ void Driver::update_last_heartbeat_cb(const Packet &)
   last_heartbeat_ = std::chrono::steady_clock::now();
 }
 
-void Driver::monitor_heartbeat(const int heartbeat_timeout_ms) const
+void Driver::monitor_heartbeat(int heartbeat_timeout_ms) const
 {
   while (running_.load()) {
     // Make sure that the lock is properly scoped so that we don't accidentally keep the look

@@ -80,7 +80,7 @@ public:
    * @return true
    * @return false
    */
-  bool active() const;  // NOLINT
+  bool active() const;
 
 private:
   /**
