@@ -57,10 +57,11 @@ public:
    * @note This method performs packet encoding. It is not necessary to encode the data before
    * calling this method.
    *
-   * @param packet message to send to the Reach Alpha manipulator; the data should not yet be
-   * encoded.
+   * @param packet message to send to the Reach Alpha manipulator
+   * @return true
+   * @return false
    */
-  void send(const Packet & packet) const;
+  bool send(const Packet & packet) const;
 
   /**
    * @brief Register a new callback function for a specified packet type.
@@ -79,7 +80,7 @@ public:
    * @return true
    * @return false
    */
-  bool active() const;  // NOLINT
+  bool active() const;
 
 private:
   /**

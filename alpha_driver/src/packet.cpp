@@ -36,16 +36,13 @@ Packet::Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char
   device_id_(device_id),
   data_(std::move(data))
 {
+  if (data_.empty()) {
+    throw std::invalid_argument("Cannot create a packet with no data.");
+  }
 }
 
 std::vector<unsigned char> Packet::encode() const
 {
-  if (data_.empty()) {
-    throw std::runtime_error(
-      "Cannot encode an empty data packet. Please define the packet data before attempting to "
-      "encode it.");
-  }
-
   std::vector<unsigned char> data(data_);
 
   // Add the packet ID and the device ID
@@ -69,7 +66,7 @@ std::vector<unsigned char> Packet::encode() const
 Packet Packet::decode(const std::vector<unsigned char> & data)
 {
   if (data.empty()) {
-    throw std::runtime_error("An empty data packet was received for decoding.");
+    throw std::invalid_argument("An empty data packet was received for decoding.");
   }
 
   // Note that an exception will be raised if the decoding fails

@@ -38,17 +38,11 @@ Driver::Driver()
     std::bind(&Driver::update_last_heartbeat_cb, this, std::placeholders::_1));
 }
 
-bool Driver::start(const std::string & serial_port, const int heartbeat_timeout_ms)
+void Driver::start(const std::string & serial_port, int heartbeat_timeout_ms)
 {
-  try {
-    // Attempt to connect the serial client
-    // We don't expose the VTIME timeout to the user API to avoid usability concerns
-    client_.connect(serial_port);
-  }
-  catch (const std::exception & e) {
-    RCLCPP_ERROR(rclcpp::get_logger("AlphaDriver"), e.what());  // NOLINT
-    return false;
-  }
+  // Attempt to connect the serial client
+  // We don't expose the VTIME timeout to the user API to avoid usability concerns
+  client_.connect(serial_port);
 
   // Disable any previous heartbeat configurations
   disable_heartbeat();
@@ -66,8 +60,6 @@ bool Driver::start(const std::string & serial_port, const int heartbeat_timeout_
 
   // Start the thread that monitors heartbeats from the manipulator
   heartbeat_worker_ = std::thread(&Driver::monitor_heartbeat, this, heartbeat_timeout_ms);
-
-  return true;
 }
 
 void Driver::stop()
@@ -172,7 +164,7 @@ void Driver::send_float(float value, PacketId packet_type, DeviceId device_id) c
   client_.send(packet);
 }
 
-void Driver::enable_heartbeat(const int freq)
+void Driver::enable_heartbeat(int freq)
 {
   // We request the model number as the heartbeat because there isn't an official heartbeat message
   const std::vector<unsigned char> heartbeat_config = {
@@ -187,7 +179,7 @@ void Driver::enable_heartbeat(const int freq)
 
 void Driver::disable_heartbeat() { set_heartbeat_freq(0); }
 
-void Driver::set_heartbeat_freq(const int freq)
+void Driver::set_heartbeat_freq(int freq)
 {
   const std::vector<unsigned char> heartbeat_frequency = {static_cast<unsigned char>(freq)};
   const Packet packet(PacketId::kHeartbeatFreqency, DeviceId::kAllJoints, heartbeat_frequency);
@@ -201,7 +193,7 @@ void Driver::update_last_heartbeat_cb(const Packet &)
   last_heartbeat_ = std::chrono::steady_clock::now();
 }
 
-void Driver::monitor_heartbeat(const int heartbeat_timeout_ms) const
+void Driver::monitor_heartbeat(int heartbeat_timeout_ms) const
 {
   while (running_.load()) {
     // Make sure that the lock is properly scoped so that we don't accidentally keep the look

@@ -25,7 +25,8 @@ Checks: >
   -bugprone-narrowing-conversions,
   -bugprone-easily-swappable-parameters,
   -bugprone-implicit-widening-of-multiplication-result,
-  -modernize-avoid-bind
+  -modernize-avoid-bind,
+  -modernize-use-nodiscard
 WarningsAsErrors: "*"
 CheckOptions:
   - { key: readability-identifier-naming.NamespaceCase, value: lower_case }
