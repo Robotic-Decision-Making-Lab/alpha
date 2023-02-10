@@ -56,6 +56,24 @@ TEST(PacketTest, TestPacketDecode)
   ASSERT_THAT(packet.data(), ::testing::ElementsAreArray(decoded_data));
 }
 
+TEST(PacketTest, TestInvalidDecoding)
+{
+  const std::vector<unsigned char> decoded_data = {0x01, 0x02, 0x03, 0x04};
+
+  // Cannot decoded data that has already been decoded
+  ASSERT_THROW(alpha_driver::Packet::decode(decoded_data), std::runtime_error);
+}
+
+TEST(PacketTest, TestInvalidPacketConstruction)
+{
+  const std::vector<unsigned char> empty_data = {};
+
+  ASSERT_THROW(
+    alpha_driver::Packet(
+      alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kAllJoints, empty_data),
+    std::invalid_argument);
+}
+
 }  // namespace test_alpha_driver
 
 int main(int argc, char ** argv)

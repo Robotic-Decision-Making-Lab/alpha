@@ -34,12 +34,9 @@ public:
   /**
    * @brief Create a new Packet.
    *
-   * @remark Each packet has been designed to be immutable, and, therefore, requires the packet
-   * data to be provided at construction.
-   *
    * @param packet_id type of packet
    * @param device_id ID of the device that the data targets
-   * @param data packet data
+   * @param data unencoded serial data
    */
   Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char> data);
 
@@ -53,7 +50,7 @@ public:
   /**
    * @brief Decode a packet that has been encoded using the BPL communication specification.
    *
-   * @param data
+   * @param data encoded serial data
    * @return Packet
    */
   static Packet decode(const std::vector<unsigned char> & data);

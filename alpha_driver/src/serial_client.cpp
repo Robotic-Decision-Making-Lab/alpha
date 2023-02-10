@@ -42,7 +42,7 @@ namespace alpha_driver
 void SerialClient::connect(const std::string & device, const int polling_timeout_ms)
 {
   if (device.empty()) {
-    throw std::logic_error("Attempted to open file using an unassigned file path.");
+    throw std::invalid_argument("Attempted to open file using an unassigned file path.");
   }
 
   handle_ = open(device.c_str(), O_RDWR);
@@ -118,20 +118,18 @@ void SerialClient::disconnect()
   close(handle_);
 }
 
-void SerialClient::send(const Packet & packet) const
+bool SerialClient::send(const Packet & packet) const
 {
-  try {
-    std::vector<unsigned char> encoded_data = packet.encode();
+  std::vector<unsigned char> encoded_data = packet.encode();
 
-    if (write(handle_, encoded_data.data(), encoded_data.size()) < 0) {
-      RCLCPP_WARN(  // NOLINT
-        rclcpp::get_logger("SerialClient"),
-        "Failed to write the encoded packet to the serial port.");
-    }
+  if (write(handle_, encoded_data.data(), encoded_data.size()) < 0) {
+    RCLCPP_WARN(  // NOLINT
+      rclcpp::get_logger("SerialClient"), "Failed to write the encoded packet to the serial port.");
+
+    return false;
   }
-  catch (const std::exception & e) {
-    RCLCPP_WARN(rclcpp::get_logger("SerialClient"), e.what());  // NOLINT
-  }
+
+  return true;
 }
 
 void SerialClient::register_callback(

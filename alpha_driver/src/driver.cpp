@@ -38,17 +38,11 @@ Driver::Driver()
     std::bind(&Driver::update_last_heartbeat_cb, this, std::placeholders::_1));
 }
 
-bool Driver::start(const std::string & serial_port, const int heartbeat_timeout_ms)
+void Driver::start(const std::string & serial_port, int heartbeat_timeout_ms)
 {
-  try {
-    // Attempt to connect the serial client
-    // We don't expose the VTIME timeout to the user API to avoid usability concerns
-    client_.connect(serial_port);
-  }
-  catch (const std::exception & e) {
-    RCLCPP_ERROR(rclcpp::get_logger("AlphaDriver"), e.what());  // NOLINT
-    return false;
-  }
+  // Attempt to connect the serial client
+  // We don't expose the VTIME timeout to the user API to avoid usability concerns
+  client_.connect(serial_port);
 
   // Disable any previous heartbeat configurations
   disable_heartbeat();
@@ -66,8 +60,6 @@ bool Driver::start(const std::string & serial_port, const int heartbeat_timeout_
 
   // Start the thread that monitors heartbeats from the manipulator
   heartbeat_worker_ = std::thread(&Driver::monitor_heartbeat, this, heartbeat_timeout_ms);
-
-  return true;
 }
 
 void Driver::stop()

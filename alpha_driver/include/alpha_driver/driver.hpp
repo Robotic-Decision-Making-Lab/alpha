@@ -51,10 +51,8 @@ public:
    * @param serial_port serial port that the manipulator is available at
    * @param heartbeat_timeout_ms maximum time between heartbeat messages before the connection is
    * considered timed out, defaults to 3 seconds
-   * @return true
-   * @return false
    */
-  bool start(const std::string & serial_port, const int heartbeat_timeout_ms = 3000);
+  void start(const std::string & serial_port, int heartbeat_timeout_ms = 3000);
 
   /**
    * @brief Stop the driver.
