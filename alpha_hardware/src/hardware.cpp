@@ -55,9 +55,9 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
   hw_commands_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
   // Load ROS params
-  serial_port_ = std::stod(info_.hardware_parameters["serial_port"]);
-  heartbeat_timeout_ = std::stod(info_.hardware_parameters["heartbeat_timeout"]);
-  state_update_freq_ = std::stod(info_.hardware_parameters["state_update_frequency"]);
+  serial_port_ = info_.hardware_parameters["serial_port"];
+  heartbeat_timeout_ = std::stoi(info_.hardware_parameters["heartbeat_timeout"]);
+  state_update_freq_ = std::stoi(info_.hardware_parameters["state_update_frequency"]);
 
   for (const hardware_interface::ComponentInfo & joint : info_.joints) {
     // AlphaHardware has two command interfaces (position & velocity) and two state interfaces
@@ -107,7 +107,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
     driver_.start(serial_port_, heartbeat_timeout_);
   }
   catch (const std::exception & e) {
-    RCLCPP_ERROR(
+    RCLCPP_ERROR(  // NOLINT
       rclcpp::get_logger("AlphaHardware"),
       "Failed to initialize the serial driver for the AlphaHardware system interface.");
 
@@ -186,8 +186,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_activate(const rclcpp_lifec
     driver_.set_mode(alpha_driver::Mode::kStandby, alpha_driver::DeviceId::kAllJoints);
   }
   catch (const std::exception & e) {
-    RCLCPP_ERROR(  // NOLINT
-      rclcpp::get_logger("AlphaHardware"), "Failed to activate the Reach Alpha manipulator.");
+    RCLCPP_ERROR(rclcpp::get_logger("AlphaHardware"), e.what());  // NOLINT
     return hardware_interface::CallbackReturn::ERROR;
   }
 
@@ -200,8 +199,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_deactivate(const rclcpp_lif
     driver_.set_mode(alpha_driver::Mode::kDisable, alpha_driver::DeviceId::kAllJoints);
   }
   catch (const std::exception & e) {
-    RCLCPP_ERROR(  // NOLINT
-      rclcpp::get_logger("AlphaHardware"), "Failed to deactivate the Reach Alpha manipulator.");
+    RCLCPP_ERROR(rclcpp::get_logger("AlphaHardware"), e.what());  // NOLINT
     return hardware_interface::CallbackReturn::ERROR;
   }
 
