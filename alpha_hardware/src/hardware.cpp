@@ -102,14 +102,23 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
     }
   }
 
+  RCLCPP_INFO(  // NOLINT
+    rclcpp::get_logger("AlphaHardware"),
+    "Successfully initialized the AlphaHardware system interface!");
+
+  return hardware_interface::CallbackReturn::SUCCESS;
+}
+
+hardware_interface::CallbackReturn AlphaHardware::on_configure(const rclcpp_lifecycle::State &)
+{
   // Start the driver
   try {
     driver_.start(serial_port_, heartbeat_timeout_);
   }
   catch (const std::exception & e) {
-    RCLCPP_ERROR(  // NOLINT
+    RCLCPP_FATAL(  // NOLINT
       rclcpp::get_logger("AlphaHardware"),
-      "Failed to initialize the serial driver for the AlphaHardware system interface.");
+      "Failed to configure the serial driver for the AlphaHardware system interface.");
 
     return hardware_interface::CallbackReturn::ERROR;
   }
@@ -129,7 +138,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
 
   RCLCPP_INFO(  // NOLINT
     rclcpp::get_logger("AlphaHardware"),
-    "Successfully initialized the AlphaHardware system interface!");
+    "Successfully configured the AlphaHardware system interface for serial communication!");
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
