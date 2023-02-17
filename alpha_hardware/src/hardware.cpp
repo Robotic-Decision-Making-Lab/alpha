@@ -268,23 +268,20 @@ hardware_interface::return_type AlphaHardware::read(const rclcpp::Time &, const 
 
 hardware_interface::return_type AlphaHardware::write(const rclcpp::Time &, const rclcpp::Duration &)
 {
-  // Construct packets to send to the manipulator
-  for (std::size_t i = 0; i < hw_states_positions_.size(); i++) {
+  // Send the commands for each joint
+  for (std::size_t i = 0; i < control_modes_.size(); i++) {
     switch (control_modes_[i]) {
-      case ControlMode::kUndefined:
-        /* nothing to send here */
-        // TODO(evan_palmer): figure out best way to handle undefined interface
-        break;
       case ControlMode::kPosition:
-        /* write the position command(s) */
-        // TODO(evan_palmer): add position command to vector
+        driver_.set_position(hw_commands_positions_[i], static_cast<alpha_driver::DeviceId>(i));
         break;
       case ControlMode::kVelocity:
-        /* write the velocity command(s) */
-        // TODO(evan_palmer): add velocity command to vector
+        driver_.set_velocity(hw_commands_velocities_[i], static_cast<alpha_driver::DeviceId>(i));
+        break;
+      default:
         break;
     }
   }
+
   return hardware_interface::return_type::OK;
 }
 
