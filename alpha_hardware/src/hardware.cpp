@@ -53,6 +53,9 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
   hw_states_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_commands_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_commands_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  control_modes_.resize(
+    info_.joints.size(),
+    ControlMode::kVelocity);  // TODO(evan_palmer): make the default mode a parameter
 
   // Load ROS params
   serial_port_ = info_.hardware_parameters["serial_port"];
@@ -156,9 +159,41 @@ hardware_interface::CallbackReturn AlphaHardware::on_cleanup(const rclcpp_lifecy
 }
 
 hardware_interface::return_type AlphaHardware::prepare_command_mode_switch(
-  const std::vector<std::string> &, const std::vector<std::string> &)
+  const std::vector<std::string> & start_interfaces,
+  const std::vector<std::string> & stop_interfaces)
 {
-  /* data */
+  // Prepare for new command modes
+  std::vector<ControlMode> new_modes = {};
+
+  for (const std::string & key : start_interfaces) {
+    for (auto & joint : info_.joints) {
+      if (key == joint.name + "/" + hardware_interface::HW_IF_POSITION) {
+        new_modes.push_back(ControlMode::kPosition);
+      }
+      if (key == joint.name + "/" + hardware_interface::HW_IF_VELOCITY) {
+        new_modes.push_back(ControlMode::kVelocity);
+      }
+    }
+  }
+
+  // Stop motion on all relevant joints that are stopping
+  for (const std::string & key : stop_interfaces) {
+    for (std::size_t i = 0; i < info_.joints.size(); i++) {
+      if (key.find(info_.joints[i].name) != std::string::npos) {
+        hw_commands_velocities_[i] = 0;
+        control_modes_[i] = ControlMode::kUndefined;  // Revert to undefined
+      }
+    }
+  }
+
+  // Set the new command modes
+  for (std::size_t i = 0; i < info_.joints.size(); i++) {
+    if (control_modes_[i] != ControlMode::kUndefined) {
+      return hardware_interface::return_type::ERROR;
+    }
+    control_modes_[i] = new_modes[i];
+  }
+  return hardware_interface::return_type::OK;
 }
 
 std::vector<hardware_interface::StateInterface> AlphaHardware::export_state_interfaces()
@@ -215,24 +250,72 @@ hardware_interface::CallbackReturn AlphaHardware::on_deactivate(const rclcpp_lif
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-hardware_interface::return_type AlphaHardware::read(
-  const rclcpp::Time & time, const rclcpp::Duration & period)
+hardware_interface::return_type AlphaHardware::read(const rclcpp::Time &, const rclcpp::Duration &)
 {
-  /* data */
+  // Get access to the real-time states
+  const std::lock_guard<std::mutex> lock(access_async_states_);
+
+  // Copy the latest readings to the read ros2_control state interfaces
+  // We need to maintain two state vectors here because the ros2_control endpoint won't have access
+  // to the mutex needed to read the real-time states
+  std::copy(
+    hw_states_positions_.begin(), hw_states_positions_.end(), async_states_positions_.begin());
+  std::copy(
+    hw_states_velocities_.begin(), hw_states_velocities_.end(), async_states_velocities_.begin());
+
+  return hardware_interface::return_type::OK;
 }
 
-hardware_interface::return_type AlphaHardware::write(
-  const rclcpp::Time & time, const rclcpp::Duration & period)
+hardware_interface::return_type AlphaHardware::write(const rclcpp::Time &, const rclcpp::Duration &)
 {
-  /* data */
+  // Construct packets to send to the manipulator
+  for (std::size_t i = 0; i < hw_states_positions_.size(); i++) {
+    switch (control_modes_[i]) {
+      case ControlMode::kUndefined:
+        /* nothing to send here */
+        // TODO(evan_palmer): figure out best way to handle undefined interface
+        break;
+      case ControlMode::kPosition:
+        /* write the position command(s) */
+        // TODO(evan_palmer): add position command to vector
+        break;
+      case ControlMode::kVelocity:
+        /* write the velocity command(s) */
+        // TODO(evan_palmer): add velocity command to vector
+        break;
+    }
+  }
+  return hardware_interface::return_type::OK;
 }
 
 void AlphaHardware::update_position_cb(const alpha_driver::Packet & packet)
-{ /* data */
+{
+  if (packet.data().size() != 4) {
+    return;
+  }
+
+  float position;
+  std::memcpy(&position, &packet.data()[0], sizeof(position));  // NOLINT
+
+  const std::lock_guard<std::mutex> lock(access_async_states_);
+
+  // We assume that the device ID is the index within the vector
+  async_states_positions_[static_cast<std::size_t>(packet.device_id())] = position;
 }
 
 void AlphaHardware::update_velocity_cb(const alpha_driver::Packet & packet)
-{ /* data */
+{
+  if (packet.data().size() != 4) {
+    return;
+  }
+
+  float velocity;
+  std::memcpy(&velocity, &packet.data()[0], sizeof(velocity));  // NOLINT
+
+  const std::lock_guard<std::mutex> lock(access_async_states_);
+
+  // We assume that the device ID is the index within the vector
+  async_states_velocities_[static_cast<std::size_t>(packet.device_id())] = velocity;
 }
 
 void AlphaHardware::poll_state(const int freq) const

@@ -21,6 +21,7 @@
 #pragma once
 
 #include <atomic>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -86,11 +87,11 @@ public:
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
-  enum class control_mode : int
+  enum class ControlMode
   {
-    kUndefined = 0,
-    kVelocity = 1,
-    kPosition = 2,
+    kUndefined,
+    kVelocity,
+    kPosition,
   };
 
   void update_position_cb(const alpha_driver::Packet & packet);
@@ -112,8 +113,11 @@ private:
   std::vector<double> hw_commands_positions_;
 
   // ros2_control state interfaces
-  std::vector<double> hw_states_positions_;
-  std::vector<double> hw_states_velocities_;
+  std::vector<double> hw_states_positions_, async_states_positions_;
+  std::vector<double> hw_states_velocities_, async_states_velocities_;
+  std::vector<ControlMode> control_modes_;
+
+  std::mutex access_async_states_;
 };
 
 }  // namespace alpha_hardware
