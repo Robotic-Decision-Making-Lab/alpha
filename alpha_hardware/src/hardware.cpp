@@ -77,7 +77,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
     if (!(joint.command_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
           joint.command_interfaces[0].name == hardware_interface::HW_IF_VELOCITY)) {
       RCLCPP_FATAL(  // NOLINT
-        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
+        rclcpp::get_logger("AlphaHardware"),
         "Joint '%s' has a %s command interface. Expected %s or %s.", joint.name.c_str(),
         joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
         hardware_interface::HW_IF_VELOCITY);
@@ -96,7 +96,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
     if (!(joint.state_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
           joint.state_interfaces[0].name == hardware_interface::HW_IF_VELOCITY)) {
       RCLCPP_FATAL(  // NOLINT
-        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
+        rclcpp::get_logger("AlphaHardware"),
         "Joint '%s' has a %s state interface. Expected %s or %s.", joint.name.c_str(),
         joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
         hardware_interface::HW_IF_VELOCITY);
