@@ -17,7 +17,7 @@
       <visual>
         <geometry>
           <mesh
-            filename="package://bpl_alpha_description/meshes/end_effectors/RS1-124.stl" />
+            filename="package://alpha_description/meshes/end_effectors/RS1-124.stl" />
         </geometry>
         <material name="${name}_black" />
       </visual>
@@ -27,7 +27,7 @@
       <visual>
         <geometry>
           <mesh
-            filename="package://bpl_alpha_description/meshes/end_effectors/RS1-130.stl" />
+            filename="package://alpha_description/meshes/end_effectors/RS1-130.stl" />
         </geometry>
         <material name="${name}_black" />
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -54,7 +54,7 @@
       <visual>
         <geometry>
           <mesh
-            filename="package://bpl_alpha_description/meshes/end_effectors/RS1-139.stl" />
+            filename="package://alpha_description/meshes/end_effectors/RS1-139.stl" />
         </geometry>
         <material name="${name}_black" />
         <origin xyz="0 0 0" rpy="0 0 0" />

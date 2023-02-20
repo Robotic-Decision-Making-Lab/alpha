@@ -14,7 +14,7 @@
     <link name="${name}_m3_inline_link">
       <visual>
         <geometry>
-          <mesh filename="package://bpl_alpha_description/meshes/M3-INLINE.stl" />
+          <mesh filename="package://alpha_description/meshes/M3-INLINE.stl" />
         </geometry>
         <origin rpy="0 0 0" xyz="0 0 0" />
         <material name="alpha_black" />
@@ -34,7 +34,7 @@
     <link name="${name}_m2_1_1_link">
       <visual>
         <geometry>
-          <mesh filename="package://bpl_alpha_description/meshes/M2-1-1.stl" />
+          <mesh filename="package://alpha_description/meshes/M2-1-1.stl" />
         </geometry>
         <origin rpy="0 0 0" xyz="0 0 0" />
         <material name="${name}_black" />
@@ -56,7 +56,7 @@
     <link name="${name}_m2_joint_link">
       <visual>
         <geometry>
-          <mesh filename="package://bpl_alpha_description/meshes/M2.stl" />
+          <mesh filename="package://alpha_description/meshes/M2.stl" />
         </geometry>
         <origin rpy="0 0 0" xyz="0 0 0" />
         <material name="${name}_black" />
@@ -90,7 +90,7 @@
     <link name="${name}_m2_1_2_link">
       <visual>
         <geometry>
-          <mesh filename="package://bpl_alpha_description/meshes/M2-1-3.stl" />
+          <mesh filename="package://alpha_description/meshes/M2-1-3.stl" />
         </geometry>
         <origin rpy="0 0 0" xyz="0 0 0" />
         <material name="${name}_black" />
@@ -113,7 +113,7 @@
       <visual>
         <geometry>
           <mesh
-            filename="package://bpl_alpha_description/meshes/RS1-100-101-123.stl" />
+            filename="package://alpha_description/meshes/RS1-100-101-123.stl" />
         </geometry>
         <origin rpy="0 -1.5707 0" xyz="0 0 0" />
         <material name="${name}_black" />
@@ -151,7 +151,7 @@
       <limit effort="10" lower="0" upper="0.015" velocity="10" />
     </joint>
     <xacro:include
-      filename="$(find bpl_alpha_description)/urdf/end_effectors/standard_jaws.urdf.xacro" />
+      filename="$(find alpha_description)/urdf/end_effectors/standard_jaws.urdf.xacro" />
     <xacro:alpha_standard_jaws parent="${name}_jaws_base_link"
       name="${name}_standard_jaws" axis_a="${name}_axis_a">
       <origin xyz="0 0 0" rpy="0 0 0" />

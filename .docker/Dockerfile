@@ -18,6 +18,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install required ROS dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-humble-rviz2 \
+    ros-humble-joint-state-publisher-gui \
+    ros-humble-robot-state-publisher \
+    ros-humble-xacro \
     ros-humble-ros2-control \
     ros-humble-ros2-controllers \
     && apt-get autoremove -y \
@@ -30,9 +34,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     iputils-ping \
     net-tools \
     lsb-release \
+    python3-dev \
+    python3-pip \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
+
+# Install debugging/linting Python packages
+RUN pip3 install \
+    black \
+    flake8 \
+    isort \
+    pydocstyle \
+    mypy
 
 # Configure a new non-root user
 ARG USERNAME=dev
