@@ -196,7 +196,7 @@ void Driver::update_last_heartbeat_cb(const Packet &)
 void Driver::monitor_heartbeat(int heartbeat_timeout_ms) const
 {
   while (running_.load()) {
-    // Make sure that the lock is properly scoped so that we don't accidentally keep the look
+    // Make sure that the lock is properly scoped so that we don't accidentally keep the lock
     // forever
     {
       const std::lock_guard<std::mutex> lock(last_heartbeat_lock_);
