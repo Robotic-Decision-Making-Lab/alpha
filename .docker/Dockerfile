@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install required ROS dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-humble-rviz2 \
+    ros-humble-moveit \
     ros-humble-joint-state-publisher-gui \
     ros-humble-robot-state-publisher \
     ros-humble-xacro \
