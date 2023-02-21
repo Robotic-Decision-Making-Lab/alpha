@@ -5,8 +5,8 @@ Reach Alpha ROS2 Driver
 The ``alpha`` driver is a collection of ROS2 packages designed
 to support ROS2 integration with the `Reach Alpha 5 manipulator`_.
 
-**DISCLAIMER**: *This is an independent project not affiliated with or
-maintained by* `Reach Robotics`_.
+**DISCLAIMER**: This is an independent project not affiliated with or
+maintained by `Reach Robotics`_.
 
 .. _Reach Alpha 5 manipulator: https://reachrobotics.com/products/manipulators/reach-alpha/
 .. _Reach Robotics: https://reachrobotics.com/
@@ -34,6 +34,8 @@ using Docker on a Linux machine.
 
 Quick start
 -----------
+
+**TODO**: write instructions regarding how to get started with the project
 
 Getting help
 ------------
