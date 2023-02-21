@@ -47,10 +47,10 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             "description_file",
-            default_value="alpha.urdf.xacro",
+            default_value="alpha.config.xacro",
             description=(
                 "URDF/XACRO description file with the Alpha; should be stored within a"
-                " `urdf` directory"
+                " `config` directory"
             ),
         ),
         DeclareLaunchArgument(
@@ -93,7 +93,7 @@ def generate_launch_description() -> LaunchDescription:
                                 PathJoinSubstitution(
                                     [
                                         FindPackageShare(description_package),
-                                        "urdf",
+                                        "config",
                                         description_file,
                                     ]
                                 ),

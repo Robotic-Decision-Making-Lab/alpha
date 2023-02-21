@@ -1,0 +1,27 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: alpha_description
+    relative_path: config/alpha.config.xacro
+  srdf:
+    relative_path: config/alpha.srdf
+  package_settings:
+    author_name: Evan Palmer
+    author_email: evanp922@gmail.com
+    generated_timestamp: 1677018748
+  control_xacro:
+    command:
+      - position
+      - velocity
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+      - velocity
+    state:
+      - position
+      - velocity

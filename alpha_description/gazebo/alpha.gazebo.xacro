@@ -8,7 +8,7 @@
     <gazebo>
       <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
         <parameters>
-          $(find alpha_bringup)/config/alpha_controllers.yaml</parameters>
+          $(find alpha_description)/config/alpha_controllers.yaml</parameters>
       </plugin>
     </gazebo>
 
