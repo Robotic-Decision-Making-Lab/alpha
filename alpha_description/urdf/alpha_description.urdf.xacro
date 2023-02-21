@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<robot name="alpha_5" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:macro name="alpha_5" params="parent *origin name:=alpha_5">
+<robot name="alpha" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="alpha" params="parent *origin name:=alpha">
     <joint name="${name}_joint" type="fixed">
       <xacro:insert_block name="origin" />
       <parent link="${parent}" />
