@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="alpha_gazebo" params="prefix">
+
+    <!-- ros_control plugin -->
+    <gazebo>
+      <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+        <parameters>
+          $(find alpha_bringup)/config/alpha_controllers.yaml</parameters>
+      </plugin>
+    </gazebo>
+
+    <gazebo reference="${prefix}base_link" />
+    <gazebo reference="${prefix}m3_inline_link" />
+    <gazebo reference="${prefix}m2_1_1_link" />
+    <gazebo reference="${prefix}m2_joint_link" />
+    <gazebo reference="${prefix}m2_1_2_link" />
+    <gazebo reference="${prefix}m1_link" />
+    <gazebo reference="${prefix}jaws_base_link" />
+    <gazebo reference="${prefix}push_rod" />
+
+  </xacro:macro>
+
+</robot>

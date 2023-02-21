@@ -1,35 +1,37 @@
 <?xml version="1.0"?>
-<robot name="alpha_standard_jaws" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
   <xacro:macro name="alpha_standard_jaws"
-    params="parent *origin name:=alpha_standard_jaws axis_a">
-    <material name="${name}_black">
+    params="parent prefix axis_a *origin">
+
+    <material name="${prefix}black">
       <color rgba="0.3 0.3 0.3 1" />
     </material>
 
-    <joint name="${name}_joint" type="fixed">
+    <joint name="${prefix}base_joint" type="fixed">
       <xacro:insert_block name="origin" />
       <parent link="${parent}" />
-      <child link="${name}_base_link" />
+      <child link="${prefix}base_link" />
       <origin xyz="0 0 0" rpy="0 0 0" />
     </joint>
 
-    <link name="${name}_base_link">
+    <link name="${prefix}base_link">
       <visual>
         <geometry>
           <mesh
             filename="package://alpha_description/meshes/end_effectors/RS1-124.stl" />
         </geometry>
-        <material name="${name}_black" />
+        <material name="${prefix}black" />
       </visual>
     </link>
 
-    <link name="${name}_rs1_130_link">
+    <link name="${prefix}rs1_130_link">
       <visual>
         <geometry>
           <mesh
             filename="package://alpha_description/meshes/end_effectors/RS1-130.stl" />
         </geometry>
-        <material name="${name}_black" />
+        <material name="${prefix}black" />
         <origin xyz="0 0 0" rpy="0 0 0" />
       </visual>
       <collision>
@@ -40,23 +42,22 @@
       </collision>
     </link>
 
-    <joint name="${name}_rs1_130_joint" type="revolute">
+    <joint name="${prefix}rs1_130_joint" type="revolute">
       <origin xyz="0 0.0155 0.0069" rpy="0 0 0" />
-      <parent link="${name}_base_link" />
-      <child link="${name}_rs1_130_link" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}rs1_130_link" />
       <axis xyz="-1 0 0" />
       <limit lower="0" upper="0.5" effort="10" velocity="10" />
       <mimic joint="${axis_a}" multiplier="51" offset="0" />
     </joint>
 
-
-    <link name="${name}_rs1_139_link">
+    <link name="${prefix}rs1_139_link">
       <visual>
         <geometry>
           <mesh
             filename="package://alpha_description/meshes/end_effectors/RS1-139.stl" />
         </geometry>
-        <material name="${name}_black" />
+        <material name="${prefix}black" />
         <origin xyz="0 0 0" rpy="0 0 0" />
       </visual>
 
@@ -68,13 +69,15 @@
       </collision>
     </link>
 
-    <joint name="${name}_rs1_139_joint" type="revolute">
+    <joint name="${prefix}rs1_139_joint" type="revolute">
       <origin xyz="0 -0.0155 0.0069" rpy="0 0 0" />
-      <parent link="${name}_base_link" />
-      <child link="${name}_rs1_139_link" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}rs1_139_link" />
       <axis xyz="1 0 0" />
       <limit lower="0" upper="0.5" effort="10" velocity="10" />
-      <mimic joint="${name}_rs1_130_joint" multiplier="1" offset="0" />
+      <mimic joint="${prefix}rs1_130_joint" multiplier="1" offset="0" />
     </joint>
+
   </xacro:macro>
+
 </robot>
