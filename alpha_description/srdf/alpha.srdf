@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<robot name="alpha">
+    <group name="arm">
+        <link name="ee_base_link" />
+        <joint name="axis_e" />
+        <joint name="axis_d" />
+        <joint name="axis_c" />
+        <joint name="axis_b" />
+    </group>
+    <group name="jaws">
+        <joint name="axis_a" />
+    </group>
+    <group_state name="home" group="arm">
+        <joint name="axis_b" value="0" />
+        <joint name="axis_c" value="0" />
+        <joint name="axis_d" value="1.5746" />
+        <joint name="axis_e" value="0" />
+    </group_state>
+    <end_effector name="jaws" parent_link="ee_base_link" group="jaws" />
+    <passive_joint name="standard_jaws_rs1_130_joint" />
+    <passive_joint name="standard_jaws_rs1_139_joint" />
+    <disable_collisions link1="m1_link" link2="m2_1_2_link" reason="Adjacent" />
+    <disable_collisions link1="m1_link" link2="m2_joint_link" reason="Default" />
+    <disable_collisions link1="m1_link" link2="m3_inline_link" reason="Default" />
+    <disable_collisions link1="m1_link" link2="standard_jaws_rs1_130_link"
+        reason="Adjacent" />
+    <disable_collisions link1="m1_link" link2="standard_jaws_rs1_139_link"
+        reason="Adjacent" />
+    <disable_collisions link1="m2_1_1_link" link2="m2_1_2_link" reason="Never" />
+    <disable_collisions link1="m2_1_1_link" link2="m2_joint_link"
+        reason="Adjacent" />
+    <disable_collisions link1="m2_1_1_link" link2="m3_inline_link"
+        reason="Adjacent" />
+    <disable_collisions link1="m2_1_2_link" link2="m2_joint_link"
+        reason="Adjacent" />
+    <disable_collisions link1="m2_1_2_link" link2="standard_jaws_rs1_130_link"
+        reason="Never" />
+    <disable_collisions link1="m2_1_2_link" link2="standard_jaws_rs1_139_link"
+        reason="Never" />
+    <disable_collisions link1="m2_joint_link" link2="m3_inline_link"
+        reason="Default" />
+    <disable_collisions link1="m2_joint_link" link2="standard_jaws_rs1_130_link"
+        reason="Default" />
+    <disable_collisions link1="standard_jaws_rs1_130_link"
+        link2="standard_jaws_rs1_139_link" reason="Adjacent" />
+</robot>

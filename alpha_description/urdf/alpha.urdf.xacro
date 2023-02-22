@@ -59,7 +59,7 @@
       <child link="${prefix}m2_1_1_link" />
       <origin xyz="0 0 0.014" />
       <axis xyz="0 0 1" />
-      <limit effort="9.0" lower="0.0" upper="6.3" velocity="0.5" />
+      <limit effort="9.0" lower="0.0" upper="6.10" velocity="0.5" />
     </joint>
 
     <link name="${prefix}m2_joint_link">
@@ -95,7 +95,7 @@
       <child link="${prefix}m2_joint_link" />
       <origin xyz="-0.02 0 0.033" />
       <axis xyz="0 1 0" />
-      <limit effort="9.0" lower="0.0" upper="3.8" velocity="0.5" />
+      <limit effort="9.0" lower="0.0" upper="3.49" velocity="0.5" />
     </joint>
 
     <link name="${prefix}m2_1_2_link">
@@ -119,7 +119,7 @@
       <child link="${prefix}m2_1_2_link" />
       <origin xyz="-0.04 0 -0.1453" rpy="0 0 3.14159" />
       <axis xyz="0 1 0" />
-      <limit effort="9.0" lower="0.0" upper="3.5" velocity="0.5" />
+      <limit effort="9.0" lower="0.0" upper="3.22" velocity="0.5" />
     </joint>
 
     <link name="${prefix}m1_link">
@@ -144,7 +144,7 @@
       <child link="${prefix}m1_link" />
       <origin xyz="0.02 0 0.033" rpy="0 0 2.09439" />
       <axis xyz="0 0 -1" />
-      <limit effort="9.0" lower="0.0" upper="6.2" velocity="0.5" />
+      <limit effort="9.0" lower="0.0" upper="3.22" velocity="0.5" />
     </joint>
 
     <material name="${prefix}ee_black">
