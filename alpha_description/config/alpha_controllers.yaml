@@ -1,30 +1,37 @@
 controller_manager:
   ros__parameters:
-    update_rate: 200 # Hz
+    update_rate: 225 # Hz
 
-    forward_position_controller:
-      type: position_controllers/JointGroupPositionController
+    arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
 
-    forward_velocity_controller:
-      type: velocity_controllers/JointGroupVelocityController
+    jaws_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-forward_position_controller:
+arm_controller:
   ros__parameters:
     joints:
-      - alpha_axis_e
-      - alpha_axis_d
-      - alpha_axis_c
-      - alpha_axis_b
-      - alpha_axis_a
+      - axis_e
+      - axis_d
+      - axis_c
+      - axis_b
+    command_interfaces:
+      - position
+      - velocity
+    state_interfaces:
+      - position
+      - velocity
 
-forward_velocity_controller:
+jaws_controller:
   ros__parameters:
     joints:
-      - alpha_axis_e
-      - alpha_axis_d
-      - alpha_axis_c
-      - alpha_axis_b
-      - alpha_axis_a
+      - axis_a
+    command_interfaces:
+      - position
+      - velocity
+    state_interfaces:
+      - position
+      - velocity

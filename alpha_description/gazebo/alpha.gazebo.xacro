@@ -2,13 +2,13 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:macro name="alpha_gazebo" params="prefix">
+  <xacro:macro name="alpha_gazebo" params="prefix controllers_file">
 
     <!-- ros_control plugin -->
     <gazebo>
       <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
         <parameters>
-          $(find alpha_description)/config/alpha_controllers.yaml</parameters>
+          $(find alpha_description)/config/${controllers_file}</parameters>
       </plugin>
     </gazebo>
 

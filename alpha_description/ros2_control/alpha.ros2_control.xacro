@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:macro name="alpha_ros2_control"
+  <xacro:macro name="alpha_system"
     params="name prefix serial_port heartbeat_timeout state_update_frequency initial_positions_file use_sim:=^|false use_fake_hardware:=^true">
     <xacro:property name="initial_positions"
       value="${load_yaml(initial_positions_file)['initial_positions']}" />
