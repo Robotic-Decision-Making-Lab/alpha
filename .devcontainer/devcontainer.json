@@ -31,6 +31,7 @@
           "*.repos": "yaml",
           "*.world": "xml",
           "*.xacro": "xml",
+          "*.srdf": "xml",
           "*.rviz": "yaml"
         },
         "files.eol": "\n",
@@ -108,16 +109,17 @@
         }
       },
       "extensions": [
-        "ms-azuretools.vscode-docker",
-        "ms-python.python",
-        "ms-python.vscode-pylance",
-        "njpwerner.autodocstring",
-        "redhat.vscode-xml",
-        "redhat.vscode-yaml",
-        "cschlosser.doxdocgen",
-        "ms-vscode.cpptools",
-        "esbenp.prettier-vscode"
-      ]
+		"ms-azuretools.vscode-docker",
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+		"njpwerner.autodocstring",
+		"redhat.vscode-xml",
+		"redhat.vscode-yaml",
+		"cschlosser.doxdocgen",
+		"ms-vscode.cpptools",
+		"esbenp.prettier-vscode",
+		"josetr.cmake-language-support-vscode"
+	]
     }
   }
 }
