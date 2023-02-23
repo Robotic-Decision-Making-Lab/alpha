@@ -196,7 +196,7 @@ def generate_launch_description() -> LaunchDescription:
         )
     }
 
-    # # Declare ROS2 nodes
+    # Declare ROS2 nodes
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
@@ -213,6 +213,7 @@ def generate_launch_description() -> LaunchDescription:
         ],
         condition=UnlessCondition(use_sim),
     )
+
     robot_state_pub_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -230,6 +231,7 @@ def generate_launch_description() -> LaunchDescription:
             "/controller_manager",
         ],
     )
+
     arm_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -239,6 +241,7 @@ def generate_launch_description() -> LaunchDescription:
             "/controller_manager",
         ],
     )
+
     ee_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -248,6 +251,7 @@ def generate_launch_description() -> LaunchDescription:
             "/controller_manager",
         ],
     )
+
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
@@ -265,6 +269,7 @@ def generate_launch_description() -> LaunchDescription:
             )  # launch either moveit or the alpha visualization
         ),
     )
+
     gazebo_spawn_entity_node = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
@@ -278,20 +283,6 @@ def generate_launch_description() -> LaunchDescription:
         robot_state_pub_node,
         gazebo_spawn_entity_node,
     ]
-
-    # # Specify additional launch files to call
-    gazebo_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [
-                PathJoinSubstitution(
-                    [FindPackageShare("gazebo_ros"), "launch", "gazebo.launch.py"]
-                )
-            ]
-        ),
-        condition=IfCondition(use_sim),
-    )
-
-    include = [gazebo_launch]
 
     # Delay `joint_state_broadcaster` after spawn_entity
     delay_joint_state_broadcaster_spawner_after_spawn_entity = RegisterEventHandler(
@@ -336,5 +327,19 @@ def generate_launch_description() -> LaunchDescription:
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_controller_spawners_after_joint_state_broadcaster_spawner,
     ]
+
+    # Specify additional launch files to call
+    gazebo_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [
+                PathJoinSubstitution(
+                    [FindPackageShare("gazebo_ros"), "launch", "gazebo.launch.py"]
+                )
+            ]
+        ),
+        condition=IfCondition(use_sim),
+    )
+
+    include = [gazebo_launch]
 
     return LaunchDescription(args + include + nodes + events)
