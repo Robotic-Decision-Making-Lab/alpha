@@ -1,6 +1,6 @@
 /**:
   ros__parameters:
-    default_planning_pipeline: pilz
+    default_planning_pipeline: ompl
     planning_pipelines: [pilz, ompl]
     pilz:
       planning_plugin: pilz_industrial_motion_planner/CommandPlanner

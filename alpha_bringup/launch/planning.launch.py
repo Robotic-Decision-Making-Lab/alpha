@@ -140,7 +140,7 @@ def generate_launch_description() -> LaunchDescription:
         [
             FindPackageShare(description_package),
             "moveit2",
-            "planning_pipelines_config.yaml",
+            "planning_pipelines.yaml",
         ]
     )
 

@@ -73,12 +73,26 @@ def generate_launch_description() -> LaunchDescription:
             description="Initial positions used for simulation.",
         ),
         DeclareLaunchArgument(
+            "initial_velocities_file",
+            default_value="initial_velocities.yaml",
+            description="Initial velocities used for simulation.",
+        ),
+        DeclareLaunchArgument(
             "prefix",
             default_value="''",
             description=(
                 "Prefix of the joint names; useful for multi-robot setup. If"
                 " changed, then the joint names in the controller configuration must"
                 " be updated. Expected format '<prefix>/'"
+            ),
+        ),
+        DeclareLaunchArgument(
+            "namespace",
+            default_value="/",
+            description=(
+                "Namespace of the launched nodes; useful for multi-robot setup. If"
+                " changed, then the namespace in the controller configuration must"
+                " be updated. Expected format '<ns>/'"
             ),
         ),
         DeclareLaunchArgument(
@@ -151,6 +165,8 @@ def generate_launch_description() -> LaunchDescription:
     timeout = LaunchConfiguration("timeout")
     state_update_frequency = LaunchConfiguration("state_update_frequency")
     robot_controller = LaunchConfiguration("robot_controller")
+    initial_velocities_file = LaunchConfiguration("initial_velocities_file")
+    namespace = LaunchConfiguration("namespace")
 
     robot_description = {
         "robot_description": Command(
@@ -188,6 +204,12 @@ def generate_launch_description() -> LaunchDescription:
                 " ",
                 "initial_positions_file:=",
                 initial_positions_file,
+                " ",
+                "namespace:=",
+                namespace,
+                " ",
+                "initial_velocities_file:=",
+                initial_velocities_file,
             ]
         )
     }

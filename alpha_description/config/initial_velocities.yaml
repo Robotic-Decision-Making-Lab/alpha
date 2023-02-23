@@ -1,0 +1,7 @@
+# Default initial velocities for alpha's ros2_control fake system
+initial_velocities:
+  axis_a: 0
+  axis_b: 0
+  axis_c: 0
+  axis_d: 0
+  axis_e: 0
