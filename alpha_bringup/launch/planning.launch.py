@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition
@@ -61,11 +60,6 @@ def generate_launch_description() -> LaunchDescription:
             ),
         ),
         DeclareLaunchArgument(
-            "initial_positions_file",
-            default_value="initial_positions.yaml",
-            description="Initial positions used for simulation.",
-        ),
-        DeclareLaunchArgument(
             "use_rviz",
             default_value="true",
             description="Automatically start RViz2",
@@ -80,60 +74,46 @@ def generate_launch_description() -> LaunchDescription:
     # Initialize Arguments
     description_package = LaunchConfiguration("description_package")
     description_file = LaunchConfiguration("description_file")
-    initial_positions_file = LaunchConfiguration("initial_positions_file")
     prefix = LaunchConfiguration("prefix")
     use_rviz = LaunchConfiguration("use_rviz")
     use_sim = LaunchConfiguration("use_sim")
 
-    # Get URDF via xacro
-    robot_description_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
-            " ",
-            PathJoinSubstitution(
-                [FindPackageShare(description_package), "config", description_file]
-            ),
-            " ",
-            "prefix:=",
-            prefix,
-            " ",
-            "initial_positions_file:=",
-            initial_positions_file,
-        ]
-    )
-
-    robot_description = {"robot_description": robot_description_content}
-
-    # Get SRDF via xacro
-    robot_description_semantic_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
-            " ",
-            PathJoinSubstitution(
-                [FindPackageShare(description_package), "srdf", "iiwa.srdf.xacro"]
-            ),
-            " ",
-            "name:=",
-            "iiwa",
-            " ",
-            "prefix:=",
-            prefix,
-            " ",
-            "description_package:=",
-            description_package,
-        ]
-    )
-
-    robot_description_semantic = {
-        "robot_description_semantic": robot_description_semantic_content
+    robot_description = {
+        "robot_description": Command(
+            [
+                PathJoinSubstitution([FindExecutable(name="xacro")]),
+                " ",
+                PathJoinSubstitution(
+                    [FindPackageShare(description_package), "config", description_file]
+                ),
+                " ",
+                "prefix:=",
+                prefix,
+            ]
+        )
     }
 
-    # Get planning parameters
+    robot_description_semantic = {
+        "robot_description_semantic": Command(
+            [
+                PathJoinSubstitution([FindExecutable(name="xacro")]),
+                " ",
+                PathJoinSubstitution(
+                    [FindPackageShare(description_package), "srdf", "alpha.srdf"]
+                ),
+                " ",
+                "prefix:=",
+                prefix,
+            ]
+        )
+    }
+
+    # Load the moveit configuration files
     robot_description_planning_joint_limits = PathJoinSubstitution(
         [
             FindPackageShare(description_package),
             "moveit2",
-            "iiwa_joint_limits.yaml",
+            "joint_limits.yaml",
         ]
     )
 
@@ -141,49 +121,21 @@ def generate_launch_description() -> LaunchDescription:
         [
             FindPackageShare(description_package),
             "moveit2",
-            "iiwa_cartesian_limits.yaml",
+            "pilz_cartesian_limits.yaml",
         ]
     )
-
-    move_group_capabilities = {
-        "capabilities": """pilz_industrial_motion_planner/MoveGroupSequenceAction \
-            pilz_industrial_motion_planner/MoveGroupSequenceService"""
-    }
 
     robot_description_kinematics = PathJoinSubstitution(
         [FindPackageShare(description_package), "moveit2", "kinematics.yaml"]
-    )
-
-    planning_pipelines_config = PathJoinSubstitution(
-        [
-            FindPackageShare(description_package),
-            "moveit2",
-            "planning_pipelines_config.yaml",
-        ]
-    )
-
-    ompl_planning_config = PathJoinSubstitution(
-        [
-            FindPackageShare(description_package),
-            "moveit2",
-            "ompl_planning.yaml",
-        ]
     )
 
     moveit_controllers = PathJoinSubstitution(
         [
             FindPackageShare(description_package),
             "moveit2",
-            "iiwa_moveit_controller_config.yaml",
+            "moveit_controller_config.yaml",
         ]
     )
-
-    trajectory_execution = {
-        "moveit_manage_controllers": True,
-        "trajectory_execution.allowed_execution_duration_scaling": 1.2,
-        "trajectory_execution.allowed_goal_duration_margin": 0.5,
-        "trajectory_execution.allowed_start_tolerance": 0.01,
-    }
 
     planning_scene_monitor_parameters = {
         "publish_planning_scene": True,
@@ -195,7 +147,6 @@ def generate_launch_description() -> LaunchDescription:
     move_group_node = Node(
         package="moveit_ros_move_group",
         executable="move_group",
-        namespace=namespace,
         output="screen",
         parameters=[
             robot_description,
@@ -203,18 +154,10 @@ def generate_launch_description() -> LaunchDescription:
             robot_description_kinematics,
             robot_description_planning_cartesian_limits,
             robot_description_planning_joint_limits,
-            planning_pipelines_config,
-            ompl_planning_config,
-            trajectory_execution,
             moveit_controllers,
             planning_scene_monitor_parameters,
-            move_group_capabilities,
             {"use_sim_time": use_sim},
         ],
-    )
-
-    rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare(description_package), "rviz", "iiwa.rviz"]
     )
 
     rviz_node = Node(
@@ -222,15 +165,18 @@ def generate_launch_description() -> LaunchDescription:
         executable="rviz2",
         name="rviz2",
         output="log",
-        arguments=["-d", rviz_config_file],
+        arguments=[
+            "-d",
+            PathJoinSubstitution(
+                [FindPackageShare(description_package), "rviz", "moveit.rviz"]
+            ),
+        ],
         parameters=[
             robot_description,
             robot_description_semantic,
             robot_description_planning_cartesian_limits,
             robot_description_planning_joint_limits,
             robot_description_kinematics,
-            planning_pipelines_config,
-            ompl_planning_config,
         ],
         condition=IfCondition(use_rviz),
     )

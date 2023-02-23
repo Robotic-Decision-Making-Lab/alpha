@@ -255,7 +255,7 @@ def generate_launch_description() -> LaunchDescription:
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
-        name="RVIZ2",
+        name="rviz2",
         arguments=[
             "-d",
             PathJoinSubstitution(
@@ -339,7 +339,20 @@ def generate_launch_description() -> LaunchDescription:
         ),
         condition=IfCondition(use_sim),
     )
+    moveit_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [FindPackageShare("alpha_bringup"), "/launch", "/planning.launch.py"]
+        ),
+        launch_arguments={
+            "description_package": description_package,
+            "description_file": description_file,
+            "prefix": prefix,
+            "start_rviz": use_rviz,
+            "use_sim": use_sim,
+        }.items(),
+        condition=IfCondition(use_planning),
+    )
 
-    include = [gazebo_launch]
+    include = [gazebo_launch, moveit_launch]
 
     return LaunchDescription(args + include + nodes + event_handlers)
