@@ -60,6 +60,15 @@ def generate_launch_description() -> LaunchDescription:
             ),
         ),
         DeclareLaunchArgument(
+            "namespace",
+            default_value="/",
+            description=(
+                "Namespace of the launched nodes; useful for multi-robot setup. If"
+                " changed, then the namespace in the controller configuration must"
+                " be updated. Expected format '<ns>/'"
+            ),
+        ),
+        DeclareLaunchArgument(
             "use_rviz",
             default_value="true",
             description="Automatically start RViz2",
@@ -74,9 +83,10 @@ def generate_launch_description() -> LaunchDescription:
     # Initialize Arguments
     description_package = LaunchConfiguration("description_package")
     description_file = LaunchConfiguration("description_file")
-    prefix = LaunchConfiguration("prefix")
     use_rviz = LaunchConfiguration("use_rviz")
     use_sim = LaunchConfiguration("use_sim")
+    prefix = LaunchConfiguration("prefix")
+    namespace = LaunchConfiguration("namespace")
 
     robot_description = {
         "robot_description": Command(
@@ -111,6 +121,9 @@ def generate_launch_description() -> LaunchDescription:
                 " ",
                 "description_package:=",
                 description_package,
+                " ",
+                "namespace:=",
+                namespace,
             ]
         )
     }
@@ -178,6 +191,7 @@ def generate_launch_description() -> LaunchDescription:
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
+        namespace=namespace,
         parameters=[
             robot_description,
             robot_description_semantic,

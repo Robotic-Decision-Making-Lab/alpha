@@ -219,6 +219,7 @@ def generate_launch_description() -> LaunchDescription:
         package="controller_manager",
         executable="ros2_control_node",
         output="both",
+        namespace=namespace,
         parameters=[
             robot_description,
             PathJoinSubstitution(
@@ -237,6 +238,7 @@ def generate_launch_description() -> LaunchDescription:
         executable="robot_state_publisher",
         name="robot_state_publisher",
         output="both",
+        namespace=namespace,
         parameters=[robot_description],
     )
 
@@ -246,7 +248,7 @@ def generate_launch_description() -> LaunchDescription:
         arguments=[
             "joint_state_broadcaster",
             "--controller-manager",
-            "/controller_manager",
+            [namespace, "controller_manager"],
         ],
     )
 
@@ -256,7 +258,7 @@ def generate_launch_description() -> LaunchDescription:
         arguments=[
             "arm_controller",
             "--controller-manager",
-            "/controller_manager",
+            [namespace, "controller_manager"],
         ],
         condition=IfCondition(use_planning),
     )
@@ -267,7 +269,7 @@ def generate_launch_description() -> LaunchDescription:
         arguments=[
             "jaws_controller",
             "--controller-manager",
-            "/controller_manager",
+            [namespace, "controller_manager"],
         ],
         condition=IfCondition(use_planning),
     )
@@ -278,7 +280,7 @@ def generate_launch_description() -> LaunchDescription:
         arguments=[
             robot_controller,
             "--controller-manager",
-            "/controller_manager",
+            [namespace, "controller_manager"],
         ],
     )
 
@@ -311,7 +313,12 @@ def generate_launch_description() -> LaunchDescription:
     gazebo_spawn_entity_node = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
-        arguments=["-topic", "robot_description", "-entity", "alpha"],
+        arguments=[
+            "-topic",
+            [namespace, "robot_description"],
+            "-entity",
+            [namespace, "alpha"],
+        ],
         output="screen",
         condition=IfCondition(use_sim),
     )
@@ -401,6 +408,7 @@ def generate_launch_description() -> LaunchDescription:
             "description_package": description_package,
             "description_file": description_file,
             "prefix": prefix,
+            "namespace": namespace,
             "start_rviz": use_rviz,
             "use_sim": use_sim,
         }.items(),
