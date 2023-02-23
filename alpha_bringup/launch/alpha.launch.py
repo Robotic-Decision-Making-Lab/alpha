@@ -126,16 +126,13 @@ def generate_launch_description() -> LaunchDescription:
             ),
         ),
         DeclareLaunchArgument(
-            "arm_controller",
-            default_value="arm_controller",
+            "robot_controller",
+            default_value="forward_position_controller",
             description=(
-                "Controller to launch for the alpha arm, excluding the manipulator"
+                "Robot controller to use. When using MoveIt for planning, this"
+                " argument will be ignored and the JointTrajectoryControllers will be"
+                " used instead"
             ),
-        ),
-        DeclareLaunchArgument(
-            "ee_controller",
-            default_value="jaws_controller",
-            description="Controller to launch for the end effector",
         ),
     ]
 
@@ -153,8 +150,7 @@ def generate_launch_description() -> LaunchDescription:
     serial_port = LaunchConfiguration("serial_port")
     timeout = LaunchConfiguration("timeout")
     state_update_frequency = LaunchConfiguration("state_update_frequency")
-    arm_controller = LaunchConfiguration("arm_controller")
-    ee_controller = LaunchConfiguration("ee_controller")
+    robot_controller = LaunchConfiguration("robot_controller")
 
     robot_description = {
         "robot_description": Command(
@@ -236,17 +232,29 @@ def generate_launch_description() -> LaunchDescription:
         package="controller_manager",
         executable="spawner",
         arguments=[
-            arm_controller,
+            "arm_controller",
             "--controller-manager",
             "/controller_manager",
         ],
+        condition=IfCondition(use_planning),
     )
 
     ee_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=[
-            ee_controller,
+            "jaws_controller",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+        condition=IfCondition(use_planning),
+    )
+
+    robot_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            robot_controller,
             "--controller-manager",
             "/controller_manager",
         ],
@@ -312,12 +320,27 @@ def generate_launch_description() -> LaunchDescription:
     )
 
     # Delay start of arm_controller & ee_controller after `joint_state_broadcaster`
-    delay_controller_spawners_after_joint_state_broadcaster_spawner = (
+    delay_moveit_controller_spawners_after_joint_state_broadcaster_spawner = (
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=joint_state_broadcaster_spawner,
-                on_exit=[arm_controller_spawner, ee_controller_spawner],
-            )
+                on_exit=[
+                    arm_controller_spawner,
+                    ee_controller_spawner,
+                ],
+            ),
+            condition=IfCondition(use_planning),
+        )
+    )
+
+    # Delay start of robot_controller after `joint_state_broadcaster`
+    delay_robot_controller_spawners_after_joint_state_broadcaster_spawner = (
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=joint_state_broadcaster_spawner,
+                on_exit=[robot_controller_spawner],
+            ),
+            condition=UnlessCondition(use_planning),
         )
     )
 
@@ -325,7 +348,8 @@ def generate_launch_description() -> LaunchDescription:
         delay_joint_state_broadcaster_spawner_after_spawn_entity,
         delay_joint_state_broadcaster_spawner_after_control_node,
         delay_rviz_after_joint_state_broadcaster_spawner,
-        delay_controller_spawners_after_joint_state_broadcaster_spawner,
+        delay_moveit_controller_spawners_after_joint_state_broadcaster_spawner,
+        delay_robot_controller_spawners_after_joint_state_broadcaster_spawner,
     ]
 
     # Specify additional launch files to call

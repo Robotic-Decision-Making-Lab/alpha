@@ -2,12 +2,21 @@ controller_manager:
   ros__parameters:
     update_rate: 225 # Hz
 
+    # Controllers for use with MoveIt
     arm_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
     jaws_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
+    # Feed-forward controllers
+    forward_position_controller:
+      type: position_controllers/JointGroupPositionController
+
+    forward_velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+    # Joint state publisher
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
@@ -35,3 +44,21 @@ jaws_controller:
     state_interfaces:
       - position
       - velocity
+
+forward_position_controller:
+  ros__parameters:
+    joints:
+      - axis_e
+      - axis_d
+      - axis_c
+      - axis_b
+      - axis_a
+
+forward_velocity_controller:
+  ros__parameters:
+    joints:
+      - axis_e
+      - axis_d
+      - axis_c
+      - axis_b
+      - axis_a

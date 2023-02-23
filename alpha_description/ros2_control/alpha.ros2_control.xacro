@@ -24,38 +24,48 @@
         </xacro:unless>
       </hardware>
       <joint name="axis_e">
-        <param name="initial_value">${initial_positions['axis_e']}</param>
         <command_interface name="position" />
         <command_interface name="velocity" />
         <state_interface name="position" />
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions['axis_e']}</param>
+        </state_interface>
         <state_interface name="velocity" />
       </joint>
       <joint name="axis_d">
-        <param name="initial_value">${initial_positions['axis_d']}</param>
         <command_interface name="position" />
         <command_interface name="velocity" />
         <state_interface name="position" />
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions['axis_d']}</param>
+        </state_interface>
         <state_interface name="velocity" />
       </joint>
       <joint name="axis_c">
-        <param name="initial_value">${initial_positions['axis_c']}</param>
         <command_interface name="position" />
         <command_interface name="velocity" />
         <state_interface name="position" />
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions['axis_c']}</param>
+        </state_interface>
         <state_interface name="velocity" />
       </joint>
       <joint name="axis_b">
-        <param name="initial_value">${initial_positions['axis_b']}</param>
         <command_interface name="position" />
         <command_interface name="velocity" />
         <state_interface name="position" />
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions['axis_b']}</param>
+        </state_interface>
         <state_interface name="velocity" />
       </joint>
       <joint name="axis_a">
-        <param name="initial_value">${initial_positions['axis_a']}</param>
         <command_interface name="position" />
         <command_interface name="velocity" />
         <state_interface name="position" />
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions['axis_a']}</param>
+        </state_interface>
         <state_interface name="velocity" />
       </joint>
 

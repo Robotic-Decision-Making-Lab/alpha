@@ -136,6 +136,22 @@ def generate_launch_description() -> LaunchDescription:
         [FindPackageShare(description_package), "moveit2", "kinematics.yaml"]
     )
 
+    planning_pipelines_config = PathJoinSubstitution(
+        [
+            FindPackageShare(description_package),
+            "moveit2",
+            "planning_pipelines_config.yaml",
+        ]
+    )
+
+    ompl_planning_config = PathJoinSubstitution(
+        [
+            FindPackageShare(description_package),
+            "moveit2",
+            "ompl_planning.yaml",
+        ]
+    )
+
     moveit_controllers = PathJoinSubstitution(
         [
             FindPackageShare(description_package),
@@ -143,6 +159,13 @@ def generate_launch_description() -> LaunchDescription:
             "moveit_controllers.yaml",
         ]
     )
+
+    trajectory_execution = {
+        "moveit_manage_controllers": True,
+        "trajectory_execution.allowed_execution_duration_scaling": 1.2,
+        "trajectory_execution.allowed_goal_duration_margin": 0.5,
+        "trajectory_execution.allowed_start_tolerance": 0.01,
+    }
 
     planning_scene_monitor_parameters = {
         "publish_planning_scene": True,
@@ -159,9 +182,12 @@ def generate_launch_description() -> LaunchDescription:
             robot_description,
             robot_description_semantic,
             robot_description_kinematics,
+            planning_pipelines_config,
+            trajectory_execution,
             robot_description_planning_cartesian_limits,
             robot_description_planning_joint_limits,
             moveit_controllers,
+            ompl_planning_config,
             planning_scene_monitor_parameters,
             {"use_sim_time": use_sim},
         ],
@@ -184,6 +210,8 @@ def generate_launch_description() -> LaunchDescription:
             robot_description_planning_cartesian_limits,
             robot_description_planning_joint_limits,
             robot_description_kinematics,
+            planning_pipelines_config,
+            ompl_planning_config,
         ],
         condition=IfCondition(use_rviz),
     )

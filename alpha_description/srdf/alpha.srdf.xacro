@@ -19,8 +19,6 @@
             <joint name="${prefix}axis_d" value="1.5746" />
             <joint name="${prefix}axis_e" value="0" />
         </group_state>
-        <virtual_joint child_link="${prefix}base_link" name="virtual_joint"
-            parent_frame="world" type="floating" />
         <end_effector name="${prefix}jaws" parent_link="${prefix}ee_base_link"
             group="${prefix}jaws" />
         <passive_joint name="${prefix}standard_jaws_rs1_130_joint" />
