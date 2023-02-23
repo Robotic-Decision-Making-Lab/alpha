@@ -99,11 +99,18 @@ def generate_launch_description() -> LaunchDescription:
                 PathJoinSubstitution([FindExecutable(name="xacro")]),
                 " ",
                 PathJoinSubstitution(
-                    [FindPackageShare(description_package), "srdf", "alpha.srdf"]
+                    [
+                        FindPackageShare(description_package),
+                        "srdf",
+                        "alpha.config.srdf.xacro",
+                    ]
                 ),
                 " ",
                 "prefix:=",
                 prefix,
+                " ",
+                "description_package:=",
+                description_package,
             ]
         )
     }
@@ -133,7 +140,7 @@ def generate_launch_description() -> LaunchDescription:
         [
             FindPackageShare(description_package),
             "moveit2",
-            "moveit_controller_config.yaml",
+            "moveit_controllers.yaml",
         ]
     )
 
@@ -164,7 +171,7 @@ def generate_launch_description() -> LaunchDescription:
         package="rviz2",
         executable="rviz2",
         name="rviz2",
-        output="log",
+        output="screen",
         arguments=[
             "-d",
             PathJoinSubstitution(

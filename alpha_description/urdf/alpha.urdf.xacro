@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:macro name="alpha" params="parent prefix *origin">
+  <xacro:macro name="alpha_urdf" params="parent prefix *origin">
 
     <joint name="${prefix}base_joint" type="fixed">
       <xacro:insert_block name="origin" />

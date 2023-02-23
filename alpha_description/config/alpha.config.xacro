@@ -25,9 +25,9 @@
 
   <link name="world" />
 
-  <xacro:alpha parent="world" prefix="$(arg prefix)">
+  <xacro:alpha_urdf parent="world" prefix="$(arg prefix)">
     <origin xyz="0 0 0" rpy="0 0 0" />
-  </xacro:alpha>
+  </xacro:alpha_urdf>
 
   <xacro:alpha_system prefix="$(arg prefix)" name="ReachAlpha5"
     use_fake_hardware="$(arg use_fake_hardware)" use_sim="$(arg use_sim)"
