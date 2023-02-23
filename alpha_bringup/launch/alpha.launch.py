@@ -19,8 +19,14 @@
 # THE SOFTWARE.
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
-from launch.conditions import IfCondition
+from launch.actions import (
+    DeclareLaunchArgument,
+    IncludeLaunchDescription,
+    RegisterEventHandler,
+)
+from launch.conditions import IfCondition, UnlessCondition
+from launch.event_handlers import OnProcessExit, OnProcessStart
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
     Command,
     FindExecutable,
@@ -64,7 +70,7 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument(
             "initial_positions_file",
             default_value="initial_positions.yaml",
-            description="Configuration file of robot initial positions for simulation.",
+            description="Initial positions used for simulation.",
         ),
         DeclareLaunchArgument(
             "prefix",
@@ -76,17 +82,19 @@ def generate_launch_description() -> LaunchDescription:
             ),
         ),
         DeclareLaunchArgument(
-            "use_sim", default_value="false", description="Start the Gazebo simulation"
+            "use_sim",
+            default_value="false",
+            description="Automatically start Gazebo",
         ),
         DeclareLaunchArgument(
             "use_rviz",
             default_value="true",
-            description="Automatically start RViz2 with this launch file",
+            description="Automatically start RViz2",
         ),
         DeclareLaunchArgument(
             "use_planning",
             default_value="false",
-            description="Start the MoveIt2 interface",
+            description="Automatically start the MoveIt2 interface",
         ),
         DeclareLaunchArgument(
             "use_fake_hardware",
@@ -112,10 +120,22 @@ def generate_launch_description() -> LaunchDescription:
             "state_update_frequency",
             default_value="250",
             description=(
-                "Frequency that the driver updates the state of the robot. Note that"
-                " this should not be less than the read frequency defined by the "
+                "Frequency at which the driver updates the state of the robot. Note"
+                " that this should not be less than the read frequency defined by the "
                 " controller configuration."
             ),
+        ),
+        DeclareLaunchArgument(
+            "arm_controller",
+            default_value="arm_controller",
+            description=(
+                "Controller to launch for the alpha arm, excluding the manipulator"
+            ),
+        ),
+        DeclareLaunchArgument(
+            "ee_controller",
+            default_value="jaws_controller",
+            description="Controller to launch for the end effector",
         ),
     ]
 
@@ -133,6 +153,8 @@ def generate_launch_description() -> LaunchDescription:
     serial_port = LaunchConfiguration("serial_port")
     timeout = LaunchConfiguration("timeout")
     state_update_frequency = LaunchConfiguration("state_update_frequency")
+    arm_controller = LaunchConfiguration("arm_controller")
+    ee_controller = LaunchConfiguration("ee_controller")
 
     robot_description = {
         "robot_description": Command(
@@ -148,7 +170,6 @@ def generate_launch_description() -> LaunchDescription:
                 ),
                 " ",
                 "prefix:=",
-                " ",
                 prefix,
                 " ",
                 "use_sim:=",
@@ -158,7 +179,6 @@ def generate_launch_description() -> LaunchDescription:
                 use_fake_hardware,
                 " ",
                 "serial_port:=",
-                " ",
                 serial_port,
                 " ",
                 "hearbeat_timeout:=",
@@ -176,46 +196,145 @@ def generate_launch_description() -> LaunchDescription:
         )
     }
 
-    # Declare ROS2 nodes
-    nodes = [
-        Node(
-            package="controller_manager",
-            executable="ros2_control_node",
-            parameters=[
-                robot_description,
-                PathJoinSubstitution(
-                    [
-                        FindPackageShare(description_package),
-                        "config",
-                        controllers_file,
-                    ]
-                ),
-            ],
-        ),
-        Node(
-            package="robot_state_publisher",
-            executable="robot_state_publisher",
-            name="robot_state_publisher",
-            output="screen",
-            parameters=[robot_description],
-        ),
-        Node(
-            package="rviz2",
-            executable="rviz2",
-            name="RVIZ2",
-            arguments=[
-                "-d",
-                PathJoinSubstitution(
-                    [FindPackageShare(description_package), rviz_config]
-                ),
-            ],
-            parameters=[robot_description],
-            condition=IfCondition(
-                PythonExpression(
-                    ["not ", use_planning, "and ", use_rviz]
-                )  # launch either moveit or the alpha visualization
+    # # Declare ROS2 nodes
+    control_node = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        output="both",
+        parameters=[
+            robot_description,
+            PathJoinSubstitution(
+                [
+                    FindPackageShare(description_package),
+                    "config",
+                    controllers_file,
+                ]
             ),
+        ],
+        condition=UnlessCondition(use_sim),
+    )
+    robot_state_pub_node = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher",
+        output="both",
+        parameters=[robot_description],
+    )
+
+    joint_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "joint_state_broadcaster",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+    )
+    arm_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            arm_controller,
+            "--controller-manager",
+            "/controller_manager",
+        ],
+    )
+    ee_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            ee_controller,
+            "--controller-manager",
+            "/controller_manager",
+        ],
+    )
+    rviz_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="RVIZ2",
+        arguments=[
+            "-d",
+            PathJoinSubstitution(
+                [FindPackageShare(description_package), "rviz", rviz_config]
+            ),
+        ],
+        parameters=[robot_description],
+        condition=IfCondition(
+            PythonExpression(
+                ["'", use_planning, "' == 'false' and '", use_rviz, "' == 'true'"]
+            )  # launch either moveit or the alpha visualization
         ),
+    )
+    gazebo_spawn_entity_node = Node(
+        package="gazebo_ros",
+        executable="spawn_entity.py",
+        arguments=["-topic", "robot_description", "-entity", "alpha"],
+        output="screen",
+        condition=IfCondition(use_sim),
+    )
+
+    nodes = [
+        control_node,
+        robot_state_pub_node,
+        gazebo_spawn_entity_node,
     ]
 
-    return LaunchDescription(args + nodes)
+    # # Specify additional launch files to call
+    gazebo_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [
+                PathJoinSubstitution(
+                    [FindPackageShare("gazebo_ros"), "launch", "gazebo.launch.py"]
+                )
+            ]
+        ),
+        condition=IfCondition(use_sim),
+    )
+
+    include = [gazebo_launch]
+
+    # Delay `joint_state_broadcaster` after spawn_entity
+    delay_joint_state_broadcaster_spawner_after_spawn_entity = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=gazebo_spawn_entity_node,
+            on_exit=[joint_state_broadcaster_spawner],
+        ),
+        condition=IfCondition(use_sim),
+    )
+
+    # Delay `joint_state_broadcaster` after control_node
+    delay_joint_state_broadcaster_spawner_after_control_node = RegisterEventHandler(
+        event_handler=OnProcessStart(
+            target_action=control_node,
+            on_start=[joint_state_broadcaster_spawner],
+        ),
+        condition=UnlessCondition(use_sim),
+    )
+
+    # Delay rviz start after `joint_state_broadcaster`
+    delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_spawner,
+            on_exit=[rviz_node],
+        ),
+        condition=IfCondition(use_rviz),
+    )
+
+    # Delay start of arm_controller & ee_controller after `joint_state_broadcaster`
+    delay_controller_spawners_after_joint_state_broadcaster_spawner = (
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=joint_state_broadcaster_spawner,
+                on_exit=[arm_controller_spawner, ee_controller_spawner],
+            )
+        )
+    )
+
+    events = [
+        delay_joint_state_broadcaster_spawner_after_spawn_entity,
+        delay_joint_state_broadcaster_spawner_after_control_node,
+        delay_rviz_after_joint_state_broadcaster_spawner,
+        delay_controller_spawners_after_joint_state_broadcaster_spawner,
+    ]
+
+    return LaunchDescription(args + include + nodes + events)

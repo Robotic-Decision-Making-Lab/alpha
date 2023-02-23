@@ -1,5 +1,5 @@
-<library path="hardware">
-  <class name="hardware/AlphaHardware"
+<library path="alpha_hardware">
+  <class name="alpha_hardware/AlphaHardware"
     type="alpha_hardware::AlphaHardware"
     base_class_type="hardware_interface::SystemInterface">
     <description>

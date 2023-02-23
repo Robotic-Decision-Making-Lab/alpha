@@ -7,19 +7,23 @@
     <!-- ros_control plugin -->
     <gazebo>
       <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+        <robot_param_node>robot_state_publisher</robot_param_node>
         <parameters>
           $(find alpha_description)/config/${controllers_file}</parameters>
       </plugin>
     </gazebo>
 
     <gazebo reference="${prefix}base_link" />
-    <gazebo reference="${prefix}m3_inline_link" />
-    <gazebo reference="${prefix}m2_1_1_link" />
-    <gazebo reference="${prefix}m2_joint_link" />
-    <gazebo reference="${prefix}m2_1_2_link" />
+    <gazebo reference="${prefix}ee_base_link" />
     <gazebo reference="${prefix}m1_link" />
-    <gazebo reference="${prefix}jaws_base_link" />
+    <gazebo reference="${prefix}m2_1_1_link" />
+    <gazebo reference="${prefix}m2_1_2_link" />
+    <gazebo reference="${prefix}m2_joint_link" />
+    <gazebo reference="${prefix}m3_inline_link" />
     <gazebo reference="${prefix}push_rod" />
+    <gazebo reference="${prefix}standard_jaws_base_link" />
+    <gazebo reference="${prefix}standard_jaws_rs1_130_link" />
+    <gazebo reference="${prefix}standard_jaws_rs1_139_link" />
 
   </xacro:macro>
 

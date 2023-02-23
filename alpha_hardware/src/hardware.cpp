@@ -42,7 +42,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
   if (
     hardware_interface::SystemInterface::on_init(info) !=
     hardware_interface::CallbackReturn::SUCCESS) {
-    RCLCPP_ERROR(  // NOLINT
+    RCLCPP_FATAL(  // NOLINT
       rclcpp::get_logger("AlphaHardware"),
       "Failed to initialize the AlphaHardware system interface.");
 
@@ -328,3 +328,7 @@ void AlphaHardware::poll_state(const int freq) const
 }
 
 }  // namespace alpha_hardware
+
+#include "pluginlib/class_list_macros.hpp"
+PLUGINLIB_EXPORT_CLASS(
+  alpha_hardware::AlphaHardware, hardware_interface::SystemInterface)

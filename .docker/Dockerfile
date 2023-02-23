@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-humble-rviz2 \
     ros-humble-moveit \
     ros-humble-robot-state-publisher \
+    ros-humble-gazebo-ros-pkgs \
     ros-humble-xacro \
     ros-humble-ros2-control \
     ros-humble-ros2-controllers \
@@ -34,6 +35,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     iputils-ping \
     net-tools \
     lsb-release \
+    gdb \
     python3-dev \
     python3-pip \
     && apt-get autoremove -y \
