@@ -229,7 +229,7 @@ def generate_launch_description() -> LaunchDescription:
                 ]
             ),
         ],
-        condition=UnlessCondition(use_sim),
+        # condition=UnlessCondition(use_sim),
     )
 
     robot_state_pub_node = Node(
@@ -295,7 +295,15 @@ def generate_launch_description() -> LaunchDescription:
         parameters=[robot_description],
         condition=IfCondition(
             PythonExpression(
-                ["'", use_planning, "' == 'false' and '", use_rviz, "' == 'true'"]
+                [
+                    "'",
+                    use_planning,
+                    "' == 'false' and '",
+                    use_rviz,
+                    "' == 'true' and '",
+                    use_sim,
+                    "' == 'false'",
+                ]
             )  # launch either moveit or the alpha visualization
         ),
     )
