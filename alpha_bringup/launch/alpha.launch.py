@@ -321,7 +321,7 @@ def generate_launch_description() -> LaunchDescription:
         )
     )
 
-    events = [
+    event_handlers = [
         delay_joint_state_broadcaster_spawner_after_spawn_entity,
         delay_joint_state_broadcaster_spawner_after_control_node,
         delay_rviz_after_joint_state_broadcaster_spawner,
@@ -342,4 +342,4 @@ def generate_launch_description() -> LaunchDescription:
 
     include = [gazebo_launch]
 
-    return LaunchDescription(args + include + nodes + events)
+    return LaunchDescription(args + include + nodes + event_handlers)
