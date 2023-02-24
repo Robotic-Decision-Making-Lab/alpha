@@ -70,25 +70,10 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        jaws_base_link:
+        ee_base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        jawsbase_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        jawsrs1_130_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        jawsrs1_139_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         m1_link:
           Alpha: 1
           Show Axes: false
@@ -118,6 +103,21 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        standard_jaws_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        standard_jaws_rs1_130_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        standard_jaws_rs1_139_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         world:
           Alpha: 1
           Show Axes: false
@@ -132,7 +132,7 @@ Visualization Manager:
       Visual Enabled: true
   Enabled: true
   Global Options:
-    Background Color: 52; 101; 164
+    Background Color: 188; 188; 188
     Fixed Frame: world
     Frame Rate: 30
   Name: root
@@ -191,10 +191,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4003986120223999
+      Pitch: 0.4203985333442688
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.5703974962234497
+      Yaw: 4.713569641113281
     Saved: ~
 Window Geometry:
   Displays:

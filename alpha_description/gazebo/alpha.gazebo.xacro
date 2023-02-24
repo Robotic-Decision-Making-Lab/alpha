@@ -18,6 +18,41 @@
       </plugin>
     </gazebo>
 
+    <gazebo reference="${prefix}base_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}ee_base_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}m1_link" />
+    <gazebo reference="${prefix}m1_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}m2_1_1_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}m2_1_2_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}m2_joint_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}m3_inline_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}push_rod">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}standard_jaws_base_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}standard_jaws_rs1_130_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}standard_jaws_rs1_139_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+
   </xacro:macro>
 
 </robot>

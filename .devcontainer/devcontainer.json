@@ -2,8 +2,7 @@
   "dockerFile": "../.docker/Dockerfile",
   "build": {
     "args": {
-      "WORKSPACE": "${containerWorkspaceFolder}",
-      "BUILDKIT_INLINE_CACHE": "0"
+      "WORKSPACE": "${containerWorkspaceFolder}"
     }
   },
   "remoteUser": "dev",
@@ -11,12 +10,13 @@
     "--network=host",
     "--cap-add=SYS_PTRACE",
     "--security-opt=seccomp:unconfined",
-    "--security-opt=apparmor:unconfined",
-    "--volume=/dev:/dev",
-    "--privileged"
+    "--security-opt=apparmor:unconfined"
   ],
   "containerEnv": {
-    "DISPLAY": "${localEnv:DISPLAY}"
+    "DISPLAY": "${localEnv:DISPLAY}",
+    "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
+    "XDG_RUNTIME_DIR": "${localEnv:XDG_RUNTIME_DIR}",
+    "PULSE_SERVER": "${localEnv:PULSE_SERVER}"
   },
   "customizations": {
     "vscode": {
@@ -109,17 +109,18 @@
         }
       },
       "extensions": [
-		"ms-azuretools.vscode-docker",
-		"ms-python.python",
-		"ms-python.vscode-pylance",
-		"njpwerner.autodocstring",
-		"redhat.vscode-xml",
-		"redhat.vscode-yaml",
-		"cschlosser.doxdocgen",
-		"ms-vscode.cpptools",
-		"esbenp.prettier-vscode",
-		"josetr.cmake-language-support-vscode"
-	]
+        "ms-azuretools.vscode-docker",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "njpwerner.autodocstring",
+        "redhat.vscode-xml",
+        "redhat.vscode-yaml",
+        "cschlosser.doxdocgen",
+        "ms-vscode.cpptools",
+        "esbenp.prettier-vscode",
+        "josetr.cmake-language-support-vscode",
+        "smilerobotics.urdf"
+      ]
     }
   }
 }

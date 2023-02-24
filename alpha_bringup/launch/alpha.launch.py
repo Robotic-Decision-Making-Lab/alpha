@@ -230,7 +230,7 @@ def generate_launch_description() -> LaunchDescription:
                 ]
             ),
         ],
-        # condition=UnlessCondition(use_sim),
+        condition=UnlessCondition(use_sim),
     )
 
     robot_state_pub_node = Node(
@@ -317,7 +317,7 @@ def generate_launch_description() -> LaunchDescription:
             "-topic",
             [namespace, "robot_description"],
             "-entity",
-            [namespace, "alpha"],
+            [namespace, "alpha"]
         ],
         output="screen",
         condition=IfCondition(use_sim),
@@ -398,8 +398,10 @@ def generate_launch_description() -> LaunchDescription:
                 )
             ]
         ),
+        launch_arguments={'verbose': 'true'}.items(),
         condition=IfCondition(use_sim),
     )
+
     moveit_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [FindPackageShare("alpha_bringup"), "/launch", "/planning.launch.py"]
