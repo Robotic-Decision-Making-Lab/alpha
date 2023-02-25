@@ -78,6 +78,11 @@ def generate_launch_description() -> LaunchDescription:
             description="Initial velocities used for simulation.",
         ),
         DeclareLaunchArgument(
+            "gazebo_world_file",
+            default_value="empty.world",
+            description="World configuration to load if using Gazebo",
+        ),
+        DeclareLaunchArgument(
             "prefix",
             default_value="''",
             description=(
@@ -88,17 +93,12 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             "namespace",
-            default_value="/",
+            default_value="",
             description=(
                 "Namespace of the launched nodes; useful for multi-robot setup. If"
                 " changed, then the namespace in the controller configuration must"
                 " be updated. Expected format '<ns>/'"
             ),
-        ),
-        DeclareLaunchArgument(
-            "use_sim",
-            default_value="false",
-            description="Automatically start Gazebo",
         ),
         DeclareLaunchArgument(
             "use_rviz",
@@ -157,7 +157,6 @@ def generate_launch_description() -> LaunchDescription:
     controllers_file = LaunchConfiguration("controllers_file")
     initial_positions_file = LaunchConfiguration("initial_positions_file")
     prefix = LaunchConfiguration("prefix")
-    use_sim = LaunchConfiguration("use_sim")
     use_rviz = LaunchConfiguration("use_rviz")
     use_planning = LaunchConfiguration("use_planning")
     use_fake_hardware = LaunchConfiguration("use_fake_hardware")
@@ -183,9 +182,6 @@ def generate_launch_description() -> LaunchDescription:
                 " ",
                 "prefix:=",
                 prefix,
-                " ",
-                "use_sim:=",
-                use_sim,
                 " ",
                 "use_fake_hardware:=",
                 use_fake_hardware,
@@ -230,7 +226,6 @@ def generate_launch_description() -> LaunchDescription:
                 ]
             ),
         ],
-        condition=UnlessCondition(use_sim),
     )
 
     robot_state_pub_node = Node(
@@ -302,41 +297,13 @@ def generate_launch_description() -> LaunchDescription:
                     use_planning,
                     "' == 'false' and '",
                     use_rviz,
-                    "' == 'true' and '",
-                    use_sim,
-                    "' == 'false'",
+                    "' == 'true'",
                 ]
             )  # launch either moveit or the alpha visualization
         ),
     )
 
-    gazebo_spawn_entity_node = Node(
-        package="gazebo_ros",
-        executable="spawn_entity.py",
-        arguments=[
-            "-topic",
-            [namespace, "robot_description"],
-            "-entity",
-            [namespace, "alpha"]
-        ],
-        output="screen",
-        condition=IfCondition(use_sim),
-    )
-
-    nodes = [
-        control_node,
-        robot_state_pub_node,
-        gazebo_spawn_entity_node,
-    ]
-
-    # Delay `joint_state_broadcaster` after spawn_entity
-    delay_joint_state_broadcaster_spawner_after_spawn_entity = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=gazebo_spawn_entity_node,
-            on_exit=[joint_state_broadcaster_spawner],
-        ),
-        condition=IfCondition(use_sim),
-    )
+    nodes = [control_node, robot_state_pub_node]
 
     # Delay `joint_state_broadcaster` after control_node
     delay_joint_state_broadcaster_spawner_after_control_node = RegisterEventHandler(
@@ -344,7 +311,6 @@ def generate_launch_description() -> LaunchDescription:
             target_action=control_node,
             on_start=[joint_state_broadcaster_spawner],
         ),
-        condition=UnlessCondition(use_sim),
     )
 
     # Delay rviz start after `joint_state_broadcaster`
@@ -382,25 +348,11 @@ def generate_launch_description() -> LaunchDescription:
     )
 
     event_handlers = [
-        delay_joint_state_broadcaster_spawner_after_spawn_entity,
         delay_joint_state_broadcaster_spawner_after_control_node,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_moveit_controller_spawners_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawners_after_joint_state_broadcaster_spawner,
     ]
-
-    # Specify additional launch files to call
-    gazebo_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [
-                PathJoinSubstitution(
-                    [FindPackageShare("gazebo_ros"), "launch", "gazebo.launch.py"]
-                )
-            ]
-        ),
-        launch_arguments={'verbose': 'true'}.items(),
-        condition=IfCondition(use_sim),
-    )
 
     moveit_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -412,11 +364,10 @@ def generate_launch_description() -> LaunchDescription:
             "prefix": prefix,
             "namespace": namespace,
             "start_rviz": use_rviz,
-            "use_sim": use_sim,
         }.items(),
         condition=IfCondition(use_planning),
     )
 
-    include = [gazebo_launch, moveit_launch]
+    include = [moveit_launch]
 
     return LaunchDescription(args + include + nodes + event_handlers)

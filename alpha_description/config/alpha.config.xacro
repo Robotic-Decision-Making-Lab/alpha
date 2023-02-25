@@ -2,7 +2,6 @@
 <robot name="alpha" xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- Declare arguments which can be set from a launch file -->
-  <xacro:arg name="use_sim" default="false" />
   <xacro:arg name="use_fake_hardware" default="true" />
   <xacro:arg name="serial_port" default="" />
   <xacro:arg name="heartbeat_timeout" default="5000" />
@@ -36,7 +35,7 @@
   </gazebo>
 
   <xacro:alpha_system prefix="$(arg prefix)" name="ReachAlpha5"
-    use_fake_hardware="$(arg use_fake_hardware)" use_sim="$(arg use_sim)"
+    use_fake_hardware="$(arg use_fake_hardware)"
     serial_port="$(arg serial_port)"
     heartbeat_timeout="$(arg heartbeat_timeout)"
     state_update_frequency="$(arg state_update_frequency)"

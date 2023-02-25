@@ -30,11 +30,6 @@
         </geometry>
         <origin rpy="0 1.57075 0" xyz="-0.075 0 0" />
       </collision>
-      <inertial>
-        <mass value="2e-06" />
-        <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0"
-          izz="1.1e-09" />
-      </inertial>
     </link>
 
     <joint name="${prefix}base_link_joint" type="fixed">
@@ -57,11 +52,6 @@
         </geometry>
         <origin rpy="0 0 0" xyz="0 0 0.000" />
       </collision>
-      <inertial>
-        <mass value="2e-06" />
-        <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0"
-          izz="1.1e-09" />
-      </inertial>
     </link>
 
     <joint name="${prefix}axis_e" type="revolute">
@@ -98,11 +88,6 @@
         </geometry>
         <origin rpy="1.5707 0 0" xyz="-0.040 0 -0.1453" />
       </collision>
-      <inertial>
-        <mass value="2e-06" />
-        <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0"
-          izz="1.1e-09" />
-      </inertial>
     </link>
 
     <joint name="${prefix}axis_d" type="revolute">
@@ -127,11 +112,6 @@
         </geometry>
         <origin rpy="0 0 0" xyz="0.02 0 0.0165" />
       </collision>
-      <inertial>
-        <mass value="2e-06" />
-        <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0"
-          izz="1.1e-09" />
-      </inertial>
     </link>
 
     <joint name="${prefix}axis_c" type="revolute">
@@ -157,11 +137,6 @@
         </geometry>
         <origin rpy="0 0 0" xyz="0.00 0 0.054875" />
       </collision>
-      <inertial>
-        <mass value="2e-06" />
-        <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0"
-          izz="1.1e-09" />
-      </inertial>
     </link>
 
     <joint name="${prefix}axis_b" type="revolute">
@@ -182,21 +157,9 @@
       <child link="${prefix}ee_base_link" />
     </joint>
 
-    <link name="${prefix}ee_base_link">
-      <inertial>
-        <mass value="2e-06" />
-        <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0"
-          izz="1.1e-09" />
-      </inertial>
-    </link>
+    <link name="${prefix}ee_base_link" />
 
-    <link name="${prefix}push_rod">
-      <inertial>
-        <mass value="2e-06" />
-        <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0"
-          izz="1.1e-09" />
-      </inertial>
-    </link>
+    <link name="${prefix}push_rod" />
 
     <joint name="${prefix}axis_a" type="prismatic">
       <origin rpy="0 0 0" xyz="0 0 0.009" />
