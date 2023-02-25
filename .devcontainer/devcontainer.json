@@ -99,6 +99,18 @@
           "editor.autoIndent": "advanced",
           "editor.defaultFormatter": "redhat.vscode-yaml"
         },
+        "[markdown]": {
+          "editor.unicodeHighlight.ambiguousCharacters": false,
+          "editor.unicodeHighlight.invisibleCharacters": false,
+          "diffEditor.ignoreTrimWhitespace": false,
+          "editor.wordWrap": "on",
+          "editor.quickSuggestions": {
+            "comments": "off",
+            "strings": "off",
+            "other": "off"
+          },
+          "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+        },
         "search.exclude": {
           "**/node_modules": true,
           "**/bower_components": true,
@@ -119,7 +131,8 @@
         "ms-vscode.cpptools",
         "esbenp.prettier-vscode",
         "josetr.cmake-language-support-vscode",
-        "smilerobotics.urdf"
+        "smilerobotics.urdf",
+        "DavidAnson.vscode-markdownlint"
       ]
     }
   }

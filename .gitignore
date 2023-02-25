@@ -40,5 +40,5 @@ log/
 .vscode/
 
 # python
-.mypy_cache
+.mypy_cache/
 __pycache__
