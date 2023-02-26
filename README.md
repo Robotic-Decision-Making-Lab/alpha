@@ -1,7 +1,7 @@
-# Reach Alpha 5 ROS2 Driver
+# Reach Alpha 5 ROS 2 Driver
 
-The Alpha 5 driver is a collection of ROS2 packages designed
-to support ROS2 integration with the [Reach Alpha 5 manipulator](https://reachrobotics.com/products/manipulators/reach-alpha/).
+The Alpha 5 driver is a collection of ROS 2 packages designed
+to support ROS 2 integration with the [Reach Alpha 5 manipulator](https://reachrobotics.com/products/manipulators/reach-alpha/).
 
 ## Main features
 
@@ -15,7 +15,7 @@ for hardware communication
 
 ## Installation
 
-The Alpha 5 driver requires at least ROS2 Humble and can be installed natively
+The Alpha 5 driver requires at least ROS 2 Humble and can be installed natively
 or using Docker on Linux.
 
 ## Quick start
@@ -30,4 +30,4 @@ contributing toward this project, please ask a question on our
 
 ## License
 
-The Alpha 5 ROS2 driver is released under the MIT license.
+The Alpha 5 ROS 2 driver is released under the MIT license.
