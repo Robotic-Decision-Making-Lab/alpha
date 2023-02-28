@@ -9,7 +9,7 @@
   <xacro:arg name="controllers_file" default="alpha_controllers.yaml" />
   <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
   <xacro:arg name="initial_velocities_file" default="initial_velocities.yaml" />
-  <xacro:arg name="namespace" default="/" />
+  <xacro:arg name="namespace" default="" />
   <xacro:arg name="prefix" default="" />
 
   <!-- Import Alpha macro -->
@@ -19,10 +19,6 @@
   <!-- Import ros2_control macro -->
   <xacro:include
     filename="$(find alpha_description)/ros2_control/alpha.ros2_control.xacro" />
-
-  <!-- Import Gazebo macro -->
-  <xacro:include
-    filename="$(find alpha_description)/gazebo/alpha.gazebo.xacro" />
 
   <link name="world" />
 
@@ -41,8 +37,5 @@
     state_update_frequency="$(arg state_update_frequency)"
     initial_positions_file="$(arg initial_positions_file)"
     initial_velocities_file="$(arg initial_velocities_file)" />
-
-  <xacro:alpha_gazebo prefix="$(arg prefix)"
-    controllers_file="$(arg controllers_file)" namespace="$(arg namespace)" />
 
 </robot>
