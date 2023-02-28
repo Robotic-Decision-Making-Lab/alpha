@@ -50,7 +50,9 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
   }
 
   hw_states_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  async_states_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_states_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  async_states_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_commands_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_commands_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   control_modes_.resize(
@@ -253,15 +255,15 @@ hardware_interface::CallbackReturn AlphaHardware::on_deactivate(const rclcpp_lif
 hardware_interface::return_type AlphaHardware::read(const rclcpp::Time &, const rclcpp::Duration &)
 {
   // Get access to the real-time states
-  const std::lock_guard<std::mutex> lock(access_async_states_);
+  // const std::lock_guard<std::mutex> lock(access_async_states_);
 
   // Copy the latest readings to the read ros2_control state interfaces
   // We need to maintain two state vectors here because the ros2_control endpoint won't have access
   // to the mutex needed to read the real-time states
-  std::copy(
-    hw_states_positions_.begin(), hw_states_positions_.end(), async_states_positions_.begin());
-  std::copy(
-    hw_states_velocities_.begin(), hw_states_velocities_.end(), async_states_velocities_.begin());
+  // std::copy(
+  //   hw_states_positions_.begin(), hw_states_positions_.end(), async_states_positions_.begin());
+  // std::copy(
+  //   hw_states_velocities_.begin(), hw_states_velocities_.end(), async_states_velocities_.begin());
 
   return hardware_interface::return_type::OK;
 }
@@ -319,7 +321,7 @@ void AlphaHardware::poll_state(const int freq) const
 {
   // Request position and velocity state information
   std::vector<alpha_driver::PacketId> packets = {
-    alpha_driver::PacketId::kPosition, alpha_driver::PacketId::kVelocity};
+    alpha_driver::PacketId::kPosition};
 
   while (running_.load()) {
     driver_.request(packets, alpha_driver::DeviceId::kAllJoints);

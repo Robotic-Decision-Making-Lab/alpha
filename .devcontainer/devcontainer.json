@@ -10,7 +10,9 @@
     "--network=host",
     "--cap-add=SYS_PTRACE",
     "--security-opt=seccomp:unconfined",
-    "--security-opt=apparmor:unconfined"
+    "--security-opt=apparmor:unconfined",
+    "--volume=/dev:/dev",
+    "--privileged"
   ],
   "containerEnv": {
     "DISPLAY": "${localEnv:DISPLAY}",
