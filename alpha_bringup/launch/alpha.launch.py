@@ -113,6 +113,11 @@ def generate_launch_description() -> LaunchDescription:
             ),
         ),
         DeclareLaunchArgument(
+            "use_sim",
+            default_value="false",
+            description="Automatically start Gazebo",
+        ),
+        DeclareLaunchArgument(
             "serial_port",
             default_value="''",
             description="Serial port that the robot is available at",
@@ -143,6 +148,11 @@ def generate_launch_description() -> LaunchDescription:
                 " used instead"
             ),
         ),
+        DeclareLaunchArgument(
+            "gazebo_world_file",
+            default_value="empty.world",
+            description="World configuration to load if using Gazebo",
+        ),
     ]
 
     # Initialize the arguments
@@ -154,6 +164,7 @@ def generate_launch_description() -> LaunchDescription:
     prefix = LaunchConfiguration("prefix")
     use_rviz = LaunchConfiguration("use_rviz")
     use_planning = LaunchConfiguration("use_planning")
+    use_sim = LaunchConfiguration("use_sim")
     use_fake_hardware = LaunchConfiguration("use_fake_hardware")
     serial_port = LaunchConfiguration("serial_port")
     timeout = LaunchConfiguration("timeout")
@@ -161,6 +172,7 @@ def generate_launch_description() -> LaunchDescription:
     robot_controller = LaunchConfiguration("robot_controller")
     initial_velocities_file = LaunchConfiguration("initial_velocities_file")
     namespace = LaunchConfiguration("namespace")
+    gazebo_world_file = LaunchConfiguration("gazebo_world_file")
 
     # Generate the robot description using xacro
     robot_description = {
@@ -202,6 +214,10 @@ def generate_launch_description() -> LaunchDescription:
                 " ",
                 "initial_velocities_file:=",
                 initial_velocities_file,
+                " ",
+                "use_sim:=",
+                use_sim,
+                " ",
             ]
         )
     }
@@ -222,6 +238,7 @@ def generate_launch_description() -> LaunchDescription:
                 ]
             ),
         ],
+        condition=UnlessCondition(use_sim),
     )
 
     robot_state_pub_node = Node(
@@ -293,10 +310,25 @@ def generate_launch_description() -> LaunchDescription:
                     use_planning,
                     "' == 'false' and '",
                     use_rviz,
-                    "' == 'true'",
+                    "' == 'true' and '",
+                    use_sim,
+                    "' == 'false'",
                 ]
             )  # launch either moveit or the alpha visualization - not both
         ),
+    )
+
+    gazebo_spawn_entity_node = Node(
+        package="gazebo_ros",
+        executable="spawn_entity.py",
+        arguments=[
+            "-topic",
+            [namespace, "robot_description"],
+            "-entity",
+            [namespace, "alpha"],
+        ],
+        output="screen",
+        condition=IfCondition(use_sim),
     )
 
     # Delay `joint_state_broadcaster` after control_node
@@ -341,13 +373,24 @@ def generate_launch_description() -> LaunchDescription:
         )
     )
 
+    # Delay `joint_state_broadcaster` after spawn_entity
+    delay_joint_state_broadcaster_spawner_after_spawn_entity = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=gazebo_spawn_entity_node,
+            on_exit=[joint_state_broadcaster_spawner],
+        ),
+        condition=IfCondition(use_sim),
+    )
+
     nodes = [
         control_node,
         robot_state_pub_node,
+        gazebo_spawn_entity_node,
         delay_joint_state_broadcaster_spawner_after_control_node,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_moveit_controller_spawners_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawners_after_joint_state_broadcaster_spawner,
+        delay_joint_state_broadcaster_spawner_after_spawn_entity,
     ]
 
     # Integrate additional launch files
@@ -365,6 +408,28 @@ def generate_launch_description() -> LaunchDescription:
         condition=IfCondition(use_planning),
     )
 
-    include = [moveit_launch]
+    gazebo_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [
+                PathJoinSubstitution(
+                    [FindPackageShare("gazebo_ros"), "launch", "gazebo.launch.py"]
+                )
+            ]
+        ),
+        launch_arguments={
+            "verbose": "true",
+            "world": PathJoinSubstitution(
+                [
+                    FindPackageShare(description_package),
+                    "gazebo",
+                    "worlds",
+                    gazebo_world_file,
+                ]
+            ),
+        }.items(),
+        condition=IfCondition(use_sim),
+    )
+
+    include = [moveit_launch, gazebo_launch]
 
     return LaunchDescription(args + include + nodes)

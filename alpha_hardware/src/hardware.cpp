@@ -269,18 +269,18 @@ hardware_interface::return_type AlphaHardware::read(const rclcpp::Time &, const 
 hardware_interface::return_type AlphaHardware::write(const rclcpp::Time &, const rclcpp::Duration &)
 {
   // Send the commands for each joint
-  for (std::size_t i = 0; i < control_modes_.size(); i++) {
-    switch (control_modes_[i]) {
-      case ControlMode::kPosition:
-        driver_.set_position(hw_commands_positions_[i], static_cast<alpha_driver::DeviceId>(i));
-        break;
-      case ControlMode::kVelocity:
-        driver_.set_velocity(hw_commands_velocities_[i], static_cast<alpha_driver::DeviceId>(i));
-        break;
-      default:
-        break;
-    }
-  }
+  // for (std::size_t i = 0; i < control_modes_.size(); i++) {
+  //   switch (control_modes_[i]) {
+  //     case ControlMode::kPosition:
+  //       driver_.set_position(hw_commands_positions_[i], static_cast<alpha_driver::DeviceId>(i));
+  //       break;
+  //     case ControlMode::kVelocity:
+  //       driver_.set_velocity(hw_commands_velocities_[i], static_cast<alpha_driver::DeviceId>(i));
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }
 
   return hardware_interface::return_type::OK;
 }

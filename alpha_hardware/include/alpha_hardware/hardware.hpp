@@ -119,6 +119,10 @@ private:
    */
   void poll_state(int freq) const;
 
+  bool check_position_limits(double position, alpha_driver::DeviceId) const;
+
+  bool check_velocity_limits(double velocity, alpha_driver::DeviceId) const;
+
   // Driver things
   alpha_driver::Driver driver_;
   std::thread state_request_worker_;

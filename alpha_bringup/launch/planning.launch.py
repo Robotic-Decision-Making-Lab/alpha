@@ -73,12 +73,18 @@ def generate_launch_description() -> LaunchDescription:
             default_value="true",
             description="Automatically start RViz2",
         ),
+        DeclareLaunchArgument(
+            "use_sim",
+            default_value="false",
+            description="Automatically start Gazebo",
+        ),
     ]
 
     # Initialize Arguments
     description_package = LaunchConfiguration("description_package")
     description_file = LaunchConfiguration("description_file")
     use_rviz = LaunchConfiguration("use_rviz")
+    use_sim = LaunchConfiguration("use_sim")
     prefix = LaunchConfiguration("prefix")
     namespace = LaunchConfiguration("namespace")
 
@@ -201,6 +207,7 @@ def generate_launch_description() -> LaunchDescription:
             moveit_controllers,
             ompl_planning_config,
             planning_scene_monitor_parameters,
+            {"use_sim_time": use_sim},
         ],
     )
 

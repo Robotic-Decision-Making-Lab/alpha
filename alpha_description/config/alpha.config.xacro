@@ -3,6 +3,7 @@
 
   <!-- Declare arguments which can be set from a launch file -->
   <xacro:arg name="use_fake_hardware" default="true" />
+  <xacro:arg name="use_sim" default="false" />
   <xacro:arg name="serial_port" default="" />
   <xacro:arg name="heartbeat_timeout" default="5000" />
   <xacro:arg name="state_update_frequency" default="200" />
@@ -20,6 +21,10 @@
   <xacro:include
     filename="$(find alpha_description)/ros2_control/alpha.ros2_control.xacro" />
 
+  <!-- Import Gazebo macro -->
+  <xacro:include
+    filename="$(find alpha_description)/gazebo/alpha.gazebo.xacro" />
+
   <link name="world" />
 
   <xacro:alpha_urdf parent="world" prefix="$(arg prefix)">
@@ -36,6 +41,10 @@
     heartbeat_timeout="$(arg heartbeat_timeout)"
     state_update_frequency="$(arg state_update_frequency)"
     initial_positions_file="$(arg initial_positions_file)"
-    initial_velocities_file="$(arg initial_velocities_file)" />
+    initial_velocities_file="$(arg initial_velocities_file)"
+    use_sim="$(arg use_sim)" />
+
+  <xacro:alpha_gazebo prefix="$(arg prefix)"
+    controllers_file="$(arg controllers_file)" namespace="$(arg namespace)" />
 
 </robot>

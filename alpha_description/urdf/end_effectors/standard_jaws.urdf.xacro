@@ -23,6 +23,11 @@
         </geometry>
         <material name="${prefix}black" />
       </visual>
+      <inertial>
+        <mass value="2e-06" />
+        <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0"
+          izz="1.1e-09" />
+      </inertial>
     </link>
 
     <link name="${prefix}rs1_130_link">
@@ -40,6 +45,11 @@
         </geometry>
         <origin xyz="0.0 -0.008 0.045" rpy="0 0 0" />
       </collision>
+      <inertial>
+        <mass value="2e-06" />
+        <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0"
+          izz="1.1e-09" />
+      </inertial>
     </link>
 
     <joint name="${prefix}rs1_130_joint" type="revolute">
@@ -66,6 +76,11 @@
         </geometry>
         <origin xyz="0.0 0.008 0.045" rpy="0 0 0" />
       </collision>
+      <inertial>
+        <mass value="2e-06" />
+        <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0"
+          izz="1.1e-09" />
+      </inertial>
     </link>
 
     <joint name="${prefix}rs1_139_joint" type="revolute">
