@@ -36,7 +36,7 @@ def generate_launch_description() -> LaunchDescription:
     Generate a launch description to run MoveIt with the Reach Alpha 5 manipulator.
 
     Returns:
-        LaunchDescription: ROS2 launch description
+        LaunchDescription: ROS 2 launch description
     """
     # Declare arguments
     args = [
@@ -88,6 +88,7 @@ def generate_launch_description() -> LaunchDescription:
     prefix = LaunchConfiguration("prefix")
     namespace = LaunchConfiguration("namespace")
 
+    # Get the robot description using xacro
     robot_description = {
         "robot_description": Command(
             [
@@ -103,6 +104,7 @@ def generate_launch_description() -> LaunchDescription:
         )
     }
 
+    # Get the robot semantic description using xacro
     robot_description_semantic = {
         "robot_description_semantic": Command(
             [
@@ -173,6 +175,7 @@ def generate_launch_description() -> LaunchDescription:
         ]
     )
 
+    # Configure MoveIt2 settings
     trajectory_execution = {
         "moveit_manage_controllers": True,
         "trajectory_execution.allowed_execution_duration_scaling": 1.2,
@@ -187,6 +190,7 @@ def generate_launch_description() -> LaunchDescription:
         "publish_transforms_updates": True,
     }
 
+    # Declare ROS 2 nodes
     move_group_node = Node(
         package="moveit_ros_move_group",
         executable="move_group",

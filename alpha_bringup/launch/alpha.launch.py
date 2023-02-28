@@ -78,11 +78,6 @@ def generate_launch_description() -> LaunchDescription:
             description="Initial velocities used for simulation.",
         ),
         DeclareLaunchArgument(
-            "gazebo_world_file",
-            default_value="empty.world",
-            description="World configuration to load if using Gazebo",
-        ),
-        DeclareLaunchArgument(
             "prefix",
             default_value="''",
             description=(
@@ -167,6 +162,7 @@ def generate_launch_description() -> LaunchDescription:
     initial_velocities_file = LaunchConfiguration("initial_velocities_file")
     namespace = LaunchConfiguration("namespace")
 
+    # Generate the robot description using xacro
     robot_description = {
         "robot_description": Command(
             [
@@ -210,7 +206,7 @@ def generate_launch_description() -> LaunchDescription:
         )
     }
 
-    # Declare ROS2 nodes
+    # Declare ROS 2 nodes
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
@@ -299,11 +295,9 @@ def generate_launch_description() -> LaunchDescription:
                     use_rviz,
                     "' == 'true'",
                 ]
-            )  # launch either moveit or the alpha visualization
+            )  # launch either moveit or the alpha visualization - not both
         ),
     )
-
-    nodes = [control_node, robot_state_pub_node]
 
     # Delay `joint_state_broadcaster` after control_node
     delay_joint_state_broadcaster_spawner_after_control_node = RegisterEventHandler(
@@ -347,13 +341,16 @@ def generate_launch_description() -> LaunchDescription:
         )
     )
 
-    event_handlers = [
+    nodes = [
+        control_node,
+        robot_state_pub_node,
         delay_joint_state_broadcaster_spawner_after_control_node,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_moveit_controller_spawners_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawners_after_joint_state_broadcaster_spawner,
     ]
 
+    # Integrate additional launch files
     moveit_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [FindPackageShare("alpha_bringup"), "/launch", "/planning.launch.py"]
@@ -370,4 +367,4 @@ def generate_launch_description() -> LaunchDescription:
 
     include = [moveit_launch]
 
-    return LaunchDescription(args + include + nodes + event_handlers)
+    return LaunchDescription(args + include + nodes)
