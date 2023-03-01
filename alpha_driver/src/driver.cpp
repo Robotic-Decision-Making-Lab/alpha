@@ -21,6 +21,7 @@
 #include "alpha_driver/driver.hpp"
 
 #include <vector>
+#include <cmath>
 
 #include "alpha_driver/device_id.hpp"
 #include "alpha_driver/packet_id.hpp"
@@ -33,13 +34,17 @@ namespace alpha_driver
 
 Driver::Driver()
 {
-  client_.register_callback(
+  subscribe(
     PacketId::kModelNumber,
     std::bind(&Driver::update_last_heartbeat_cb, this, std::placeholders::_1));
 }
 
-void Driver::start(const std::string & serial_port, int heartbeat_timeout_ms)
+void Driver::start(const std::string & serial_port, int heartbeat_timeout)
 {
+  if (heartbeat_timeout < 1) {
+    throw std::invalid_argument("The heartbeat timeout must be greater than 1 second.");
+  }
+
   // Attempt to connect the serial client
   // We don't expose the VTIME timeout to the user API to avoid usability concerns
   client_.connect(serial_port);
@@ -47,9 +52,11 @@ void Driver::start(const std::string & serial_port, int heartbeat_timeout_ms)
   // Disable any previous heartbeat configurations
   disable_heartbeat();
 
+  RCLCPP_INFO(rclcpp::get_logger("what"), "freq: %f", ceil(2 / heartbeat_timeout));
+
   // Configure the new heartbeat request
-  // The heartbeat should be sent 3 times per timeout interval
-  enable_heartbeat(3 / heartbeat_timeout_ms);
+  // The heartbeat has a minimum of once per second, so we set it to that
+  enable_heartbeat(1);
 
   {
     const std::lock_guard<std::mutex> lock(last_heartbeat_lock_);
@@ -59,7 +66,7 @@ void Driver::start(const std::string & serial_port, int heartbeat_timeout_ms)
   running_.store(true);
 
   // Start the thread that monitors heartbeats from the manipulator
-  heartbeat_worker_ = std::thread(&Driver::monitor_heartbeat, this, heartbeat_timeout_ms);
+  heartbeat_worker_ = std::thread(&Driver::monitor_heartbeat, this, heartbeat_timeout);
 }
 
 void Driver::stop()
@@ -193,7 +200,7 @@ void Driver::update_last_heartbeat_cb(const Packet &)
   last_heartbeat_ = std::chrono::steady_clock::now();
 }
 
-void Driver::monitor_heartbeat(int heartbeat_timeout_ms) const
+void Driver::monitor_heartbeat(int heartbeat_timeout) const
 {
   while (running_.load()) {
     // Make sure that the lock is properly scoped so that we don't accidentally keep the lock
@@ -203,17 +210,17 @@ void Driver::monitor_heartbeat(int heartbeat_timeout_ms) const
 
       if (
         std::chrono::steady_clock::now() - last_heartbeat_ >
-        std::chrono::milliseconds(heartbeat_timeout_ms)) {
+        std::chrono::seconds(heartbeat_timeout)) {
         RCLCPP_WARN(  // NOLINT
           rclcpp::get_logger("AlphaDriver"),
           "Timeout occurred; the system has not received a heartbeat message in the last %d "
-          "seconds",
-          heartbeat_timeout_ms);
+          "milliseconds",
+          heartbeat_timeout);
       }
     }
 
     // We don't need to check more often than our timeout requires us to
-    std::this_thread::sleep_for(std::chrono::milliseconds(heartbeat_timeout_ms));
+    std::this_thread::sleep_for(std::chrono::seconds(heartbeat_timeout));
   }
 }
 

@@ -49,10 +49,10 @@ public:
    * @note This will attempt to connect the serial client and start the heartbeat.
    *
    * @param serial_port serial port that the manipulator is available at
-   * @param heartbeat_timeout_ms maximum time between heartbeat messages before the connection is
-   * considered timed out, defaults to 3 seconds
+   * @param heartbeat_timeout maximum time (s) between heartbeat messages before the connection is
+   * considered timed out; must be greater than 1, defaults to 3 seconds
    */
-  void start(const std::string & serial_port, int heartbeat_timeout_ms = 3000);
+  void start(const std::string & serial_port, int heartbeat_timeout = 3);
 
   /**
    * @brief Stop the driver.

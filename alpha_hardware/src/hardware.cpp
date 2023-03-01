@@ -255,15 +255,15 @@ hardware_interface::CallbackReturn AlphaHardware::on_deactivate(const rclcpp_lif
 hardware_interface::return_type AlphaHardware::read(const rclcpp::Time &, const rclcpp::Duration &)
 {
   // Get access to the real-time states
-  // const std::lock_guard<std::mutex> lock(access_async_states_);
+  const std::lock_guard<std::mutex> lock(access_async_states_);
 
   // Copy the latest readings to the read ros2_control state interfaces
   // We need to maintain two state vectors here because the ros2_control endpoint won't have access
   // to the mutex needed to read the real-time states
-  // std::copy(
-  //   hw_states_positions_.begin(), hw_states_positions_.end(), async_states_positions_.begin());
-  // std::copy(
-  //   hw_states_velocities_.begin(), hw_states_velocities_.end(), async_states_velocities_.begin());
+  std::copy(
+    hw_states_positions_.begin(), hw_states_positions_.end(), async_states_positions_.begin());
+  std::copy(
+    hw_states_velocities_.begin(), hw_states_velocities_.end(), async_states_velocities_.begin());
 
   return hardware_interface::return_type::OK;
 }
@@ -319,12 +319,26 @@ void AlphaHardware::update_velocity_cb(const alpha_driver::Packet & packet)
 
 void AlphaHardware::poll_state(const int freq) const
 {
-  // Request position and velocity state information
-  std::vector<alpha_driver::PacketId> packets = {
-    alpha_driver::PacketId::kPosition};
-
   while (running_.load()) {
-    driver_.request(packets, alpha_driver::DeviceId::kAllJoints);
+    // There are a few important things to note here:
+    //   1. Yes, we could use the kAllJoints device ID, but for some reason, the response rate for
+    //      each joints becomes less reliable so we get better  response rates from all joints when
+    //      we split this up.
+    //   2. Yes, we could also create a request with multiple packet IDs, but, again, there are
+    //      bugs in the serial communication when that is used. Specifically, data is more likely
+    //      to become corrupted resulting in bad data. So we instead just request them separately.
+    driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kLinearJaws);
+    driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kRotateEndEffector);
+    driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kBendElbow);
+    driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kBendShoulder);
+    driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kRotateBase);
+
+    driver_.request(alpha_driver::PacketId::kPosition, alpha_driver::DeviceId::kLinearJaws);
+    driver_.request(alpha_driver::PacketId::kPosition, alpha_driver::DeviceId::kRotateEndEffector);
+    driver_.request(alpha_driver::PacketId::kPosition, alpha_driver::DeviceId::kBendElbow);
+    driver_.request(alpha_driver::PacketId::kPosition, alpha_driver::DeviceId::kBendShoulder);
+    driver_.request(alpha_driver::PacketId::kPosition, alpha_driver::DeviceId::kRotateBase);
+
     std::this_thread::sleep_for(std::chrono::seconds(1 / freq));
   }
 }

@@ -180,8 +180,11 @@ void SerialClient::poll() const
           // the [] does not have const overloading which we want for this to be thread-safe
           auto it = callbacks_.find(packet.packet_id());
 
-          for (const auto & callback : it->second) {
-            callback(packet);
+          // If a callback exists for the message, execute it
+          if (it != callbacks_.end()) {
+            for (const auto & callback : it->second) {
+              callback(packet);
+            }
           }
         }
         catch (const std::exception & e) {
