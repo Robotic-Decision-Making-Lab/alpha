@@ -28,22 +28,22 @@ namespace alpha_driver
 {
 
 /**
- * @brief CRC initial value specified in the BPL protocol
+ * @brief CRC initial value specified in the Reach protocol
  */
 const unsigned char kInitialValue = 0x00;
 
 /**
- * @brief CRC final XOR value specified in the BPL protocol.
+ * @brief CRC final XOR value specified in the Reach protocol.
  */
 const unsigned char kFinalXorValue = 0xFF;
 
 /**
- * @brief BPL protocol specifies that the CRC input should be reflected.
+ * @brief Reach protocol specifies that the CRC input should be reflected.
  */
 const bool kInputReflected = true;
 
 /**
- * @brief BPL protocol specifies that the CRC result should be reflected.
+ * @brief Reach protocol specifies that the CRC result should be reflected.
  */
 const bool kResultReflected = true;
 
@@ -90,7 +90,7 @@ const std::array<unsigned char, 256> kCrc8LookupTable = {
  *
  * @param data data to reflect
  * @param size size of the data being reflected
- * @return unsigned char
+ * @return reflected data
  */
 unsigned char reflect(std::uint64_t data, int size);
 
@@ -107,7 +107,7 @@ unsigned char reflect(std::uint64_t data, int size);
  * @param input_reflected Reflect the input
  * @param result_reflected Reflect the result
  * @param lookup_table Lookup table used for CRC calculation
- * @return unsigned char
+ * @return CRC8 value for the provided serial data
  */
 unsigned char calculate_crc8(
   const std::vector<unsigned char> & data, unsigned char initial_value,
@@ -115,14 +115,14 @@ unsigned char calculate_crc8(
   const std::array<unsigned char, 256> & lookup_table);
 
 /**
- * @brief Calculate the CRC value for a message using the BPL protocol specification.
+ * @brief Calculate the CRC value for a message using the Reach serial protocol specification.
  *
- * @remark This is a wrapper for the @ref calculate_crc8 method defined using the BPL specifications
- * to help improve usability.
+ * @remark This is a wrapper for the @ref calculate_crc8 method defined using the Reach
+ * specifications to help improve usability.
  *
- * @param data serial data whose CRC should be calculated using the BPL specification
- * @return unsigned char
+ * @param data serial data whose CRC should be calculated using the Reach specification
+ * @return CRC8 value calculated using the Reach serial protocol
  */
-unsigned char calculate_bpl_crc8(const std::vector<unsigned char> & data);
+unsigned char calculate_reach_crc8(const std::vector<unsigned char> & data);
 
 }  // namespace alpha_driver

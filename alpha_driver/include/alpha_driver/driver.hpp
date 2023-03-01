@@ -87,7 +87,7 @@ public:
    * @note If the position setpoint is outside of the configured limits, the command is ignored.
    *
    * @param position position setpoint; for rotational devices, this should be an angle in the range
-   * [0, 2pi]. For linear divices, the velocity should be a distance in mm.
+   * [0, 2pi]. For linear devices, the velocity should be a distance in mm.
    * @param device device whose position should be set
    */
   void set_position(float position, DeviceId device) const;
@@ -98,7 +98,7 @@ public:
    * @note The actuator will move from its current position by the amount specified.
    *
    * @param relative_position relative position setpoint; for rotational devices, this should be an
-   * angle in the range [0, 2pi]. For linear divices, the velocity should be a distance in mm.
+   * angle in the range [0, 2pi]. For linear devices, the velocity should be a distance in mm.
    * @param device device whose relative position should be set.
    */
   void set_relative_position(float relative_position, DeviceId device) const;
@@ -126,7 +126,7 @@ public:
   /**
    * @brief Request multiple packets from the Alpha manipulator.
    *
-   * @note Up to to 10 packets may be requested at once
+   * @note Up to to 10 packets may be requested at once.
    *
    * @param packet_types vector of packet types that the manipulator should send
    * @param device device that should sent the packets
@@ -164,7 +164,7 @@ private:
    * @note There isn't a single dedicated message available for heartbeat messages. Because of this,
    * we specify the Model Number packet as the heartbeat message.
    *
-   * @remark While a more helpful message could be request as the heartbeat (e.g., position,
+   * @remark While a more helpful message could be requested as the heartbeat (e.g., position,
    * velocity, mode, etc.), the interface would become less usable and a bit more confusing if some
    * state messages are broadcasted but others aren't. Furthermore, those messages may not be
    * desired by users. Therefore, we leave it up to the users to request state information.
@@ -200,7 +200,7 @@ private:
    * responsibility to respond.
    *
    * @param heartbeat_timeout_ms maximum allowable time between heartbeat messages before notifying
-   * users that a timeout may have occurred.
+   * users that a timeout may have occurred
    */
   void monitor_heartbeat(int heartbeat_timeout_ms) const;
 

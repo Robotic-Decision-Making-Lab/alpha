@@ -52,7 +52,7 @@ void Driver::start(const std::string & serial_port, int heartbeat_timeout)
   disable_heartbeat();
 
   // Configure the new heartbeat request
-  // The heartbeat has a minimum of once per second, so we set it to that
+  // The heartbeat has a minimum frequency of one message per second, so we set it to that
   enable_heartbeat(1);
 
   {
@@ -125,7 +125,7 @@ void Driver::request(PacketId packet_type, DeviceId device) const
 void Driver::request(std::vector<PacketId> & packet_types, DeviceId device) const
 {
   if (packet_types.size() > 10) {
-    throw std::logic_error("Cannot request more than 10 packets from a device at once.");
+    throw std::invalid_argument("Cannot request more than 10 packets from a device at once.");
   }
 
   if (!running_.load() || !client_.active()) {
@@ -133,8 +133,7 @@ void Driver::request(std::vector<PacketId> & packet_types, DeviceId device) cons
       "Cannot send a request to the manipulator without an active connection!");
   }
 
-  std::vector<unsigned char> request_types;
-  request_types.reserve(packet_types.size());
+  std::vector<unsigned char> request_types(packet_types.size());
 
   // Cast to unsigned char
   for (auto type : packet_types) {
@@ -192,7 +191,6 @@ void Driver::set_heartbeat_freq(int freq)
 void Driver::update_last_heartbeat_cb(const Packet &)
 {
   const std::lock_guard<std::mutex> lock(last_heartbeat_lock_);
-
   last_heartbeat_ = std::chrono::steady_clock::now();
 }
 
@@ -210,7 +208,7 @@ void Driver::monitor_heartbeat(int heartbeat_timeout) const
         RCLCPP_WARN(  // NOLINT
           rclcpp::get_logger("AlphaDriver"),
           "Timeout occurred; the system has not received a heartbeat message in the last %d "
-          "milliseconds",
+          "seconds",
           heartbeat_timeout);
       }
     }

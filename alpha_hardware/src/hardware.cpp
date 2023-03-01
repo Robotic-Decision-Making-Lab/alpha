@@ -56,9 +56,10 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
   async_states_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_commands_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_commands_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  control_modes_.resize(
-    info_.joints.size(),
-    ControlMode::kVelocity);  // TODO(evan_palmer): make the default mode a parameter
+
+  // We set the default mode to position, but this will get changed as soon as the controller is
+  // loaded
+  control_modes_.resize(info_.joints.size(), ControlMode::kPosition);
 
   // Load ROS params
   serial_port_ = info_.hardware_parameters["serial_port"];
@@ -196,7 +197,7 @@ hardware_interface::return_type AlphaHardware::perform_command_mode_switch(
   const std::vector<std::string> & /* start interfaces */,
   const std::vector<std::string> & /* stop interfaces */)
 {
-  // The alpha arm taks care of most of the mode switching for us. To make things a bit safer
+  // The Alpha arm takes care of most of the mode switching for us. To make things a bit safer
   // though, we stop the robot before switching command modes
   driver_.set_velocity(0, alpha_driver::DeviceId::kAllJoints);
 
@@ -357,10 +358,10 @@ void AlphaHardware::poll_state(const int freq) const
     // There are a few important things to note here:
     //   1. Yes, we could use the kAllJoints device ID, but for some reason, the response rate for
     //      each joints becomes less reliable when we use kAllJoints. We get better response rates
-    //      the joints when we split this up.
+    //      from the joints when we split this up.
     //   2. Yes, we could also create a request with multiple packet IDs, but, again, there are
     //      bugs in the serial communication when that is used. Specifically, data is more likely
-    //      to become corrupted, resulting in bad data. So instead we just request them separately.
+    //      to become corrupted, resulting in bad reads. So instead we just request them separately.
     driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kLinearJaws);
     driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kRotateEndEffector);
     driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kBendElbow);

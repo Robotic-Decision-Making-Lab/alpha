@@ -32,7 +32,7 @@ namespace alpha_driver
  * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L19
  *
  * @param data serial data to encode
- * @return std::vector<unsigned char>
+ * @return serial data that has been encoded with the COBS algorithm
  */
 std::vector<unsigned char> cobs_encode(const std::vector<unsigned char> & data);
 
@@ -43,7 +43,7 @@ std::vector<unsigned char> cobs_encode(const std::vector<unsigned char> & data);
  * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L74
  *
  * @param data serial data to decode
- * @return std::vector<unsigned char>
+ * @return decoded serial data
  */
 std::vector<unsigned char> cobs_decode(const std::vector<unsigned char> & data);
 

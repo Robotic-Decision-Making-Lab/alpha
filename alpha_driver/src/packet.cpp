@@ -48,14 +48,14 @@ std::vector<unsigned char> Packet::encode() const
   // Add the packet ID and the device ID
   // Note that we need to type cast to the underlying type because enum classes
   // don't implicitly cast to ints (which is a good thing)
-  data.push_back(static_cast<std::underlying_type<PacketId>::type>(packet_id_));
-  data.push_back(static_cast<std::underlying_type<DeviceId>::type>(device_id_));
+  data.push_back(static_cast<unsigned char>(packet_id_));
+  data.push_back(static_cast<unsigned char>(device_id_));
 
   // Length is the current buffer size plus two (length and CRC)
   data.push_back(data.size() + 2);
 
   // Calculate the CRC from the data and add it to the buffer
-  data.push_back(calculate_bpl_crc8(data));
+  data.push_back(calculate_reach_crc8(data));
 
   // Encode the data using COBS encoding
   std::vector<unsigned char> encoded_data = cobs_encode(data);
@@ -80,7 +80,7 @@ Packet Packet::decode(const std::vector<unsigned char> & data)
   const unsigned char actual_crc = decoded_data.back();
   decoded_data.pop_back();
 
-  const unsigned char expected_crc = calculate_bpl_crc8(decoded_data);
+  const unsigned char expected_crc = calculate_reach_crc8(decoded_data);
 
   if (actual_crc != expected_crc) {
     throw std::runtime_error("The expected and actual CRC values do not match.");

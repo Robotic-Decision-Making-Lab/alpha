@@ -93,7 +93,7 @@ private:
    * @brief Write the current position of the robot received from the serial client to the
    * respective asynchronous vector.
    *
-   * @param packet
+   * @param packet position packet that signaled the callback
    */
   void update_position_cb(const alpha_driver::Packet & packet);
 
@@ -101,7 +101,7 @@ private:
    * @brief Write the current velocity of the robot received from the serial client to the
    * respective asynchronous vector.
    *
-   * @param packet
+   * @param packet velocity packet that signaled the callback
    */
   void update_velocity_cb(const alpha_driver::Packet & packet);
 
@@ -109,7 +109,7 @@ private:
    * @brief Asynchronously read the current state of the robot by polling the robot serial
    * interface.
    *
-   * @param freq
+   * @param freq frequency (Hz) that the inteface should poll the current robot state
    */
   void poll_state(int freq) const;
 

@@ -58,8 +58,7 @@ public:
    * calling this method.
    *
    * @param packet message to send to the Reach Alpha manipulator
-   * @return true
-   * @return false
+   * @return true if the packet was sent successfully, false otherwise
    */
   bool send(const Packet & packet) const;
 
@@ -77,15 +76,11 @@ public:
    * @note To be considered 'active' there must be an open serial connection and a worker should be
    * polling the RX.
    *
-   * @return true
-   * @return false
+   * @return true if the serial client is active, false otherwise
    */
   bool active() const;
 
 private:
-  /**
-   * @brief Current state of the serial port.
-   */
   enum class PortState
   {
     kOpen,   // The serial port is currently open
@@ -109,13 +104,9 @@ private:
    */
   std::unordered_map<PacketId, std::vector<std::function<void(Packet)>>> callbacks_;
 
-  // Serial port file descriptor
   int handle_;
-
-  std::atomic<bool> running_{false};  // This flag is used to control the RX main loop
+  std::atomic<bool> running_{false};
   PortState port_status_ = PortState::kClosed;
-
-  // Thread responsible for receiving incoming data and executing the respective callbacks
   std::thread rx_worker_;
 };
 

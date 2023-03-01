@@ -43,7 +43,7 @@ public:
   /**
    * @brief Encode the packet's data using the BPL packet structure specification.
    *
-   * @return std::vector<unsigned char>
+   * @return encoded serial data
    */
   std::vector<unsigned char> encode() const;
 
@@ -51,28 +51,31 @@ public:
    * @brief Decode a packet that has been encoded using the BPL communication specification.
    *
    * @param data encoded serial data
-   * @return Packet
+   * @return packet obtained from the decoded serial data
    */
   static Packet decode(const std::vector<unsigned char> & data);
 
   /**
    * @brief Get the unique packet identifier.
    *
-   * @return PacketId
+   * @return packet type
    */
   PacketId packet_id() const;
 
   /**
    * @brief Get the unique device identifier.
    *
-   * @return DeviceId
+   * @return device ID that the packet targets
    */
   DeviceId device_id() const;
 
   /**
    * @brief Get the packet data.
    *
-   * @return std::vector<unsigned char>
+   * @note The packet serial data will never be encoded during the lifetime of the object unless
+   * the packet is instantiated with the serial data already encoded.
+   *
+   * @return packet serial data
    */
   std::vector<unsigned char> data() const;
 

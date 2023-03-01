@@ -68,7 +68,7 @@ unsigned char calculate_crc8(
   return crc ^ final_xor_value;
 }
 
-unsigned char calculate_bpl_crc8(const std::vector<unsigned char> & data)
+unsigned char calculate_reach_crc8(const std::vector<unsigned char> & data)
 {
   return calculate_crc8(
     data, kInitialValue, kFinalXorValue, kInputReflected, kResultReflected, kCrc8LookupTable);
