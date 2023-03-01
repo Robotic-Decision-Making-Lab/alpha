@@ -21,7 +21,6 @@
 #include "alpha_driver/driver.hpp"
 
 #include <vector>
-#include <cmath>
 
 #include "alpha_driver/device_id.hpp"
 #include "alpha_driver/packet_id.hpp"
@@ -51,8 +50,6 @@ void Driver::start(const std::string & serial_port, int heartbeat_timeout)
 
   // Disable any previous heartbeat configurations
   disable_heartbeat();
-
-  RCLCPP_INFO(rclcpp::get_logger("what"), "freq: %f", ceil(2 / heartbeat_timeout));
 
   // Configure the new heartbeat request
   // The heartbeat has a minimum of once per second, so we set it to that
@@ -162,9 +159,8 @@ void Driver::send_float(float value, PacketId packet_type, DeviceId device_id) c
   }
 
   // Convert the float into a vector of bytes
-  std::vector<unsigned char> reinterpretted_vector;
-  reinterpretted_vector.reserve(sizeof(value));
-  std::memcpy(&reinterpretted_vector[0], &value, sizeof(value));  // NOLINT
+  std::vector<unsigned char> reinterpretted_vector(sizeof(value));
+  std::memcpy(reinterpretted_vector.data(), &value, sizeof(value));
 
   const Packet packet(packet_type, device_id, reinterpretted_vector);
 

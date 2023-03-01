@@ -21,6 +21,7 @@
 #include "alpha_hardware/hardware.hpp"
 
 #include <chrono>
+#include <cmath>
 #include <limits>
 
 #include "alpha_driver/device_id.hpp"
@@ -162,7 +163,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_cleanup(const rclcpp_lifecy
 
 hardware_interface::return_type AlphaHardware::prepare_command_mode_switch(
   const std::vector<std::string> & start_interfaces,
-  const std::vector<std::string> & stop_interfaces)
+  const std::vector<std::string> & /* stop interfaces */)
 {
   // Prepare for new command modes
   std::vector<ControlMode> new_modes = {};
@@ -178,23 +179,27 @@ hardware_interface::return_type AlphaHardware::prepare_command_mode_switch(
     }
   }
 
-  // Stop motion on all relevant joints that are stopping
-  for (const std::string & key : stop_interfaces) {
-    for (std::size_t i = 0; i < info_.joints.size(); i++) {
-      if (key.find(info_.joints[i].name) != std::string::npos) {
-        hw_commands_velocities_[i] = 0;
-        control_modes_[i] = ControlMode::kUndefined;  // Revert to undefined
-      }
-    }
+  // Make sure that command modes are set to all interfaces at the same time
+  if (!new_modes.empty() && new_modes.size() != info_.joints.size()) {
+    return hardware_interface::return_type::ERROR;
   }
 
   // Set the new command modes
   for (std::size_t i = 0; i < info_.joints.size(); i++) {
-    if (control_modes_[i] != ControlMode::kUndefined) {
-      return hardware_interface::return_type::ERROR;
-    }
     control_modes_[i] = new_modes[i];
   }
+
+  return hardware_interface::return_type::OK;
+}
+
+hardware_interface::return_type AlphaHardware::perform_command_mode_switch(
+  const std::vector<std::string> & /* start interfaces */,
+  const std::vector<std::string> & /* stop interfaces */)
+{
+  // The alpha arm taks care of most of the mode switching for us. To make things a bit safer
+  // though, we stop the robot before switching command modes
+  driver_.set_velocity(0, alpha_driver::DeviceId::kAllJoints);
+
   return hardware_interface::return_type::OK;
 }
 
@@ -260,10 +265,8 @@ hardware_interface::return_type AlphaHardware::read(const rclcpp::Time &, const 
   // Copy the latest readings to the read ros2_control state interfaces
   // We need to maintain two state vectors here because the ros2_control endpoint won't have access
   // to the mutex needed to read the real-time states
-  std::copy(
-    hw_states_positions_.begin(), hw_states_positions_.end(), async_states_positions_.begin());
-  std::copy(
-    hw_states_velocities_.begin(), hw_states_velocities_.end(), async_states_velocities_.begin());
+  hw_states_positions_ = async_states_positions_;
+  hw_states_velocities_ = async_states_velocities_;
 
   return hardware_interface::return_type::OK;
 }
@@ -274,15 +277,27 @@ hardware_interface::return_type AlphaHardware::write(const rclcpp::Time &, const
   // for (std::size_t i = 0; i < control_modes_.size(); i++) {
   //   switch (control_modes_[i]) {
   //     case ControlMode::kPosition:
-  //       driver_.set_position(hw_commands_positions_[i], static_cast<alpha_driver::DeviceId>(i));
+  //       if (!std::isnan(hw_commands_positions_[i])) {
+  //         driver_.set_position(hw_commands_positions_[i],
+  //         static_cast<alpha_driver::DeviceId>(i));
+  //       }
   //       break;
   //     case ControlMode::kVelocity:
-  //       driver_.set_velocity(hw_commands_velocities_[i], static_cast<alpha_driver::DeviceId>(i));
+  //       if (!std::isnan(hw_commands_velocities_[i])) {
+  //         driver_.set_velocity(hw_commands_velocities_[i],
+  //         static_cast<alpha_driver::DeviceId>(i));
+  //       }
   //       break;
   //     default:
   //       break;
   //   }
   // }
+
+  for (const auto & command : hw_commands_positions_) {
+    if (!std::isnan(command)) {
+      RCLCPP_INFO(rclcpp::get_logger("debug"), "pos command: %f", command);
+    }
+  }
 
   return hardware_interface::return_type::OK;
 }
@@ -299,7 +314,7 @@ void AlphaHardware::update_position_cb(const alpha_driver::Packet & packet)
   const std::lock_guard<std::mutex> lock(access_async_states_);
 
   // We assume that the device ID is the index within the vector
-  async_states_positions_[static_cast<std::size_t>(packet.device_id())] = position;
+  async_states_positions_[static_cast<std::size_t>(packet.device_id()) - 1] = position;
 }
 
 void AlphaHardware::update_velocity_cb(const alpha_driver::Packet & packet)
@@ -314,7 +329,7 @@ void AlphaHardware::update_velocity_cb(const alpha_driver::Packet & packet)
   const std::lock_guard<std::mutex> lock(access_async_states_);
 
   // We assume that the device ID is the index within the vector
-  async_states_velocities_[static_cast<std::size_t>(packet.device_id())] = velocity;
+  async_states_velocities_[static_cast<std::size_t>(packet.device_id()) - 1] = velocity;
 }
 
 void AlphaHardware::poll_state(const int freq) const
@@ -322,11 +337,11 @@ void AlphaHardware::poll_state(const int freq) const
   while (running_.load()) {
     // There are a few important things to note here:
     //   1. Yes, we could use the kAllJoints device ID, but for some reason, the response rate for
-    //      each joints becomes less reliable so we get better  response rates from all joints when
-    //      we split this up.
+    //      each joints becomes less reliable when we use kAllJoints. We get better response rates
+    //      the joints when we split this up.
     //   2. Yes, we could also create a request with multiple packet IDs, but, again, there are
     //      bugs in the serial communication when that is used. Specifically, data is more likely
-    //      to become corrupted resulting in bad data. So we instead just request them separately.
+    //      to become corrupted, resulting in bad data. So instead we just request them separately.
     driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kLinearJaws);
     driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kRotateEndEffector);
     driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kBendElbow);
@@ -346,5 +361,5 @@ void AlphaHardware::poll_state(const int freq) const
 }  // namespace alpha_hardware
 
 #include "pluginlib/class_list_macros.hpp"
-PLUGINLIB_EXPORT_CLASS(
-  alpha_hardware::AlphaHardware, hardware_interface::SystemInterface)
+
+PLUGINLIB_EXPORT_CLASS(alpha_hardware::AlphaHardware, hardware_interface::SystemInterface)

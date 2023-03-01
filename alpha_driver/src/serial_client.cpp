@@ -188,7 +188,7 @@ void SerialClient::poll() const
           }
         }
         catch (const std::exception & e) {
-          RCLCPP_WARN(rclcpp::get_logger("SerialClient"), e.what());  // NOLINT
+          RCLCPP_DEBUG(rclcpp::get_logger("SerialClient"), e.what());  // NOLINT
         }
 
         // Empty the buffer before we start reading the next packet

@@ -64,12 +64,15 @@
         "C_Cpp.clang_format_fallbackStyle": "Google",
         "C_Cpp.codeAnalysis.clangTidy.enabled": true,
         "C_Cpp.codeAnalysis.clangTidy.runAutomatically": true,
+        "clang-format.executable": "/usr/bin/clang-format",
         "uncrustify.configPath.linux": "/opt/ros/humble/lib/python3.10/site-packages/ament_uncrustify/configuration/ament_code_style.cfg",
         "[cpp]": {
           "editor.wordBasedSuggestions": false,
           "editor.suggest.insertMode": "replace",
           "editor.semanticHighlighting.enabled": true,
-          "editor.rulers": [100]
+          "editor.rulers": [100],
+          "editor.defaultFormatter": "xaver.clang-format",
+          "editor.formatOnSave": true
         },
         "[python]": {
           "editor.tabSize": 4,
@@ -131,10 +134,11 @@
         "redhat.vscode-yaml",
         "cschlosser.doxdocgen",
         "ms-vscode.cpptools",
-        "esbenp.prettier-vscode",
         "josetr.cmake-language-support-vscode",
         "smilerobotics.urdf",
-        "DavidAnson.vscode-markdownlint"
+        "DavidAnson.vscode-markdownlint",
+        "esbenp.prettier-vscode",
+        "xaver.clang-format"
       ]
     }
   }

@@ -271,17 +271,6 @@ def generate_launch_description() -> LaunchDescription:
         condition=IfCondition(use_planning),
     )
 
-    ee_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=[
-            "jaws_controller",
-            "--controller-manager",
-            [namespace, "controller_manager"],
-        ],
-        condition=IfCondition(use_planning),
-    )
-
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -354,8 +343,7 @@ def generate_launch_description() -> LaunchDescription:
             event_handler=OnProcessExit(
                 target_action=joint_state_broadcaster_spawner,
                 on_exit=[
-                    arm_controller_spawner,
-                    ee_controller_spawner,
+                    arm_controller_spawner
                 ],
             ),
             condition=IfCondition(use_planning),

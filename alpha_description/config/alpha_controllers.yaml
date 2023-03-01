@@ -27,23 +27,11 @@ arm_controller:
       - axis_d
       - axis_c
       - axis_b
-    command_interfaces:
-      - position
-      - velocity
-    state_interfaces:
-      - position
-      - velocity
-
-jaws_controller:
-  ros__parameters:
-    joints:
       - axis_a
     command_interfaces:
       - position
-      - velocity
     state_interfaces:
       - position
-      - velocity
 
 forward_position_controller:
   ros__parameters:
