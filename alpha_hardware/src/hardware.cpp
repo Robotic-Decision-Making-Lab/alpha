@@ -274,28 +274,37 @@ hardware_interface::return_type AlphaHardware::read(const rclcpp::Time &, const 
 hardware_interface::return_type AlphaHardware::write(const rclcpp::Time &, const rclcpp::Duration &)
 {
   // Send the commands for each joint
-  // for (std::size_t i = 0; i < control_modes_.size(); i++) {
-  //   switch (control_modes_[i]) {
-  //     case ControlMode::kPosition:
-  //       if (!std::isnan(hw_commands_positions_[i])) {
-  //         driver_.set_position(hw_commands_positions_[i],
-  //         static_cast<alpha_driver::DeviceId>(i));
-  //       }
-  //       break;
-  //     case ControlMode::kVelocity:
-  //       if (!std::isnan(hw_commands_velocities_[i])) {
-  //         driver_.set_velocity(hw_commands_velocities_[i],
-  //         static_cast<alpha_driver::DeviceId>(i));
-  //       }
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
+  for (std::size_t i = 0; i < control_modes_.size(); i++) {
+    switch (control_modes_[i]) {
+      case ControlMode::kPosition:
+        if (!std::isnan(hw_commands_positions_[i])) {
+          // Get the target device
+          const auto target_device = static_cast<alpha_driver::DeviceId>(i + 1);
 
-  for (const auto & command : hw_commands_positions_) {
-    if (!std::isnan(command)) {
-      RCLCPP_INFO(rclcpp::get_logger("debug"), "pos command: %f", command);
+          // Get the target position; if the command is for the jaws, then convert from m to mm
+          const double target_position =
+            static_cast<alpha_driver::DeviceId>(i + 1) == alpha_driver::DeviceId::kLinearJaws
+              ? hw_commands_positions_[i] * 1000
+              : hw_commands_positions_[i];
+          driver_.set_position(target_position, target_device);
+        }
+        break;
+      case ControlMode::kVelocity:
+        if (!std::isnan(hw_commands_velocities_[i])) {
+          // Get the target device
+          const auto target_device = static_cast<alpha_driver::DeviceId>(i + 1);
+
+          // Get the target velocity; if the command is for the jaws, then convert from m/s to mm/s
+          const double target_velocity =
+            static_cast<alpha_driver::DeviceId>(i + 1) == alpha_driver::DeviceId::kLinearJaws
+              ? hw_commands_velocities_[i] * 1000
+              : hw_commands_velocities_[i];
+
+          driver_.set_velocity(target_velocity, target_device);
+        }
+        break;
+      default:
+        break;
     }
   }
 
@@ -311,6 +320,11 @@ void AlphaHardware::update_position_cb(const alpha_driver::Packet & packet)
   float position;
   std::memcpy(&position, &packet.data()[0], sizeof(position));  // NOLINT
 
+  // Convert from mm to m if the message is from the jaws
+  if (packet.device_id() == alpha_driver::DeviceId::kLinearJaws) {
+    position /= 1000;
+  }
+
   const std::lock_guard<std::mutex> lock(access_async_states_);
 
   // We assume that the device ID is the index within the vector
@@ -325,6 +339,11 @@ void AlphaHardware::update_velocity_cb(const alpha_driver::Packet & packet)
 
   float velocity;
   std::memcpy(&velocity, &packet.data()[0], sizeof(velocity));  // NOLINT
+
+  // Convert from mm/s to m/s if the message is from the jaws
+  if (packet.device_id() == alpha_driver::DeviceId::kLinearJaws) {
+    velocity /= 1000;
+  }
 
   const std::lock_guard<std::mutex> lock(access_async_states_);
 
@@ -361,5 +380,4 @@ void AlphaHardware::poll_state(const int freq) const
 }  // namespace alpha_hardware
 
 #include "pluginlib/class_list_macros.hpp"
-
 PLUGINLIB_EXPORT_CLASS(alpha_hardware::AlphaHardware, hardware_interface::SystemInterface)

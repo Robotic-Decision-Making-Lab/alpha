@@ -6,9 +6,6 @@ controller_manager:
     arm_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
-    jaws_controller:
-      type: joint_trajectory_controller/JointTrajectoryController
-
     # Feed-forward controllers
     forward_position_controller:
       type: position_controllers/JointGroupPositionController
