@@ -3,7 +3,7 @@ controller_manager:
     update_rate: 225 # Hz
 
     # Controllers for use with MoveIt
-    arm_controller:
+    feedback_joint_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
     # Feed-forward controllers
@@ -17,7 +17,7 @@ controller_manager:
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-arm_controller:
+feedback_joint_trajectory_controller:
   ros__parameters:
     joints:
       - axis_e

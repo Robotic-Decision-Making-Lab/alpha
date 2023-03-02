@@ -43,40 +43,44 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument(
             "description_package",
             default_value="alpha_description",
-            description="Description package with the Alpha URDF files.",
+            description=(
+                "The description package with the Alpha URDF files. This is typically"
+                " not set, but is available incase another description package has"
+                " been defined."
+            ),
         ),
         DeclareLaunchArgument(
             "description_file",
             default_value="alpha.config.xacro",
-            description="URDF/XACRO description file with the Alpha",
+            description="The URDF/XACRO description file with the Alpha.",
         ),
         DeclareLaunchArgument(
             "prefix",
-            default_value="''",
+            default_value="",
             description=(
-                "Prefix of the joint names; useful for multi-robot setup. If"
-                " changed, then the joint names in the controller configuration must"
-                " be updated. Expected format '<prefix>/'"
+                "The prefix of the joint names. This is useful for multi-robot setups."
+                " If the prefix is changed, then the joint names in the controller"
+                " configuration must be updated. Expected format '<prefix>/'."
             ),
         ),
         DeclareLaunchArgument(
             "namespace",
-            default_value="/",
+            default_value="",
             description=(
-                "Namespace of the launched nodes; useful for multi-robot setup. If"
-                " changed, then the namespace in the controller configuration must"
-                " be updated. Expected format '<ns>/'"
+                "The namespace of the launched nodes. This is useful for multi-robot"
+                " setups. If the namespace is changed, then the namespace in the"
+                " controller configuration must be updated. Expected format '<ns>/'."
             ),
         ),
         DeclareLaunchArgument(
             "use_rviz",
             default_value="true",
-            description="Automatically start RViz2",
+            description="Automatically start RViz2.",
         ),
         DeclareLaunchArgument(
             "use_sim",
             default_value="false",
-            description="Automatically start Gazebo",
+            description="Automatically start Gazebo.",
         ),
     ]
 

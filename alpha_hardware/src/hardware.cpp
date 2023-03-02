@@ -63,7 +63,6 @@ hardware_interface::CallbackReturn AlphaHardware::on_init(
 
   // Load ROS params
   serial_port_ = info_.hardware_parameters["serial_port"];
-  heartbeat_timeout_ = std::stoi(info_.hardware_parameters["heartbeat_timeout"]);
   state_update_freq_ = std::stoi(info_.hardware_parameters["state_update_frequency"]);
 
   for (const hardware_interface::ComponentInfo & joint : info_.joints) {
@@ -120,7 +119,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_configure(const rclcpp_life
 {
   // Start the driver
   try {
-    driver_.start(serial_port_, heartbeat_timeout_);
+    driver_.start(serial_port_);
   }
   catch (const std::exception & e) {
     RCLCPP_FATAL(  // NOLINT
@@ -133,15 +132,15 @@ hardware_interface::CallbackReturn AlphaHardware::on_configure(const rclcpp_life
   // Register callbacks for joint states
   driver_.subscribe(
     alpha_driver::PacketId::kPosition,
-    std::bind(&AlphaHardware::update_position_cb, this, std::placeholders::_1));
+    std::bind(&AlphaHardware::updatePositionCb, this, std::placeholders::_1));
 
   driver_.subscribe(
     alpha_driver::PacketId::kVelocity,
-    std::bind(&AlphaHardware::update_velocity_cb, this, std::placeholders::_1));
+    std::bind(&AlphaHardware::updateVelocityCb, this, std::placeholders::_1));
 
   // Start a thread to request state updates
   running_.store(true);
-  state_request_worker_ = std::thread(&AlphaHardware::poll_state, this, state_update_freq_);
+  state_request_worker_ = std::thread(&AlphaHardware::pollState, this, state_update_freq_);
 
   RCLCPP_INFO(  // NOLINT
     rclcpp::get_logger("AlphaHardware"),
@@ -199,7 +198,7 @@ hardware_interface::return_type AlphaHardware::perform_command_mode_switch(
 {
   // The Alpha arm takes care of most of the mode switching for us. To make things a bit safer
   // though, we stop the robot before switching command modes
-  driver_.set_velocity(0, alpha_driver::DeviceId::kAllJoints);
+  driver_.setVelocity(0, alpha_driver::DeviceId::kAllJoints);
 
   return hardware_interface::return_type::OK;
 }
@@ -235,7 +234,7 @@ std::vector<hardware_interface::CommandInterface> AlphaHardware::export_command_
 hardware_interface::CallbackReturn AlphaHardware::on_activate(const rclcpp_lifecycle::State &)
 {
   try {
-    driver_.set_mode(alpha_driver::Mode::kStandby, alpha_driver::DeviceId::kAllJoints);
+    driver_.setMode(alpha_driver::Mode::kStandby, alpha_driver::DeviceId::kAllJoints);
   }
   catch (const std::exception & e) {
     RCLCPP_ERROR(rclcpp::get_logger("AlphaHardware"), e.what());  // NOLINT
@@ -248,7 +247,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_activate(const rclcpp_lifec
 hardware_interface::CallbackReturn AlphaHardware::on_deactivate(const rclcpp_lifecycle::State &)
 {
   try {
-    driver_.set_mode(alpha_driver::Mode::kDisable, alpha_driver::DeviceId::kAllJoints);
+    driver_.setMode(alpha_driver::Mode::kDisable, alpha_driver::DeviceId::kAllJoints);
   }
   catch (const std::exception & e) {
     RCLCPP_ERROR(rclcpp::get_logger("AlphaHardware"), e.what());  // NOLINT
@@ -287,7 +286,7 @@ hardware_interface::return_type AlphaHardware::write(const rclcpp::Time &, const
             static_cast<alpha_driver::DeviceId>(i + 1) == alpha_driver::DeviceId::kLinearJaws
               ? hw_commands_positions_[i] * 1000
               : hw_commands_positions_[i];
-          driver_.set_position(target_position, target_device);
+          driver_.setPosition(target_position, target_device);
         }
         break;
       case ControlMode::kVelocity:
@@ -301,7 +300,7 @@ hardware_interface::return_type AlphaHardware::write(const rclcpp::Time &, const
               ? hw_commands_velocities_[i] * 1000
               : hw_commands_velocities_[i];
 
-          driver_.set_velocity(target_velocity, target_device);
+          driver_.setVelocity(target_velocity, target_device);
         }
         break;
       default:
@@ -312,47 +311,45 @@ hardware_interface::return_type AlphaHardware::write(const rclcpp::Time &, const
   return hardware_interface::return_type::OK;
 }
 
-void AlphaHardware::update_position_cb(const alpha_driver::Packet & packet)
+void AlphaHardware::updatePositionCb(const alpha_driver::Packet & packet)
 {
-  if (packet.data().size() != 4) {
+  if (packet.getData().size() != 4) {
     return;
   }
 
   float position;
-  std::memcpy(&position, &packet.data()[0], sizeof(position));  // NOLINT
+  std::memcpy(&position, &packet.getData()[0], sizeof(position));  // NOLINT
 
   // Convert from mm to m if the message is from the jaws
-  if (packet.device_id() == alpha_driver::DeviceId::kLinearJaws) {
-    position /= 1000;
-  }
+  position =
+    packet.getDeviceId() == alpha_driver::DeviceId::kLinearJaws ? position / 1000 : position;
 
   const std::lock_guard<std::mutex> lock(access_async_states_);
 
   // We assume that the device ID is the index within the vector
-  async_states_positions_[static_cast<std::size_t>(packet.device_id()) - 1] = position;
+  async_states_positions_[static_cast<std::size_t>(packet.getDeviceId()) - 1] = position;
 }
 
-void AlphaHardware::update_velocity_cb(const alpha_driver::Packet & packet)
+void AlphaHardware::updateVelocityCb(const alpha_driver::Packet & packet)
 {
-  if (packet.data().size() != 4) {
+  if (packet.getData().size() != 4) {
     return;
   }
 
   float velocity;
-  std::memcpy(&velocity, &packet.data()[0], sizeof(velocity));  // NOLINT
+  std::memcpy(&velocity, &packet.getData()[0], sizeof(velocity));  // NOLINT
 
   // Convert from mm/s to m/s if the message is from the jaws
-  if (packet.device_id() == alpha_driver::DeviceId::kLinearJaws) {
-    velocity /= 1000;
-  }
+  velocity =
+    packet.getDeviceId() == alpha_driver::DeviceId::kLinearJaws ? velocity / 1000 : velocity;
 
   const std::lock_guard<std::mutex> lock(access_async_states_);
 
   // We assume that the device ID is the index within the vector
-  async_states_velocities_[static_cast<std::size_t>(packet.device_id()) - 1] = velocity;
+  async_states_velocities_[static_cast<std::size_t>(packet.getDeviceId()) - 1] = velocity;
 }
 
-void AlphaHardware::poll_state(const int freq) const
+void AlphaHardware::pollState(const int freq) const
 {
   while (running_.load()) {
     // There are a few important things to note here:

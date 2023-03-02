@@ -126,7 +126,7 @@
         TrajOptDefault:
           type: geometric::TrajOpt
 
-      arm:
+      alpha:
         planner_configs:
           - SBLkConfigDefault
           - ESTkConfigDefault

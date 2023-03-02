@@ -33,7 +33,7 @@ TEST(PacketTest, TestPacketEncode)
   const std::vector<unsigned char> data = {
     static_cast<unsigned char>(alpha_driver::PacketId::kPosition)};
 
-  // Create an encoded test packet using the BPL structure based off of the test
+  // Create an encoded test packet using the Reach structure based off of the test
   // data
   const std::vector<unsigned char> expected_encoding = {0x06, 0x03, 0x60, 0x01, 0x05, 0x52, 0x00};
 
@@ -53,7 +53,7 @@ TEST(PacketTest, TestPacketDecode)
 
   const alpha_driver::Packet packet = alpha_driver::Packet::decode(encoded_data);
 
-  ASSERT_THAT(packet.data(), ::testing::ElementsAreArray(decoded_data));
+  ASSERT_THAT(packet.getData(), ::testing::ElementsAreArray(decoded_data));
 }
 
 TEST(PacketTest, TestInvalidDecoding)

@@ -84,7 +84,6 @@ public:
 private:
   enum class ControlMode
   {
-    kUndefined,
     kVelocity,
     kPosition,
   };
@@ -93,29 +92,29 @@ private:
    * @brief Write the current position of the robot received from the serial client to the
    * respective asynchronous vector.
    *
-   * @param packet position packet that signaled the callback
+   * @param packet The position packet that signaled the callback.
    */
-  void update_position_cb(const alpha_driver::Packet & packet);
+  void updatePositionCb(const alpha_driver::Packet & packet);
 
   /**
    * @brief Write the current velocity of the robot received from the serial client to the
    * respective asynchronous vector.
    *
-   * @param packet velocity packet that signaled the callback
+   * @param packet The velocity packet that signaled the callback.
    */
-  void update_velocity_cb(const alpha_driver::Packet & packet);
+  void updateVelocityCb(const alpha_driver::Packet & packet);
 
   /**
    * @brief Asynchronously read the current state of the robot by polling the robot serial
    * interface.
    *
-   * @param freq frequency (Hz) that the inteface should poll the current robot state
+   * @param freq The frequency (Hz) that the inteface should poll the current robot state at.
    */
-  void poll_state(int freq) const;
+  void pollState(int freq) const;
 
-  bool check_position_limits(double position, alpha_driver::DeviceId) const;
+  bool clampPositionToLimits(double position, alpha_driver::DeviceId) const;
 
-  bool check_velocity_limits(double velocity, alpha_driver::DeviceId) const;
+  bool clampVelocityToLimits(double velocity, alpha_driver::DeviceId) const;
 
   // Driver things
   alpha_driver::Driver driver_;
@@ -124,7 +123,6 @@ private:
 
   // ROS parameters
   std::string serial_port_;
-  int heartbeat_timeout_;
   int state_update_freq_;
 
   // ros2_control command interfaces

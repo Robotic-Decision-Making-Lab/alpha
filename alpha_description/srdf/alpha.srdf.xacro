@@ -3,7 +3,7 @@
 
     <xacro:macro name="alpha_srdf" params="prefix">
 
-        <group name="${prefix}arm">
+        <group name="${prefix}alpha">
             <link name="${prefix}ee_base_link" />
             <joint name="${prefix}axis_e" />
             <joint name="${prefix}axis_d" />
@@ -11,11 +11,11 @@
             <joint name="${prefix}axis_b" />
             <joint name="${prefix}axis_a" />
         </group>
-        <group_state name="home" group="${prefix}arm">
+        <group_state name="home" group="${prefix}alpha">
             <joint name="${prefix}axis_a" value="0" />
-            <joint name="${prefix}axis_b" value="0" />
+            <joint name="${prefix}axis_b" value="1.5746" />
             <joint name="${prefix}axis_c" value="0" />
-            <joint name="${prefix}axis_d" value="1.5746" />
+            <joint name="${prefix}axis_d" value="0" />
             <joint name="${prefix}axis_e" value="0" />
         </group_state>
         <passive_joint name="${prefix}standard_jaws_rs1_130_joint" />

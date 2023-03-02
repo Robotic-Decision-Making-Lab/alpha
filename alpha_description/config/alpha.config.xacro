@@ -5,8 +5,7 @@
   <xacro:arg name="use_fake_hardware" default="true" />
   <xacro:arg name="use_sim" default="false" />
   <xacro:arg name="serial_port" default="" />
-  <xacro:arg name="heartbeat_timeout" default="5000" />
-  <xacro:arg name="state_update_frequency" default="200" />
+  <xacro:arg name="state_update_frequency" default="250" />
   <xacro:arg name="controllers_file" default="alpha_controllers.yaml" />
   <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
   <xacro:arg name="initial_velocities_file" default="initial_velocities.yaml" />
@@ -38,7 +37,6 @@
   <xacro:alpha_system prefix="$(arg prefix)" name="ReachAlpha5"
     use_fake_hardware="$(arg use_fake_hardware)"
     serial_port="$(arg serial_port)"
-    heartbeat_timeout="$(arg heartbeat_timeout)"
     state_update_frequency="$(arg state_update_frequency)"
     initial_positions_file="$(arg initial_positions_file)"
     initial_velocities_file="$(arg initial_velocities_file)"

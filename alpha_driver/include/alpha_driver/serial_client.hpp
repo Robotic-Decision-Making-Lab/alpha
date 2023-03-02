@@ -41,8 +41,8 @@ public:
    *
    * @note This configures the serial port for R/W operation at a baudrate of 115200.
    *
-   * @param device full path to the serial device file
-   * @param polling_timeout_ms timeout (ms) between serial port reads; used for VTIME
+   * @param device The full path to the serial device file (e.g., /dev/ttyUSB0).
+   * @param polling_timeout_ms The timeout (ms) between serial port reads--used for VTIME.
    */
   void connect(const std::string & device, int polling_timeout_ms = 500);
 
@@ -57,18 +57,19 @@ public:
    * @note This method performs packet encoding. It is not necessary to encode the data before
    * calling this method.
    *
-   * @param packet message to send to the Reach Alpha manipulator
-   * @return true if the packet was sent successfully, false otherwise
+   * @param packet The message to send to the Reach Alpha manipulator.
+   * @return True if the packet was sent successfully, false otherwise.
    */
   bool send(const Packet & packet) const;
 
   /**
    * @brief Register a new callback function for a specified packet type.
    *
-   * @param packet_type type of packet that the callback should be registered to
-   * @param callback function that should be executed when a message of a given type is received
+   * @param packet_type The type of packet that the callback should be registered to.
+   * @param callback The function that should be executed when a message of a given type is
+   * received.
    */
-  void register_callback(PacketId packet_type, const std::function<void(Packet)> & callback);
+  void registerCallback(PacketId packet_type, const std::function<void(Packet)> & callback);
 
   /**
    * @brief Indicates whether or not the serial client is currently active.
@@ -76,7 +77,7 @@ public:
    * @note To be considered 'active' there must be an open serial connection and a worker should be
    * polling the RX.
    *
-   * @return true if the serial client is active, false otherwise
+   * @return True if the serial client is active, false otherwise.
    */
   bool active() const;
 
@@ -104,6 +105,7 @@ private:
    */
   std::unordered_map<PacketId, std::vector<std::function<void(Packet)>>> callbacks_;
 
+  // Serial port poller
   int handle_;
   std::atomic<bool> running_{false};
   PortState port_status_ = PortState::kClosed;

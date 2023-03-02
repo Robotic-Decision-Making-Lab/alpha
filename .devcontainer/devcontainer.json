@@ -113,8 +113,7 @@
             "comments": "off",
             "strings": "off",
             "other": "off"
-          },
-          "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+          }
         },
         "search.exclude": {
           "**/node_modules": true,

@@ -2,7 +2,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:macro name="alpha_system"
-    params="name prefix serial_port heartbeat_timeout state_update_frequency initial_positions_file initial_velocities_file use_sim:=^|false  use_fake_hardware:=^true">
+    params="name prefix serial_port state_update_frequency initial_positions_file initial_velocities_file use_sim:=^|false  use_fake_hardware:=^true">
 
     <xacro:property name="initial_positions"
       value="${xacro.load_yaml(initial_positions_file)['initial_positions']}" />
@@ -23,7 +23,6 @@
           <xacro:unless value="${use_fake_hardware}">
             <plugin>alpha_hardware/AlphaHardware</plugin>
             <param name="serial_port">${serial_port}</param>
-            <param name="heartbeat_timeout">${heartbeat_timeout}</param>
             <param name="state_update_frequency">${state_update_frequency}</param>
           </xacro:unless>
         </hardware>

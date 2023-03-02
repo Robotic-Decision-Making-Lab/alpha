@@ -34,8 +34,7 @@ namespace alpha_driver
 Driver::Driver()
 {
   subscribe(
-    PacketId::kModelNumber,
-    std::bind(&Driver::update_last_heartbeat_cb, this, std::placeholders::_1));
+    PacketId::kModelNumber, std::bind(&Driver::updateLastHeartbeatCb, this, std::placeholders::_1));
 }
 
 void Driver::start(const std::string & serial_port, int heartbeat_timeout)
@@ -49,11 +48,11 @@ void Driver::start(const std::string & serial_port, int heartbeat_timeout)
   client_.connect(serial_port);
 
   // Disable any previous heartbeat configurations
-  disable_heartbeat();
+  disableHeartbeat();
 
   // Configure the new heartbeat request
   // The heartbeat has a minimum frequency of one message per second, so we set it to that
-  enable_heartbeat(1);
+  enableHeartbeat(1);
 
   {
     const std::lock_guard<std::mutex> lock(last_heartbeat_lock_);
@@ -63,18 +62,18 @@ void Driver::start(const std::string & serial_port, int heartbeat_timeout)
   running_.store(true);
 
   // Start the thread that monitors heartbeats from the manipulator
-  heartbeat_worker_ = std::thread(&Driver::monitor_heartbeat, this, heartbeat_timeout);
+  heartbeat_worker_ = std::thread(&Driver::monitorHeartbeat, this, heartbeat_timeout);
 }
 
 void Driver::stop()
 {
-  disable_heartbeat();
+  disableHeartbeat();
   running_.store(false);
   heartbeat_worker_.join();
   client_.disconnect();
 }
 
-void Driver::set_mode(Mode mode, DeviceId device) const
+void Driver::setMode(Mode mode, DeviceId device) const
 {
   if (!running_.load() || !client_.active()) {
     throw std::runtime_error(
@@ -88,24 +87,24 @@ void Driver::set_mode(Mode mode, DeviceId device) const
   client_.send(packet);
 }
 
-void Driver::set_velocity(float velocity, DeviceId device) const
+void Driver::setVelocity(float velocity, DeviceId device) const
 {
-  send_float(velocity, PacketId::kVelocity, device);
+  sendFloat(velocity, PacketId::kVelocity, device);
 }
 
-void Driver::set_position(float position, DeviceId device) const
+void Driver::setPosition(float position, DeviceId device) const
 {
-  send_float(position, PacketId::kPosition, device);
+  sendFloat(position, PacketId::kPosition, device);
 }
 
-void Driver::set_relative_position(float relative_position, DeviceId device) const
+void Driver::setRelativePosition(float relative_position, DeviceId device) const
 {
-  send_float(relative_position, PacketId::kRelativePosition, device);
+  sendFloat(relative_position, PacketId::kRelativePosition, device);
 }
 
-void Driver::set_current(float current, DeviceId device) const
+void Driver::setCurrent(float current, DeviceId device) const
 {
-  send_float(current, PacketId::kCurrent, device);
+  sendFloat(current, PacketId::kCurrent, device);
 }
 
 void Driver::request(PacketId packet_type, DeviceId device) const
@@ -147,10 +146,10 @@ void Driver::request(std::vector<PacketId> & packet_types, DeviceId device) cons
 
 void Driver::subscribe(PacketId packet_type, const std::function<void(Packet)> & callback)
 {
-  client_.register_callback(packet_type, callback);
+  client_.registerCallback(packet_type, callback);
 }
 
-void Driver::send_float(float value, PacketId packet_type, DeviceId device_id) const
+void Driver::sendFloat(float value, PacketId packet_type, DeviceId device_id) const
 {
   if (!running_.load() || !client_.active()) {
     throw std::runtime_error(
@@ -166,7 +165,7 @@ void Driver::send_float(float value, PacketId packet_type, DeviceId device_id) c
   client_.send(packet);
 }
 
-void Driver::enable_heartbeat(int freq)
+void Driver::enableHeartbeat(int freq)
 {
   // We request the model number as the heartbeat because there isn't an official heartbeat message
   const std::vector<unsigned char> heartbeat_config = {
@@ -176,25 +175,25 @@ void Driver::enable_heartbeat(int freq)
 
   client_.send(packet);
 
-  set_heartbeat_freq(freq);
+  setHeartbeatFreq(freq);
 }
 
-void Driver::disable_heartbeat() { set_heartbeat_freq(0); }
+void Driver::disableHeartbeat() { setHeartbeatFreq(0); }
 
-void Driver::set_heartbeat_freq(int freq)
+void Driver::setHeartbeatFreq(int freq)
 {
   const std::vector<unsigned char> heartbeat_frequency = {static_cast<unsigned char>(freq)};
   const Packet packet(PacketId::kHeartbeatFreqency, DeviceId::kAllJoints, heartbeat_frequency);
   client_.send(packet);
 }
 
-void Driver::update_last_heartbeat_cb(const Packet &)
+void Driver::updateLastHeartbeatCb(const Packet &)
 {
   const std::lock_guard<std::mutex> lock(last_heartbeat_lock_);
   last_heartbeat_ = std::chrono::steady_clock::now();
 }
 
-void Driver::monitor_heartbeat(int heartbeat_timeout) const
+void Driver::monitorHeartbeat(int heartbeat_timeout) const
 {
   while (running_.load()) {
     // Make sure that the lock is properly scoped so that we don't accidentally keep the lock

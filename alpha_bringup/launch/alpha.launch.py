@@ -43,115 +43,121 @@ def generate_launch_description() -> LaunchDescription:
     Generate a launch description to run the Reach Alpha 5 manipulator.
 
     Returns:
-        LaunchDescription: ROS2 launch description
+        LaunchDescription: The Alpha 5 driver ROS 2 launch description.
     """
     # Declare launch arguments
     args = [
         DeclareLaunchArgument(
             "description_package",
             default_value="alpha_description",
-            description="Description package with the Alpha URDF files.",
+            description=(
+                "The description package with the Alpha URDF files. This is typically"
+                " not set, but is available incase another description package has"
+                " been defined."
+            ),
         ),
         DeclareLaunchArgument(
             "description_file",
             default_value="alpha.config.xacro",
-            description="URDF/XACRO description file with the Alpha",
+            description="The URDF/XACRO description file with the Alpha.",
         ),
         DeclareLaunchArgument(
             "rviz_config",
             default_value="view_alpha.rviz",
-            description="RViz2 configuration file",
+            description="The RViz2 configuration file.",
         ),
         DeclareLaunchArgument(
             "controllers_file",
             default_value="alpha_controllers.yaml",
-            description="YAML file defining the ros2_control controllers",
+            description="The YAML file defining the ros2_control controllers.",
         ),
         DeclareLaunchArgument(
             "initial_positions_file",
             default_value="initial_positions.yaml",
-            description="Initial positions used for simulation.",
+            description=(
+                "The configuration file that defines the initial positions used for"
+                " simulation."
+            ),
         ),
         DeclareLaunchArgument(
             "initial_velocities_file",
             default_value="initial_velocities.yaml",
-            description="Initial velocities used for simulation.",
+            description=(
+                "The configuration file that defines the initial velocities used for"
+                " simulation."
+            ),
         ),
         DeclareLaunchArgument(
             "prefix",
-            default_value="''",
+            default_value="",
             description=(
-                "Prefix of the joint names; useful for multi-robot setup. If"
-                " changed, then the joint names in the controller configuration must"
-                " be updated. Expected format '<prefix>/'"
+                "The prefix of the joint names. This is useful for multi-robot setups."
+                " If the prefix is changed, then the joint names in the controller"
+                " configuration must be updated. Expected format '<prefix>/'."
             ),
         ),
         DeclareLaunchArgument(
             "namespace",
             default_value="",
             description=(
-                "Namespace of the launched nodes; useful for multi-robot setup. If"
-                " changed, then the namespace in the controller configuration must"
-                " be updated. Expected format '<ns>/'"
+                "The namespace of the launched nodes. This is useful for multi-robot"
+                " setups. If the namespace is changed, then the namespace in the"
+                " controller configuration must be updated. Expected format '<ns>/'."
             ),
         ),
         DeclareLaunchArgument(
             "use_rviz",
             default_value="true",
-            description="Automatically start RViz2",
+            description="Automatically start RViz2.",
         ),
         DeclareLaunchArgument(
             "use_planning",
             default_value="false",
-            description="Automatically start the MoveIt2 interface",
+            description="Automatically start the MoveIt2 interface.",
+        ),
+        DeclareLaunchArgument(
+            "use_sim",
+            default_value="false",
+            description="Automatically start Gazebo.",
         ),
         DeclareLaunchArgument(
             "use_fake_hardware",
             default_value="true",
             description=(
-                "Start robot with fake hardware mirroring command to its states."
+                "Start the driver using fake hardware mirroring command to its states."
+                " If this is set to 'false', the Alpha 5 manipulator serial port should"
+                " be specified."
             ),
-        ),
-        DeclareLaunchArgument(
-            "use_sim",
-            default_value="false",
-            description="Automatically start Gazebo",
         ),
         DeclareLaunchArgument(
             "serial_port",
             default_value="''",
-            description="Serial port that the robot is available at",
-        ),
-        DeclareLaunchArgument(
-            "timeout",
-            default_value="5000",
             description=(
-                "Maximum allowable time (ms) between heartbeat packets before a timeout"
-                " warning is issued"
+                "The serial port that the Alpha 5 is available at (e.g., /dev/ttyUSB0)."
             ),
         ),
         DeclareLaunchArgument(
             "state_update_frequency",
             default_value="250",
             description=(
-                "Frequency at which the driver updates the state of the robot. Note"
-                " that this should not be less than the read frequency defined by the "
-                " controller configuration."
+                "The frequency (Hz) at which the driver updates the state of the robot."
+                " Note that this should not be less than the read frequency defined by"
+                " the controller configuration."
             ),
         ),
         DeclareLaunchArgument(
             "robot_controller",
             default_value="forward_position_controller",
             description=(
-                "Robot controller to use. When using MoveIt for planning, this"
-                " argument will be ignored and the JointTrajectoryControllers will be"
-                " used instead"
+                "The ros2_control controller to use. When using MoveIt for planning,"
+                " this argument will be ignored and the JointTrajectoryController will"
+                " be used instead."
             ),
         ),
         DeclareLaunchArgument(
             "gazebo_world_file",
             default_value="empty.world",
-            description="World configuration to load if using Gazebo",
+            description="The world configuration to load if using Gazebo.",
         ),
     ]
 
@@ -167,7 +173,6 @@ def generate_launch_description() -> LaunchDescription:
     use_sim = LaunchConfiguration("use_sim")
     use_fake_hardware = LaunchConfiguration("use_fake_hardware")
     serial_port = LaunchConfiguration("serial_port")
-    timeout = LaunchConfiguration("timeout")
     state_update_frequency = LaunchConfiguration("state_update_frequency")
     robot_controller = LaunchConfiguration("robot_controller")
     initial_velocities_file = LaunchConfiguration("initial_velocities_file")
@@ -197,9 +202,6 @@ def generate_launch_description() -> LaunchDescription:
                 "serial_port:=",
                 serial_port,
                 " ",
-                "hearbeat_timeout:=",
-                timeout,
-                " ",
                 "state_update_frequency:=",
                 state_update_frequency,
                 " ",
@@ -217,7 +219,6 @@ def generate_launch_description() -> LaunchDescription:
                 " ",
                 "use_sim:=",
                 use_sim,
-                " ",
             ]
         )
     }
@@ -260,11 +261,11 @@ def generate_launch_description() -> LaunchDescription:
         ],
     )
 
-    arm_controller_spawner = Node(
+    feedback_joint_trajectory_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=[
-            "arm_controller",
+            "feedback_joint_trajectory_controller",
             "--controller-manager",
             [namespace, "controller_manager"],
         ],
@@ -279,6 +280,7 @@ def generate_launch_description() -> LaunchDescription:
             "--controller-manager",
             [namespace, "controller_manager"],
         ],
+        condition=UnlessCondition(use_planning),
     )
 
     rviz_node = Node(
@@ -294,16 +296,8 @@ def generate_launch_description() -> LaunchDescription:
         parameters=[robot_description],
         condition=IfCondition(
             PythonExpression(
-                [
-                    "'",
-                    use_planning,
-                    "' == 'false' and '",
-                    use_rviz,
-                    "' == 'true' and '",
-                    use_sim,
-                    "' == 'false'",
-                ]
-            )  # launch either moveit or the alpha visualization - not both
+                ["'", use_planning, "' == 'false' and '", use_rviz, "' == 'true'"]
+            )  # launch either MoveIt or the Alpha visualization, not both
         ),
     )
 
@@ -337,16 +331,14 @@ def generate_launch_description() -> LaunchDescription:
         condition=IfCondition(use_rviz),
     )
 
-    # Delay start of arm_controller & ee_controller after `joint_state_broadcaster`
+    # Delay start of feedback_joint_trajectory_controller after
+    # `joint_state_broadcaster`
     delay_moveit_controller_spawners_after_joint_state_broadcaster_spawner = (
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=joint_state_broadcaster_spawner,
-                on_exit=[
-                    arm_controller_spawner
-                ],
+                on_exit=[feedback_joint_trajectory_controller_spawner],
             ),
-            condition=IfCondition(use_planning),
         )
     )
 
@@ -357,7 +349,6 @@ def generate_launch_description() -> LaunchDescription:
                 target_action=joint_state_broadcaster_spawner,
                 on_exit=[robot_controller_spawner],
             ),
-            condition=UnlessCondition(use_planning),
         )
     )
 
@@ -367,7 +358,6 @@ def generate_launch_description() -> LaunchDescription:
             target_action=gazebo_spawn_entity_node,
             on_exit=[joint_state_broadcaster_spawner],
         ),
-        condition=IfCondition(use_sim),
     )
 
     nodes = [

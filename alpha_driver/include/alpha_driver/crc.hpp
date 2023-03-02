@@ -28,22 +28,22 @@ namespace alpha_driver
 {
 
 /**
- * @brief CRC initial value specified in the Reach protocol
+ * @brief The CRC initial value specified by the Reach protocol.
  */
 const unsigned char kInitialValue = 0x00;
 
 /**
- * @brief CRC final XOR value specified in the Reach protocol.
+ * @brief The CRC final XOR value specified by the Reach protocol.
  */
 const unsigned char kFinalXorValue = 0xFF;
 
 /**
- * @brief Reach protocol specifies that the CRC input should be reflected.
+ * @brief The Reach protocol specifies that the CRC input should be reflected.
  */
 const bool kInputReflected = true;
 
 /**
- * @brief Reach protocol specifies that the CRC result should be reflected.
+ * @brief The Reach protocol specifies that the CRC result should be reflected.
  */
 const bool kResultReflected = true;
 
@@ -88,9 +88,9 @@ const std::array<unsigned char, 256> kCrc8LookupTable = {
  * Part 3: CRC Implementation Code in C/C++" (2000), retrieved Jan 6, 2023:
  * https://barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
  *
- * @param data data to reflect
- * @param size size of the data being reflected
- * @return reflected data
+ * @param data The data to reflect.
+ * @param size The size of the data being reflected.
+ * @return The reflected data.
  */
 unsigned char reflect(std::uint64_t data, int size);
 
@@ -101,15 +101,15 @@ unsigned char reflect(std::uint64_t data, int size);
  * Part 3: CRC Implementation Code in C/C++" (2000), retrieved Jan 6, 2023:
  * https://barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
  *
- * @param data serial data whose CRC should be calculated
- * @param initial_value CRC initial value
- * @param final_xor_value CRC final XOR value
- * @param input_reflected Reflect the input
- * @param result_reflected Reflect the result
- * @param lookup_table Lookup table used for CRC calculation
- * @return CRC8 value for the provided serial data
+ * @param data The serial data whose CRC should be calculated.
+ * @param initial_value The CRC initial value.
+ * @param final_xor_value The CRC final XOR value.
+ * @param input_reflected Reflect the input.
+ * @param result_reflected Reflect the result.
+ * @param lookup_table The pre-computed lookup table used for CRC calculation.
+ * @return The calculated CRC8 value for the provided serial data.
  */
-unsigned char calculate_crc8(
+unsigned char calculateCrc8(
   const std::vector<unsigned char> & data, unsigned char initial_value,
   unsigned char final_xor_value, bool input_reflected, bool result_reflected,
   const std::array<unsigned char, 256> & lookup_table);
@@ -117,12 +117,12 @@ unsigned char calculate_crc8(
 /**
  * @brief Calculate the CRC value for a message using the Reach serial protocol specification.
  *
- * @remark This is a wrapper for the @ref calculate_crc8 method defined using the Reach
- * specifications to help improve usability.
+ * @remark This is a wrapper for the @ref calculateCrc8 method defined using the Reach
+ * protocol.
  *
- * @param data serial data whose CRC should be calculated using the Reach specification
- * @return CRC8 value calculated using the Reach serial protocol
+ * @param data The serial data whose CRC should be calculated using the Reach specification.
+ * @return The CRC8 value calculated using the Reach serial protocol.
  */
-unsigned char calculate_reach_crc8(const std::vector<unsigned char> & data);
+unsigned char calculateReachCrc8(const std::vector<unsigned char> & data);
 
 }  // namespace alpha_driver

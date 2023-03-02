@@ -5,9 +5,9 @@
 
     moveit_simple_controller_manager:
       controller_names:
-        - arm_controller
+        - feedback_joint_trajectory_controller
 
-      arm_controller:
+      feedback_joint_trajectory_controller:
         type: FollowJointTrajectory
         action_ns: follow_joint_trajectory
         default: true
