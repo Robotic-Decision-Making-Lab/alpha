@@ -132,7 +132,7 @@ bool SerialClient::send(const Packet & packet) const
   return true;
 }
 
-void SerialClient::register_callback(
+void SerialClient::registerCallback(
   PacketId packet_type, const std::function<void(Packet)> & callback)
 {
   callbacks_[packet_type].push_back(callback);
@@ -159,7 +159,7 @@ void SerialClient::poll() const
 
   // Now we can start processing data
   while (running_.load()) {
-    // Note that we have to read byte-by-byte. This is because the BPL protocol doesn't include
+    // Note that we have to read byte-by-byte. This is because the Reach protocol doesn't include
     // a header which defines the size of the packet. Instead we have to read until there is a
     // packet delimiter (0x00) and process that data.
     const int size = read(handle_, &data, 1);
@@ -178,14 +178,17 @@ void SerialClient::poll() const
 
           // We need to use the find method here instead of a normal [] indexing operation because
           // the [] does not have const overloading which we want for this to be thread-safe
-          auto it = callbacks_.find(packet.packet_id());
+          auto it = callbacks_.find(packet.getPacketId());
 
-          for (const auto & callback : it->second) {
-            callback(packet);
+          // If a callback exists for the message, execute it
+          if (it != callbacks_.end()) {
+            for (const auto & callback : it->second) {
+              callback(packet);
+            }
           }
         }
         catch (const std::exception & e) {
-          RCLCPP_WARN(rclcpp::get_logger("SerialClient"), e.what());  // NOLINT
+          RCLCPP_DEBUG(rclcpp::get_logger("SerialClient"), e.what());  // NOLINT
         }
 
         // Empty the buffer before we start reading the next packet

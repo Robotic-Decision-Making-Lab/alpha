@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<robot name="alpha" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Declare arguments which can be set from a launch file -->
+  <xacro:arg name="use_fake_hardware" default="true" />
+  <xacro:arg name="use_sim" default="false" />
+  <xacro:arg name="serial_port" default="" />
+  <xacro:arg name="state_update_frequency" default="250" />
+  <xacro:arg name="controllers_file" default="alpha_controllers.yaml" />
+  <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
+  <xacro:arg name="initial_velocities_file" default="initial_velocities.yaml" />
+  <xacro:arg name="namespace" default="" />
+  <xacro:arg name="prefix" default="" />
+
+  <!-- Import Alpha macro -->
+  <xacro:include
+    filename="$(find alpha_description)/urdf/alpha.urdf.xacro" />
+
+  <!-- Import ros2_control macro -->
+  <xacro:include
+    filename="$(find alpha_description)/ros2_control/alpha.ros2_control.xacro" />
+
+  <!-- Import Gazebo macro -->
+  <xacro:include
+    filename="$(find alpha_description)/gazebo/alpha.gazebo.xacro" />
+
+  <link name="world" />
+
+  <xacro:alpha_urdf parent="world" prefix="$(arg prefix)">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:alpha_urdf>
+
+  <gazebo reference="world">
+    <static>true</static>
+  </gazebo>
+
+  <xacro:alpha_system prefix="$(arg prefix)" name="ReachAlpha5"
+    use_fake_hardware="$(arg use_fake_hardware)"
+    serial_port="$(arg serial_port)"
+    state_update_frequency="$(arg state_update_frequency)"
+    initial_positions_file="$(arg initial_positions_file)"
+    initial_velocities_file="$(arg initial_velocities_file)"
+    use_sim="$(arg use_sim)" />
+
+  <xacro:alpha_gazebo prefix="$(arg prefix)"
+    controllers_file="$(arg controllers_file)" namespace="$(arg namespace)" />
+
+</robot>

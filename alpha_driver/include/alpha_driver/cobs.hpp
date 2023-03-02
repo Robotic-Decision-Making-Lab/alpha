@@ -31,10 +31,10 @@ namespace alpha_driver
  * @remark This implementation has been inspired by the following source:
  * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L19
  *
- * @param data serial data to encode
- * @return std::vector<unsigned char>
+ * @param data The serial data to encode.
+ * @return The serial data that has been encoded with the COBS algorithm.
  */
-std::vector<unsigned char> cobs_encode(const std::vector<unsigned char> & data);
+std::vector<unsigned char> cobsEncode(const std::vector<unsigned char> & data);
 
 /**
  * @brief Decode serial data that has been encoded with the COBS algorithm.
@@ -42,9 +42,9 @@ std::vector<unsigned char> cobs_encode(const std::vector<unsigned char> & data);
  * @remark This implementation has been inspired by the following source:
  * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L74
  *
- * @param data serial data to decode
- * @return std::vector<unsigned char>
+ * @param data The serial data to decode.
+ * @return The decoded serial data.
  */
-std::vector<unsigned char> cobs_decode(const std::vector<unsigned char> & data);
+std::vector<unsigned char> cobsDecode(const std::vector<unsigned char> & data);
 
 }  // namespace alpha_driver

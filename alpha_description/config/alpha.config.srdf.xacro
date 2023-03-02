@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot name="alpha" xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <xacro:arg name="prefix" default="" />
+  <xacro:arg name="description_package" default="alpha_description" />
+
+  <xacro:property name="description_package" value="$(arg description_package)" />
+  <xacro:include
+    filename="$(find ${description_package})/srdf/alpha.srdf.xacro" />
+
+  <xacro:alpha_srdf prefix="$(arg prefix)" />
+
+</robot>

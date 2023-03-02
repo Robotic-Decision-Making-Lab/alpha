@@ -38,3 +38,7 @@ log/
 
 # VSCode
 .vscode/
+
+# python
+.mypy_cache/
+__pycache__
