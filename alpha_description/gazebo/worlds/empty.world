@@ -28,8 +28,9 @@
     </include>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>4.927360 -4.376610 3.740080 0.000000 0.275643 2.356190</pose>
+        <pose>-0.137599 -0.973052 0.306799 0 0.2354 1.50827</pose>
         <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
       </camera>
     </gui>
 
