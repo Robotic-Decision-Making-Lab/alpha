@@ -70,7 +70,7 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}axis_a" type="revolute">
+    <joint name="${prefix}axis_e" type="revolute">
       <parent link="${prefix}m3_inline_link" />
       <child link="${prefix}m2_1_1_link" />
       <origin xyz="0 0 0.014" />
@@ -114,7 +114,7 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}axis_b" type="revolute">
+    <joint name="${prefix}axis_d" type="revolute">
       <parent link="${prefix}m2_1_1_link" />
       <child link="${prefix}m2_joint_link" />
       <origin xyz="-0.02 0 0.033" />
@@ -179,7 +179,7 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}axis_d" type="revolute">
+    <joint name="${prefix}axis_b" type="revolute">
       <parent link="${prefix}m2_1_2_link" />
       <child link="${prefix}m1_link" />
       <origin xyz="0.02 0 0.033" rpy="0 0 2.09439" />
@@ -213,7 +213,7 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}axis_e" type="prismatic">
+    <joint name="${prefix}axis_a" type="prismatic">
       <origin rpy="0 0 0" xyz="0 0 0.009" />
       <parent link="${prefix}ee_base_link" />
       <child link="${prefix}push_rod" />
@@ -226,7 +226,7 @@
 
     <xacro:alpha_standard_jaws parent="${prefix}ee_base_link"
       prefix="${prefix}standard_jaws_"
-      axis_a="${prefix}axis_e">
+      axis_a="${prefix}axis_a">
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:alpha_standard_jaws>
 

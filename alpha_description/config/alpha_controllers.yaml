@@ -20,11 +20,11 @@ controller_manager:
 feedback_joint_trajectory_controller:
   ros__parameters:
     joints:
-      - axis_e
-      - axis_d
-      - axis_c
-      - axis_b
       - axis_a
+      - axis_b
+      - axis_c
+      - axis_d
+      - axis_e
     command_interfaces:
       - position
     state_interfaces:
@@ -33,17 +33,17 @@ feedback_joint_trajectory_controller:
 forward_position_controller:
   ros__parameters:
     joints:
-      - axis_e
-      - axis_d
-      - axis_c
-      - axis_b
       - axis_a
+      - axis_b
+      - axis_c
+      - axis_d
+      - axis_e
 
 forward_velocity_controller:
   ros__parameters:
     joints:
-      - axis_e
-      - axis_d
-      - axis_c
-      - axis_b
       - axis_a
+      - axis_b
+      - axis_c
+      - axis_d
+      - axis_e

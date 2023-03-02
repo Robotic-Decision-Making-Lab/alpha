@@ -20,6 +20,7 @@
 
 #include "alpha_hardware/hardware.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <limits>
