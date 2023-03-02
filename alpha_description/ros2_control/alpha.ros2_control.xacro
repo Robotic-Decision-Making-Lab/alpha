@@ -39,11 +39,11 @@
           <param name="max">2.5</param>
         </command_interface>
         <state_interface name="position">
-          <param name="initial_value">${initial_positions['axis_e']}</param>
+          <param name="initial_value">${initial_positions['axis_a']}</param>
         </state_interface>
         <state_interface
           name="velocity">
-          <param name="initial_value">${initial_velocities['axis_e']}</param>
+          <param name="initial_value">${initial_velocities['axis_a']}</param>
         </state_interface>
       </joint>
       <joint
@@ -57,10 +57,10 @@
           <param name="max">1.0</param>
         </command_interface>
         <state_interface name="position">
-          <param name="initial_value">${initial_positions['axis_d']}</param>
+          <param name="initial_value">${initial_positions['axis_b']}</param>
         </state_interface>
         <state_interface name="velocity">
-          <param name="initial_value">${initial_velocities['axis_d']}</param>
+          <param name="initial_value">${initial_velocities['axis_b']}</param>
         </state_interface>
       </joint>
       <joint
@@ -91,10 +91,10 @@
           <param name="max">1.0</param>
         </command_interface>
         <state_interface name="position">
-          <param name="initial_value">${initial_positions['axis_b']}</param>
+          <param name="initial_value">${initial_positions['axis_d']}</param>
         </state_interface>
         <state_interface name="velocity">
-          <param name="initial_value">${initial_velocities['axis_b']}</param>
+          <param name="initial_value">${initial_velocities['axis_d']}</param>
         </state_interface>
       </joint>
       <joint
@@ -108,10 +108,10 @@
           <param name="max">0.5</param>
         </command_interface>
         <state_interface name="position">
-          <param name="initial_value">${initial_positions['axis_a']}</param>
+          <param name="initial_value">${initial_positions['axis_e']}</param>
         </state_interface>
         <state_interface name="velocity">
-          <param name="initial_value">${initial_velocities['axis_a']}</param>
+          <param name="initial_value">${initial_velocities['axis_e']}</param>
         </state_interface>
       </joint>
     </ros2_control>
