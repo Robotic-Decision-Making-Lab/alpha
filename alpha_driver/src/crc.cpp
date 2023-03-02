@@ -38,7 +38,7 @@ unsigned char reflect(std::uint64_t data, int size)
   return static_cast<unsigned char>(reflection);
 }
 
-unsigned char calculate_crc8(
+unsigned char calculateCrc8(
   const std::vector<unsigned char> & data, unsigned char initial_value,
   unsigned char final_xor_value, bool input_reflected, bool result_reflected,
   const std::array<unsigned char, 256> & lookup_table)
@@ -68,9 +68,9 @@ unsigned char calculate_crc8(
   return crc ^ final_xor_value;
 }
 
-unsigned char calculate_bpl_crc8(const std::vector<unsigned char> & data)
+unsigned char calculateReachCrc8(const std::vector<unsigned char> & data)
 {
-  return calculate_crc8(
+  return calculateCrc8(
     data, kInitialValue, kFinalXorValue, kInputReflected, kResultReflected, kCrc8LookupTable);
 }
 

@@ -33,29 +33,26 @@ namespace alpha_driver
 
 Driver::Driver()
 {
-  client_.register_callback(
-    PacketId::kModelNumber,
-    std::bind(&Driver::update_last_heartbeat_cb, this, std::placeholders::_1));
+  subscribe(
+    PacketId::kModelNumber, std::bind(&Driver::updateLastHeartbeatCb, this, std::placeholders::_1));
 }
 
-bool Driver::start(const std::string & serial_port, const int heartbeat_timeout_ms)
+void Driver::start(const std::string & serial_port, int heartbeat_timeout)
 {
-  try {
-    // Attempt to connect the serial client
-    // We don't expose the VTIME timeout to the user API to avoid usability concerns
-    client_.connect(serial_port);
+  if (heartbeat_timeout < 1) {
+    throw std::invalid_argument("The heartbeat timeout must be greater than 1 second.");
   }
-  catch (const std::exception & e) {
-    RCLCPP_ERROR(rclcpp::get_logger("AlphaDriver"), e.what());  // NOLINT
-    return false;
-  }
+
+  // Attempt to connect the serial client
+  // We don't expose the VTIME timeout to the user API to avoid usability concerns
+  client_.connect(serial_port);
 
   // Disable any previous heartbeat configurations
-  disable_heartbeat();
+  disableHeartbeat();
 
   // Configure the new heartbeat request
-  // The heartbeat should be sent 3 times per timeout interval
-  enable_heartbeat(3 / heartbeat_timeout_ms);
+  // The heartbeat has a minimum frequency of one message per second, so we set it to that
+  enableHeartbeat(1);
 
   {
     const std::lock_guard<std::mutex> lock(last_heartbeat_lock_);
@@ -65,20 +62,18 @@ bool Driver::start(const std::string & serial_port, const int heartbeat_timeout_
   running_.store(true);
 
   // Start the thread that monitors heartbeats from the manipulator
-  heartbeat_worker_ = std::thread(&Driver::monitor_heartbeat, this, heartbeat_timeout_ms);
-
-  return true;
+  heartbeat_worker_ = std::thread(&Driver::monitorHeartbeat, this, heartbeat_timeout);
 }
 
 void Driver::stop()
 {
-  disable_heartbeat();
+  disableHeartbeat();
   running_.store(false);
   heartbeat_worker_.join();
   client_.disconnect();
 }
 
-void Driver::set_mode(Mode mode, DeviceId device) const
+void Driver::setMode(Mode mode, DeviceId device) const
 {
   if (!running_.load() || !client_.active()) {
     throw std::runtime_error(
@@ -92,24 +87,24 @@ void Driver::set_mode(Mode mode, DeviceId device) const
   client_.send(packet);
 }
 
-void Driver::set_velocity(float velocity, DeviceId device) const
+void Driver::setVelocity(float velocity, DeviceId device) const
 {
-  send_float(velocity, PacketId::kVelocity, device);
+  sendFloat(velocity, PacketId::kVelocity, device);
 }
 
-void Driver::set_position(float position, DeviceId device) const
+void Driver::setPosition(float position, DeviceId device) const
 {
-  send_float(position, PacketId::kPosition, device);
+  sendFloat(position, PacketId::kPosition, device);
 }
 
-void Driver::set_relative_position(float relative_position, DeviceId device) const
+void Driver::setRelativePosition(float relative_position, DeviceId device) const
 {
-  send_float(relative_position, PacketId::kRelativePosition, device);
+  sendFloat(relative_position, PacketId::kRelativePosition, device);
 }
 
-void Driver::set_current(float current, DeviceId device) const
+void Driver::setCurrent(float current, DeviceId device) const
 {
-  send_float(current, PacketId::kCurrent, device);
+  sendFloat(current, PacketId::kCurrent, device);
 }
 
 void Driver::request(PacketId packet_type, DeviceId device) const
@@ -129,7 +124,7 @@ void Driver::request(PacketId packet_type, DeviceId device) const
 void Driver::request(std::vector<PacketId> & packet_types, DeviceId device) const
 {
   if (packet_types.size() > 10) {
-    throw std::logic_error("Cannot request more than 10 packets from a device at once.");
+    throw std::invalid_argument("Cannot request more than 10 packets from a device at once.");
   }
 
   if (!running_.load() || !client_.active()) {
@@ -137,8 +132,7 @@ void Driver::request(std::vector<PacketId> & packet_types, DeviceId device) cons
       "Cannot send a request to the manipulator without an active connection!");
   }
 
-  std::vector<unsigned char> request_types;
-  request_types.reserve(packet_types.size());
+  std::vector<unsigned char> request_types(packet_types.size());
 
   // Cast to unsigned char
   for (auto type : packet_types) {
@@ -152,10 +146,10 @@ void Driver::request(std::vector<PacketId> & packet_types, DeviceId device) cons
 
 void Driver::subscribe(PacketId packet_type, const std::function<void(Packet)> & callback)
 {
-  client_.register_callback(packet_type, callback);
+  client_.registerCallback(packet_type, callback);
 }
 
-void Driver::send_float(float value, PacketId packet_type, DeviceId device_id) const
+void Driver::sendFloat(float value, PacketId packet_type, DeviceId device_id) const
 {
   if (!running_.load() || !client_.active()) {
     throw std::runtime_error(
@@ -163,16 +157,15 @@ void Driver::send_float(float value, PacketId packet_type, DeviceId device_id) c
   }
 
   // Convert the float into a vector of bytes
-  std::vector<unsigned char> reinterpretted_vector;
-  reinterpretted_vector.reserve(sizeof(value));
-  std::memcpy(&reinterpretted_vector[0], &value, sizeof(value));  // NOLINT
+  std::vector<unsigned char> reinterpretted_vector(sizeof(value));
+  std::memcpy(reinterpretted_vector.data(), &value, sizeof(value));
 
   const Packet packet(packet_type, device_id, reinterpretted_vector);
 
   client_.send(packet);
 }
 
-void Driver::enable_heartbeat(const int freq)
+void Driver::enableHeartbeat(int freq)
 {
   // We request the model number as the heartbeat because there isn't an official heartbeat message
   const std::vector<unsigned char> heartbeat_config = {
@@ -182,46 +175,45 @@ void Driver::enable_heartbeat(const int freq)
 
   client_.send(packet);
 
-  set_heartbeat_freq(freq);
+  setHeartbeatFreq(freq);
 }
 
-void Driver::disable_heartbeat() { set_heartbeat_freq(0); }
+void Driver::disableHeartbeat() { setHeartbeatFreq(0); }
 
-void Driver::set_heartbeat_freq(const int freq)
+void Driver::setHeartbeatFreq(int freq)
 {
   const std::vector<unsigned char> heartbeat_frequency = {static_cast<unsigned char>(freq)};
   const Packet packet(PacketId::kHeartbeatFreqency, DeviceId::kAllJoints, heartbeat_frequency);
   client_.send(packet);
 }
 
-void Driver::update_last_heartbeat_cb(const Packet &)
+void Driver::updateLastHeartbeatCb(const Packet &)
 {
   const std::lock_guard<std::mutex> lock(last_heartbeat_lock_);
-
   last_heartbeat_ = std::chrono::steady_clock::now();
 }
 
-void Driver::monitor_heartbeat(const int heartbeat_timeout_ms) const
+void Driver::monitorHeartbeat(int heartbeat_timeout) const
 {
   while (running_.load()) {
-    // Make sure that the lock is properly scoped so that we don't accidentally keep the look
+    // Make sure that the lock is properly scoped so that we don't accidentally keep the lock
     // forever
     {
       const std::lock_guard<std::mutex> lock(last_heartbeat_lock_);
 
       if (
         std::chrono::steady_clock::now() - last_heartbeat_ >
-        std::chrono::milliseconds(heartbeat_timeout_ms)) {
+        std::chrono::seconds(heartbeat_timeout)) {
         RCLCPP_WARN(  // NOLINT
           rclcpp::get_logger("AlphaDriver"),
           "Timeout occurred; the system has not received a heartbeat message in the last %d "
           "seconds",
-          heartbeat_timeout_ms);
+          heartbeat_timeout);
       }
     }
 
     // We don't need to check more often than our timeout requires us to
-    std::this_thread::sleep_for(std::chrono::milliseconds(heartbeat_timeout_ms));
+    std::this_thread::sleep_for(std::chrono::seconds(heartbeat_timeout));
   }
 }
 

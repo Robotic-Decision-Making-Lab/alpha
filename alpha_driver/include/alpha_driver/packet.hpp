@@ -34,50 +34,50 @@ public:
   /**
    * @brief Create a new Packet.
    *
-   * @remark Each packet has been designed to be immutable, and, therefore, requires the packet
-   * data to be provided at construction.
-   *
-   * @param packet_id type of packet
-   * @param device_id ID of the device that the data targets
-   * @param data packet data
+   * @param packet_id The packet type.
+   * @param device_id The ID of the device that the data targets.
+   * @param data Unencoded serial data.
    */
   Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char> data);
 
   /**
-   * @brief Encode the packet's data using the BPL packet structure specification.
+   * @brief Encode the packet's data using the Reach packet structure specification.
    *
-   * @return std::vector<unsigned char>
+   * @return Encoded serial data.
    */
   std::vector<unsigned char> encode() const;
 
   /**
-   * @brief Decode a packet that has been encoded using the BPL communication specification.
+   * @brief Decode a packet that has been encoded using the Reach communication specification.
    *
-   * @param data
-   * @return Packet
+   * @param data The encoded serial data.
+   * @return The packet obtained from the decoded serial data.
    */
   static Packet decode(const std::vector<unsigned char> & data);
 
   /**
    * @brief Get the unique packet identifier.
    *
-   * @return PacketId
+   * @return The packet type.
    */
-  PacketId packet_id() const;
+  PacketId getPacketId() const;
 
   /**
    * @brief Get the unique device identifier.
    *
-   * @return DeviceId
+   * @return The ID of the device that the packet targets.
    */
-  DeviceId device_id() const;
+  DeviceId getDeviceId() const;
 
   /**
    * @brief Get the packet data.
    *
-   * @return std::vector<unsigned char>
+   * @note The packet serial data will never be encoded during the lifetime of the object unless
+   * the packet is instantiated with the serial data already encoded.
+   *
+   * @return The packet serial data.
    */
-  std::vector<unsigned char> data() const;
+  std::vector<unsigned char> getData() const;
 
 private:
   PacketId packet_id_;

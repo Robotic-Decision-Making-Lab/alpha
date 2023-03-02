@@ -42,7 +42,7 @@ namespace alpha_driver
 void SerialClient::connect(const std::string & device, const int polling_timeout_ms)
 {
   if (device.empty()) {
-    throw std::logic_error("Attempted to open file using an unassigned file path.");
+    throw std::invalid_argument("Attempted to open file using an unassigned file path.");
   }
 
   handle_ = open(device.c_str(), O_RDWR);
@@ -118,23 +118,21 @@ void SerialClient::disconnect()
   close(handle_);
 }
 
-void SerialClient::send(const Packet & packet) const
+bool SerialClient::send(const Packet & packet) const
 {
-  try {
-    std::vector<unsigned char> encoded_data = packet.encode();
+  std::vector<unsigned char> encoded_data = packet.encode();
 
-    if (write(handle_, encoded_data.data(), encoded_data.size()) < 0) {
-      RCLCPP_WARN(  // NOLINT
-        rclcpp::get_logger("SerialClient"),
-        "Failed to write the encoded packet to the serial port.");
-    }
+  if (write(handle_, encoded_data.data(), encoded_data.size()) < 0) {
+    RCLCPP_WARN(  // NOLINT
+      rclcpp::get_logger("SerialClient"), "Failed to write the encoded packet to the serial port.");
+
+    return false;
   }
-  catch (const std::exception & e) {
-    RCLCPP_WARN(rclcpp::get_logger("SerialClient"), e.what());  // NOLINT
-  }
+
+  return true;
 }
 
-void SerialClient::register_callback(
+void SerialClient::registerCallback(
   PacketId packet_type, const std::function<void(Packet)> & callback)
 {
   callbacks_[packet_type].push_back(callback);
@@ -161,7 +159,7 @@ void SerialClient::poll() const
 
   // Now we can start processing data
   while (running_.load()) {
-    // Note that we have to read byte-by-byte. This is because the BPL protocol doesn't include
+    // Note that we have to read byte-by-byte. This is because the Reach protocol doesn't include
     // a header which defines the size of the packet. Instead we have to read until there is a
     // packet delimiter (0x00) and process that data.
     const int size = read(handle_, &data, 1);
@@ -180,14 +178,17 @@ void SerialClient::poll() const
 
           // We need to use the find method here instead of a normal [] indexing operation because
           // the [] does not have const overloading which we want for this to be thread-safe
-          auto it = callbacks_.find(packet.packet_id());
+          auto it = callbacks_.find(packet.getPacketId());
 
-          for (const auto & callback : it->second) {
-            callback(packet);
+          // If a callback exists for the message, execute it
+          if (it != callbacks_.end()) {
+            for (const auto & callback : it->second) {
+              callback(packet);
+            }
           }
         }
         catch (const std::exception & e) {
-          RCLCPP_WARN(rclcpp::get_logger("SerialClient"), e.what());  // NOLINT
+          RCLCPP_DEBUG(rclcpp::get_logger("SerialClient"), e.what());  // NOLINT
         }
 
         // Empty the buffer before we start reading the next packet

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:macro name="alpha_srdf" params="prefix">
+
+        <group name="${prefix}alpha">
+            <link name="${prefix}ee_base_link" />
+            <joint name="${prefix}axis_a" />
+            <joint name="${prefix}axis_b" />
+            <joint name="${prefix}axis_c" />
+            <joint name="${prefix}axis_d" />
+            <joint name="${prefix}axis_e" />
+        </group>
+        <group_state name="home" group="${prefix}alpha">
+            <joint name="${prefix}axis_a" value="0" />
+            <joint name="${prefix}axis_b" value="0" />
+            <joint name="${prefix}axis_c" value="0.08" />
+            <joint name="${prefix}axis_d" value="1.5746" />
+            <joint name="${prefix}axis_e" value="0" />
+        </group_state>
+        <passive_joint name="${prefix}standard_jaws_rs1_130_joint" />
+        <passive_joint name="${prefix}standard_jaws_rs1_139_joint" />
+        <disable_collisions link1="${prefix}m1_link"
+            link2="${prefix}m2_1_2_link"
+            reason="Adjacent" />
+        <disable_collisions link1="${prefix}m1_link"
+            link2="${prefix}m2_joint_link"
+            reason="Default" />
+        <disable_collisions link1="${prefix}m1_link"
+            link2="${prefix}m3_inline_link"
+            reason="Default" />
+        <disable_collisions link1="${prefix}m1_link"
+            link2="${prefix}standard_jaws_rs1_130_link"
+            reason="Adjacent" />
+        <disable_collisions link1="${prefix}m1_link"
+            link2="${prefix}standard_jaws_rs1_139_link"
+            reason="Adjacent" />
+        <disable_collisions link1="${prefix}m2_1_1_link"
+            link2="${prefix}m2_1_2_link" reason="Never" />
+        <disable_collisions link1="${prefix}m2_1_1_link"
+            link2="${prefix}m2_joint_link"
+            reason="Adjacent" />
+        <disable_collisions link1="${prefix}m2_1_1_link"
+            link2="${prefix}m3_inline_link"
+            reason="Adjacent" />
+        <disable_collisions link1="${prefix}m2_1_2_link"
+            link2="${prefix}m2_joint_link"
+            reason="Adjacent" />
+        <disable_collisions link1="${prefix}m2_1_2_link"
+            link2="${prefix}standard_jaws_rs1_130_link"
+            reason="Never" />
+        <disable_collisions link1="${prefix}m2_1_2_link"
+            link2="${prefix}standard_jaws_rs1_139_link"
+            reason="Never" />
+        <disable_collisions link1="${prefix}m2_joint_link"
+            link2="${prefix}m3_inline_link"
+            reason="Default" />
+        <disable_collisions link1="${prefix}m2_joint_link"
+            link2="${prefix}standard_jaws_rs1_130_link"
+            reason="Default" />
+        <disable_collisions link1="${prefix}standard_jaws_rs1_130_link"
+            link2="${prefix}standard_jaws_rs1_139_link" reason="Adjacent" />
+
+    </xacro:macro>
+
+</robot>

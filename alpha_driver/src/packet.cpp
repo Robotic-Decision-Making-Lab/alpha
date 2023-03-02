@@ -36,32 +36,29 @@ Packet::Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char
   device_id_(device_id),
   data_(std::move(data))
 {
+  if (data_.empty()) {
+    throw std::invalid_argument("Cannot create a packet with no data.");
+  }
 }
 
 std::vector<unsigned char> Packet::encode() const
 {
-  if (data_.empty()) {
-    throw std::invalid_argument(
-      "Cannot encode an empty data packet. Please define the packet data before attempting to "
-      "encode it.");
-  }
-
   std::vector<unsigned char> data(data_);
 
   // Add the packet ID and the device ID
   // Note that we need to type cast to the underlying type because enum classes
   // don't implicitly cast to ints (which is a good thing)
-  data.push_back(static_cast<std::underlying_type<PacketId>::type>(packet_id_));
-  data.push_back(static_cast<std::underlying_type<DeviceId>::type>(device_id_));
+  data.push_back(static_cast<unsigned char>(packet_id_));
+  data.push_back(static_cast<unsigned char>(device_id_));
 
   // Length is the current buffer size plus two (length and CRC)
   data.push_back(data.size() + 2);
 
   // Calculate the CRC from the data and add it to the buffer
-  data.push_back(calculate_bpl_crc8(data));
+  data.push_back(calculateReachCrc8(data));
 
   // Encode the data using COBS encoding
-  std::vector<unsigned char> encoded_data = cobs_encode(data);
+  std::vector<unsigned char> encoded_data = cobsEncode(data);
 
   return encoded_data;
 }
@@ -73,7 +70,7 @@ Packet Packet::decode(const std::vector<unsigned char> & data)
   }
 
   // Note that an exception will be raised if the decoding fails
-  std::vector<unsigned char> decoded_data = cobs_decode(data);
+  std::vector<unsigned char> decoded_data = cobsDecode(data);
 
   if (decoded_data.empty()) {
     throw std::runtime_error("Decoded data is empty");
@@ -83,7 +80,7 @@ Packet Packet::decode(const std::vector<unsigned char> & data)
   const unsigned char actual_crc = decoded_data.back();
   decoded_data.pop_back();
 
-  const unsigned char expected_crc = calculate_bpl_crc8(decoded_data);
+  const unsigned char expected_crc = calculateReachCrc8(decoded_data);
 
   if (actual_crc != expected_crc) {
     throw std::runtime_error("The expected and actual CRC values do not match.");
@@ -109,10 +106,10 @@ Packet Packet::decode(const std::vector<unsigned char> & data)
   return Packet(static_cast<PacketId>(packet_id), static_cast<DeviceId>(device_id), decoded_data);
 }
 
-PacketId Packet::packet_id() const { return packet_id_; }
+PacketId Packet::getPacketId() const { return packet_id_; }
 
-DeviceId Packet::device_id() const { return device_id_; }
+DeviceId Packet::getDeviceId() const { return device_id_; }
 
-std::vector<unsigned char> Packet::data() const { return data_; }
+std::vector<unsigned char> Packet::getData() const { return data_; }
 
 }  // namespace alpha_driver

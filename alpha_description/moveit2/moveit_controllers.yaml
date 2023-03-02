@@ -1,0 +1,19 @@
+# MoveIt uses this configuration for controller management
+/**:
+  ros__parameters:
+    moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
+
+    moveit_simple_controller_manager:
+      controller_names:
+        - feedback_joint_trajectory_controller
+
+      feedback_joint_trajectory_controller:
+        type: FollowJointTrajectory
+        action_ns: follow_joint_trajectory
+        default: true
+        joints:
+          - axis_a
+          - axis_b
+          - axis_c
+          - axis_d
+          - axis_e
