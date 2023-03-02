@@ -12,8 +12,8 @@
         action_ns: follow_joint_trajectory
         default: true
         joints:
-          - axis_e
-          - axis_d
-          - axis_c
-          - axis_b
           - axis_a
+          - axis_b
+          - axis_c
+          - axis_d
+          - axis_e
