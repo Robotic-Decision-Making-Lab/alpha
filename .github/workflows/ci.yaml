@@ -43,6 +43,7 @@ jobs:
         with:
           linter: clang_tidy
           distribution: ${{ matrix.env.ROS_DISTRO }}
+          package-name: alpha
           workspace-directory: outputs.ros-workspace-directory-name
 
       - name: Run ROS Industrial CI
