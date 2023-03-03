@@ -23,6 +23,7 @@ jobs:
         env:
           - IMAGE: rolling-ci
             ROS_DISTRO: rolling
+            CLANG_TIDY: true
           - IMAGE: humble-ci
             ROS_DISTRO: humble
     steps:
@@ -58,3 +59,10 @@ jobs:
             (cd $TARGET_REPO_PATH; clang-tidy --list-checks)
           CC: ${{ matrix.env.CLANG_TIDY && 'clang' }}
           CXX: ${{ matrix.env.CLANG_TIDY && 'clang++' }}
+
+      - name: Upload clang-tidy changes
+        uses: rhaschke/upload-git-patch-action@main
+        if: always() && matrix.env.CLANG_TIDY
+        with:
+          name: clang-tidy
+          path: ${{ env.BASEDIR }}/target_ws/src/$(basename $(pwd))
