@@ -47,4 +47,4 @@ jobs:
             -Wall -Wextra -Wpedantic
           CLANG_TIDY: pedantic
           CLANG_TIDY_ARGS: --format-style=file
-          CLANG_FORMAT_ARGS: --style=file
+          CLANG_FORMAT_CHECK: file
