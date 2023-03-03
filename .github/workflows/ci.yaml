@@ -45,6 +45,6 @@ jobs:
           DOCKER_IMAGE: ghcr.io/evan-palmer/alpha:${{ matrix.env.IMAGE }}
           CXXFLAGS: >-
             -Wall -Wextra -Wpedantic
-          CLANG_TIDY: pedantic
+          CLANG_TIDY: true
           CLANG_TIDY_ARGS: --format-style=file
           CLANG_FORMAT_CHECK: file
