@@ -16,7 +16,7 @@ repos:
         name: clang-format
         entry: clang-format-14
         language: system
-        files: \.(c|cc|cxx|cpp|frag|glsl|h|hpp|hxx|ih|ispc|ipp|java|js|m|proto|vert)$
+        files: \.(c|cc|cxx|cpp|h|hpp|hxx|)$
         args: ["-fallback-style=none", "-i"]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks

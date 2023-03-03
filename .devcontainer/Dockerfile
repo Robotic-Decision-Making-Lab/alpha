@@ -4,7 +4,6 @@ FROM ros:$ROS_DISTRO as core
 
 LABEL maintainer="Evan Palmer"
 LABEL maintainer-email="evanp922@gmail.com"
-LABEL license="MIT"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
