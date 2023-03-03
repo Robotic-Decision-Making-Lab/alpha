@@ -13,6 +13,9 @@ on:
       - reopened
   workflow_dispatch:
 
+env:
+  CLANG_TIDY: true
+
 jobs:
   test:
     name: Test Implementation
@@ -45,6 +48,5 @@ jobs:
           DOCKER_IMAGE: ghcr.io/evan-palmer/alpha:${{ matrix.env.IMAGE }}
           CXXFLAGS: >-
             -Wall -Wextra -Wpedantic -Wwrite-strings -Wunreachable-code -Wpointer-arith -Wredundant-decls
-          CLANG_TIDY: true
           CC: ${{ env.CLANG_TIDY && 'clang' }}
           CXX: ${{ env.CLANG_TIDY && 'clang++' }}
