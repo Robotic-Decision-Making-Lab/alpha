@@ -39,12 +39,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run ROS Industrial CI
-        id: rici
         uses: ros-industrial/industrial_ci@master
         env:
           DOCKER_IMAGE: ghcr.io/evan-palmer/alpha:${{ matrix.env.IMAGE }}
           CXXFLAGS: >-
             -Wall -Wextra -Wpedantic
-          CLANG_TIDY: true
+          CLANG_TIDY: pedantic
           CLANG_TIDY_ARGS: --format-style=file
           CLANG_FORMAT_CHECK: file

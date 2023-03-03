@@ -35,7 +35,7 @@ TEST(CobsTest, EncodesData)
 
 TEST(CobsTest, DecodesData)
 {
-  const std::vector<unsigned char> encoded_data = {0x02, 0x23, 0x03, 0xD4, 0x81, 0x02, 0xFA, 0x00};
+  const std::vector<unsigned char> encoded_data = {0x02, 0x2, 0x03, 0xD4, 0x81, 0x02, 0xFA, 0x00};
   const std::vector<unsigned char> decoded_data = {0x23, 0x00, 0xD4, 0x81, 0x00, 0xFA};
 
   ASSERT_THAT(alpha_driver::cobsDecode(encoded_data), ::testing::ElementsAreArray(decoded_data));
