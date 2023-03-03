@@ -18,8 +18,8 @@ The main features of the Alpha 5 driver are:
 ## Installation
 
 The Alpha 5 driver is currently supported on Linux, and is available for the ROS
-distributions Humble and Rolling. To install the Alpha 5 driver from source,
-first clone this project to the `src` directory of your ROS workspace.
+distributions Humble and Rolling. To install the Alpha 5 driver, first clone
+this project to the `src` directory of your ROS workspace.
 
 ```bash
 git clone -b $ROS_DISTRO git@github.com:evan-palmer/alpha.git
