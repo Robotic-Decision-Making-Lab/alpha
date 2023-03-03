@@ -46,3 +46,4 @@ jobs:
             -Wall -Wextra -Wpedantic
           CLANG_TIDY: true
           CLANG_TIDY_ARGS: --fix --fix-errors --format-style=file
+          BASEDIR: ${{ github.workspace }}/.work
