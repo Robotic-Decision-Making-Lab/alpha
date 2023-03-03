@@ -54,4 +54,3 @@ RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" \
     --event-handlers desktop_notification- status- \
     # Update /ros_entrypoint.sh to source the new workspace
     && sed -i "s#/opt/ros/\$ROS_DISTRO/setup.bash#$ROS_UNDERLAY/setup.sh#g" /ros_entrypoint.sh
-

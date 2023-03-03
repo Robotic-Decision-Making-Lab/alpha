@@ -3,7 +3,7 @@
     type="alpha_hardware::AlphaHardware"
     base_class_type="hardware_interface::SystemInterface">
     <description>
-      Reach Alpha manipulator plugin for ros2_control uisng a system hardware
+      Reach Alpha manipulator plugin for ros2_control using a system hardware
       interface-type.
     </description>
   </class>

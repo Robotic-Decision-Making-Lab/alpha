@@ -45,7 +45,7 @@ def generate_launch_description() -> LaunchDescription:
             default_value="alpha_description",
             description=(
                 "The description package with the Alpha URDF files. This is typically"
-                " not set, but is available incase another description package has"
+                " not set, but is available in case another description package has"
                 " been defined."
             ),
         ),

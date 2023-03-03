@@ -24,7 +24,7 @@ namespace alpha_driver
 {
 
 /**
- * @brief A unique identifer used to determine how to interpret the packet data.
+ * @brief A unique identifier used to determine how to interpret the packet data.
  */
 enum class PacketId : unsigned char
 {
