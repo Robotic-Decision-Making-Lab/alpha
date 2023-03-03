@@ -39,18 +39,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Clang-Tidy
-        uses: ros-tooling/action-ros-lint@v0.1
-        with:
-          container: ghcr.io/evan-palmer/alpha:${{ matrix.env.IMAGE }}
-          linter: clang_tidy
-          distribution: ${{ matrix.env.ROS_DISTRO }}
-          package-name: alpha
-          workspace-directory: outputs.ros-workspace-directory-name
-
       - name: Run ROS Industrial CI
         uses: ros-industrial/industrial_ci@master
         env:
           DOCKER_IMAGE: ghcr.io/evan-palmer/alpha:${{ matrix.env.IMAGE }}
           CXXFLAGS: >-
             -Wall -Wextra -Wpedantic -Wwrite-strings -Wunreachable-code -Wpointer-arith -Wredundant-decls
+          CXX: ${{ pedantic && 'clang++' }}
