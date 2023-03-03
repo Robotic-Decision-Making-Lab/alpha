@@ -17,6 +17,7 @@ jobs:
   test:
     name: Test Implementation
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
@@ -41,6 +42,7 @@ jobs:
       - name: Run Clang-Tidy
         uses: ros-tooling/action-ros-lint@v0.1
         with:
+          container: ghcr.io/evan-palmer/alpha:${{ matrix.env.IMAGE }}
           linter: clang_tidy
           distribution: ${{ matrix.env.ROS_DISTRO }}
           package-name: alpha
