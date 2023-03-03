@@ -16,10 +16,20 @@ The main features of the Alpha 5 driver are:
 
 ## Installation
 
-The Alpha 5 driver requires at least ROS 2 Humble and can be installed from source on a Linux machine. To install the Alpha 5 driver from source, clone this project to the `src` directory of your ROS 2 workspace:
+The Alpha 5 driver requires at least ROS 2 Humble and can be installed from
+source on a Linux machine. To install the Alpha 5 driver from source, clone
+this project to the `src` directory of your ROS 2 workspace:
 
 ```bash
 git clone git@github.com:evan-palmer/alpha.git
+```
+
+After cloning the project, install the ROS 2 dependencies using rosdep,
+replacing `<ROS_DISTRO>` with the desired ROS 2 distro:
+
+```bash
+rosdep update && \
+rosdep install -y --from-paths src --ignore-src --rosdistro <ROS_DISTRO>
 ```
 
 ## Quick start
