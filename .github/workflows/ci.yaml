@@ -23,7 +23,6 @@ jobs:
         env:
           - IMAGE: rolling-ci
             ROS_DISTRO: rolling
-            CLANG_TIDY: true
           - IMAGE: humble-ci
             ROS_DISTRO: humble
     steps:
@@ -39,11 +38,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: cpp-linter/cpp-linter-action@v2
-        id: linter
+      - name: Run Clang-Tidy
+        uses: ros-tooling/action-ros-lint@v0.1
         with:
-          style: ""
-          tidy-checks: ""
+          linter: clang_tidy
+          distribution: ${{ matrix.env.ROS_DISTRO }}
+          workspace-directory: outputs.ros-workspace-directory-name
 
       - name: Run ROS Industrial CI
         uses: ros-industrial/industrial_ci@master
