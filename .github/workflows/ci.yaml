@@ -45,4 +45,4 @@ jobs:
           CXXFLAGS: >-
             -Wall -Wextra -Wpedantic
           CLANG_TIDY: true
-          CLANG_TIDY_ARGS: --format-style=file
+          CLANG_TIDY_ARGS: --fix --fix-errors --format-style=file
