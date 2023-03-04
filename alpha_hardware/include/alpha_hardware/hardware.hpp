@@ -108,7 +108,7 @@ private:
    * @brief Asynchronously read the current state of the robot by polling the robot serial
    * interface.
    *
-   * @param freq The frequency (Hz) that the inteface should poll the current robot state at.
+   * @param freq The frequency (Hz) that the interface should poll the current robot state at.
    */
   void pollState(int freq) const;
 

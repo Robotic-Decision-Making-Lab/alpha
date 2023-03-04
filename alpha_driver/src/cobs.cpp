@@ -30,7 +30,7 @@ namespace alpha_driver
 std::vector<unsigned char> cobsEncode(const std::vector<unsigned char> & data)
 {
   // Initialize the encoded data with 0x00 prepended
-  // this will be overwritten once the count to the next 0x00 is detemined
+  // this will be overwritten once the count to the next 0x00 is determined
   std::vector<unsigned char> encoded_data = {0x00};
 
   int block_start = 0;
