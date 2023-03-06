@@ -1,0 +1,8 @@
+# ignore everything
+*
+
+# except the following
+!alpha_bringup
+!alpha_description
+!alpha_driver
+!alpha_hardware
