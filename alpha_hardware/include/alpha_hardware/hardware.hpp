@@ -112,10 +112,6 @@ private:
    */
   void pollState(int freq) const;
 
-  bool clampPositionToLimits(double position, alpha_driver::DeviceId) const;
-
-  bool clampVelocityToLimits(double velocity, alpha_driver::DeviceId) const;
-
   // Driver things
   alpha_driver::Driver driver_;
   std::thread state_request_worker_;
