@@ -1,5 +1,6 @@
 {
-  "dockerFile": "Dockerfile",
+  "dockerFile": ".docker/Dockerfile",
+  "context": ".",
   "build": {
     "args": {
       "WORKSPACE": "${containerWorkspaceFolder}",
@@ -31,6 +32,7 @@
           "*.srdf": "xml",
           "*.rviz": "yaml"
         },
+        "terminal.integrated.defaultProfile.linux": "bash",
         "files.insertFinalNewline": true,
         "files.trimTrailingWhitespace": true,
         "editor.formatOnSave": true,
@@ -56,7 +58,7 @@
         "C_Cpp.clang_format_fallbackStyle": "Google",
         "C_Cpp.codeAnalysis.clangTidy.enabled": true,
         "C_Cpp.codeAnalysis.clangTidy.runAutomatically": true,
-        "clang-format.executable": "/usr/bin/clang-format",
+        "clang-format.executable": "/usr/bin/clang-format-14",
         "[cpp]": {
           "editor.rulers": [100],
           "editor.tabSize": 2,
@@ -80,10 +82,10 @@
           "editor.defaultFormatter": "esbenp.prettier-vscode"
         },
         "[xml]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
+          "editor.defaultFormatter": "redhat.vscode-xml"
         },
         "[yaml]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
+          "editor.defaultFormatter": "redhat.vscode-yaml"
         },
         "[markdown]": {
           "editor.rulers": [80],
@@ -101,12 +103,15 @@
         "njpwerner.autodocstring",
         "cschlosser.doxdocgen",
         "ms-vscode.cpptools",
+        "redhat.vscode-xml",
+        "redhat.vscode-yaml",
         "josetr.cmake-language-support-vscode",
         "smilerobotics.urdf",
         "DavidAnson.vscode-markdownlint",
         "esbenp.prettier-vscode",
         "xaver.clang-format",
-        "ms-python.isort"
+        "ms-python.isort",
+        "ms-python.flake8"
       ]
     }
   }
