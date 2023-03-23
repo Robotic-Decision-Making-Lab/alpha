@@ -15,7 +15,7 @@ The main features of the Alpha 5 driver are:
 
 - Integration of the [Reach System Serial Protocol](https://reach-robotics.github.io/reach_robotics_sdk/documentation/index.html#)
   for hardware communication
-- `ros2_control` integration for manipulator position, velocity, and joint
+- ros2_control integration for manipulator position, velocity, and joint
   trajectory control
 - Visualization support using RViz2
 - Integration with MoveIt2 for motion planning
@@ -64,4 +64,7 @@ contributing to this project, please ask a question on our
 
 ## License
 
-The Alpha 5 ROS 2 driver is released under the MIT license.
+Any proprietary documents or software owned by Reach Robotics and used within
+this project are made available with official permission from Reach
+Robotics and have been documented accordingly. All other software is is released
+under the MIT license.
