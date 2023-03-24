@@ -29,8 +29,6 @@ body:
     label: Documentation Location
     description: >
       Please provide the location of the documentation that should be modified.
-  validations:
-    required: true
 
 - type: textarea
   attributes:
