@@ -45,6 +45,6 @@ body:
     label: Suggested Change
     description: >
       Please provide a description of the proposed change and why the proposed change
-      improves the upon existing documentation.
+      improves the upon the existing documentation.
   validations:
     required: true
