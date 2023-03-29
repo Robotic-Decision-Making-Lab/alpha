@@ -22,7 +22,7 @@
 
 #include "alpha_driver/crc.hpp"
 
-namespace alpha_driver_test
+namespace alpha::driver::test
 {
 
 TEST(CrcTest, CalculatesReachCrc)
@@ -30,10 +30,10 @@ TEST(CrcTest, CalculatesReachCrc)
   const std::vector<unsigned char> message = {0xFF, 0x12, 0xAD, 0x23, 0x56};
   const unsigned char expected_crc = 0xF3;
 
-  EXPECT_EQ(alpha_driver::calculateReachCrc8(message), expected_crc);
+  EXPECT_EQ(alpha::driver::calculateReachCrc8(message), expected_crc);
 }
 
-}  // namespace alpha_driver_test
+}  // namespace alpha::driver::test
 
 int main(int argc, char ** argv)
 {

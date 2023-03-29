@@ -30,7 +30,7 @@
 #include "alpha_driver/packet.hpp"
 #include "alpha_driver/packet_id.hpp"
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 class SerialClient
@@ -112,4 +112,4 @@ private:
   std::thread rx_worker_;
 };
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver

@@ -20,7 +20,7 @@
 
 #pragma once
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 /**
@@ -35,4 +35,4 @@ enum class Mode : unsigned char
   kCurrent = 0x04,
 };
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver

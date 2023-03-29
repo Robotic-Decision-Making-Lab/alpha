@@ -24,7 +24,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 /**
@@ -125,4 +125,4 @@ unsigned char calculateCrc8(
  */
 unsigned char calculateReachCrc8(const std::vector<unsigned char> & data);
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver

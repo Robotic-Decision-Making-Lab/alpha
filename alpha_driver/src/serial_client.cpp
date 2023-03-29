@@ -36,7 +36,7 @@
 
 using namespace std::chrono_literals;
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 void SerialClient::connect(const std::string & device, const int polling_timeout_ms)
@@ -198,4 +198,4 @@ void SerialClient::poll() const
   }
 }
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver

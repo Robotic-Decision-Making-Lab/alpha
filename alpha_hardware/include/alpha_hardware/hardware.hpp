@@ -40,7 +40,7 @@
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 
-namespace alpha_hardware
+namespace alpha::hardware
 {
 
 class AlphaHardware : public hardware_interface::SystemInterface
@@ -94,7 +94,7 @@ private:
    *
    * @param packet The position packet that signaled the callback.
    */
-  void updatePositionCb(const alpha_driver::Packet & packet);
+  void updatePositionCb(const alpha::driver::Packet & packet);
 
   /**
    * @brief Write the current velocity of the robot received from the serial client to the
@@ -102,7 +102,7 @@ private:
    *
    * @param packet The velocity packet that signaled the callback.
    */
-  void updateVelocityCb(const alpha_driver::Packet & packet);
+  void updateVelocityCb(const alpha::driver::Packet & packet);
 
   /**
    * @brief Asynchronously read the current state of the robot by polling the robot serial
@@ -113,7 +113,7 @@ private:
   void pollState(int freq) const;
 
   // Driver things
-  alpha_driver::Driver driver_;
+  alpha::driver::Driver driver_;
   std::thread state_request_worker_;
   std::atomic<bool> running_{false};
 
@@ -133,4 +133,4 @@ private:
   std::mutex access_async_states_;
 };
 
-}  // namespace alpha_hardware
+}  // namespace alpha::hardware
