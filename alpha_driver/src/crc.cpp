@@ -20,7 +20,7 @@
 
 #include "alpha_driver/crc.hpp"
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 unsigned char reflect(std::uint64_t data, int size)
@@ -74,4 +74,4 @@ unsigned char calculateReachCrc8(const std::vector<unsigned char> & data)
     data, kInitialValue, kFinalXorValue, kInputReflected, kResultReflected, kCrc8LookupTable);
 }
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver

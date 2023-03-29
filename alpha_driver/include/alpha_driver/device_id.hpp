@@ -20,7 +20,7 @@
 
 #pragma once
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 /**
@@ -36,4 +36,4 @@ enum class DeviceId : unsigned char
   kAllJoints = 0xFF,
 };
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver

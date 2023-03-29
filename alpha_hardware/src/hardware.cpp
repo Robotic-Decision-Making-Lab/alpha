@@ -31,7 +31,7 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-namespace alpha_hardware
+namespace alpha::hardware
 {
 
 hardware_interface::CallbackReturn AlphaHardware::on_init(
@@ -132,11 +132,11 @@ hardware_interface::CallbackReturn AlphaHardware::on_configure(const rclcpp_life
 
   // Register callbacks for joint states
   driver_.subscribe(
-    alpha_driver::PacketId::kPosition,
+    alpha::driver::PacketId::kPosition,
     std::bind(&AlphaHardware::updatePositionCb, this, std::placeholders::_1));
 
   driver_.subscribe(
-    alpha_driver::PacketId::kVelocity,
+    alpha::driver::PacketId::kVelocity,
     std::bind(&AlphaHardware::updateVelocityCb, this, std::placeholders::_1));
 
   // Start a thread to request state updates
@@ -199,7 +199,7 @@ hardware_interface::return_type AlphaHardware::perform_command_mode_switch(
 {
   // The Alpha arm takes care of most of the mode switching for us. To make things a bit safer
   // though, we stop the robot before switching command modes
-  driver_.setVelocity(0, alpha_driver::DeviceId::kAllJoints);
+  driver_.setVelocity(0, alpha::driver::DeviceId::kAllJoints);
 
   return hardware_interface::return_type::OK;
 }
@@ -235,7 +235,7 @@ std::vector<hardware_interface::CommandInterface> AlphaHardware::export_command_
 hardware_interface::CallbackReturn AlphaHardware::on_activate(const rclcpp_lifecycle::State &)
 {
   try {
-    driver_.setMode(alpha_driver::Mode::kStandby, alpha_driver::DeviceId::kAllJoints);
+    driver_.setMode(alpha::driver::Mode::kStandby, alpha::driver::DeviceId::kAllJoints);
   }
   catch (const std::exception & e) {
     RCLCPP_ERROR(rclcpp::get_logger("AlphaHardware"), e.what());  // NOLINT
@@ -248,7 +248,7 @@ hardware_interface::CallbackReturn AlphaHardware::on_activate(const rclcpp_lifec
 hardware_interface::CallbackReturn AlphaHardware::on_deactivate(const rclcpp_lifecycle::State &)
 {
   try {
-    driver_.setMode(alpha_driver::Mode::kDisable, alpha_driver::DeviceId::kAllJoints);
+    driver_.setMode(alpha::driver::Mode::kDisable, alpha::driver::DeviceId::kAllJoints);
   }
   catch (const std::exception & e) {
     RCLCPP_ERROR(rclcpp::get_logger("AlphaHardware"), e.what());  // NOLINT
@@ -280,11 +280,11 @@ hardware_interface::return_type AlphaHardware::write(const rclcpp::Time &, const
       case ControlMode::kPosition:
         if (!std::isnan(hw_commands_positions_[i])) {
           // Get the target device
-          const auto target_device = static_cast<alpha_driver::DeviceId>(i + 1);
+          const auto target_device = static_cast<alpha::driver::DeviceId>(i + 1);
 
           // Get the target position; if the command is for the jaws, then convert from m to mm
           const double target_position =
-            static_cast<alpha_driver::DeviceId>(i + 1) == alpha_driver::DeviceId::kLinearJaws
+            static_cast<alpha::driver::DeviceId>(i + 1) == alpha::driver::DeviceId::kLinearJaws
               ? hw_commands_positions_[i] * 1000
               : hw_commands_positions_[i];
           driver_.setPosition(target_position, target_device);
@@ -293,11 +293,11 @@ hardware_interface::return_type AlphaHardware::write(const rclcpp::Time &, const
       case ControlMode::kVelocity:
         if (!std::isnan(hw_commands_velocities_[i])) {
           // Get the target device
-          const auto target_device = static_cast<alpha_driver::DeviceId>(i + 1);
+          const auto target_device = static_cast<alpha::driver::DeviceId>(i + 1);
 
           // Get the target velocity; if the command is for the jaws, then convert from m/s to mm/s
           const double target_velocity =
-            static_cast<alpha_driver::DeviceId>(i + 1) == alpha_driver::DeviceId::kLinearJaws
+            static_cast<alpha::driver::DeviceId>(i + 1) == alpha::driver::DeviceId::kLinearJaws
               ? hw_commands_velocities_[i] * 1000
               : hw_commands_velocities_[i];
 
@@ -312,7 +312,7 @@ hardware_interface::return_type AlphaHardware::write(const rclcpp::Time &, const
   return hardware_interface::return_type::OK;
 }
 
-void AlphaHardware::updatePositionCb(const alpha_driver::Packet & packet)
+void AlphaHardware::updatePositionCb(const alpha::driver::Packet & packet)
 {
   if (packet.getData().size() != 4) {
     return;
@@ -323,7 +323,7 @@ void AlphaHardware::updatePositionCb(const alpha_driver::Packet & packet)
 
   // Convert from mm to m if the message is from the jaws
   position =
-    packet.getDeviceId() == alpha_driver::DeviceId::kLinearJaws ? position / 1000 : position;
+    packet.getDeviceId() == alpha::driver::DeviceId::kLinearJaws ? position / 1000 : position;
 
   const std::lock_guard<std::mutex> lock(access_async_states_);
 
@@ -331,7 +331,7 @@ void AlphaHardware::updatePositionCb(const alpha_driver::Packet & packet)
   async_states_positions_[static_cast<std::size_t>(packet.getDeviceId()) - 1] = position;
 }
 
-void AlphaHardware::updateVelocityCb(const alpha_driver::Packet & packet)
+void AlphaHardware::updateVelocityCb(const alpha::driver::Packet & packet)
 {
   if (packet.getData().size() != 4) {
     return;
@@ -342,7 +342,7 @@ void AlphaHardware::updateVelocityCb(const alpha_driver::Packet & packet)
 
   // Convert from mm/s to m/s if the message is from the jaws
   velocity =
-    packet.getDeviceId() == alpha_driver::DeviceId::kLinearJaws ? velocity / 1000 : velocity;
+    packet.getDeviceId() == alpha::driver::DeviceId::kLinearJaws ? velocity / 1000 : velocity;
 
   const std::lock_guard<std::mutex> lock(access_async_states_);
 
@@ -360,23 +360,25 @@ void AlphaHardware::pollState(const int freq) const
     //   2. Yes, we could also create a request with multiple packet IDs, but, again, there are
     //      bugs in the serial communication when that is used. Specifically, data is more likely
     //      to become corrupted, resulting in bad reads. So instead we just request them separately.
-    driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kLinearJaws);
-    driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kRotateEndEffector);
-    driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kBendElbow);
-    driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kBendShoulder);
-    driver_.request(alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kRotateBase);
+    driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kLinearJaws);
+    driver_.request(
+      alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kRotateEndEffector);
+    driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kBendElbow);
+    driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kBendShoulder);
+    driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kRotateBase);
 
-    driver_.request(alpha_driver::PacketId::kPosition, alpha_driver::DeviceId::kLinearJaws);
-    driver_.request(alpha_driver::PacketId::kPosition, alpha_driver::DeviceId::kRotateEndEffector);
-    driver_.request(alpha_driver::PacketId::kPosition, alpha_driver::DeviceId::kBendElbow);
-    driver_.request(alpha_driver::PacketId::kPosition, alpha_driver::DeviceId::kBendShoulder);
-    driver_.request(alpha_driver::PacketId::kPosition, alpha_driver::DeviceId::kRotateBase);
+    driver_.request(alpha::driver::PacketId::kPosition, alpha::driver::DeviceId::kLinearJaws);
+    driver_.request(
+      alpha::driver::PacketId::kPosition, alpha::driver::DeviceId::kRotateEndEffector);
+    driver_.request(alpha::driver::PacketId::kPosition, alpha::driver::DeviceId::kBendElbow);
+    driver_.request(alpha::driver::PacketId::kPosition, alpha::driver::DeviceId::kBendShoulder);
+    driver_.request(alpha::driver::PacketId::kPosition, alpha::driver::DeviceId::kRotateBase);
 
     std::this_thread::sleep_for(std::chrono::seconds(1 / freq));
   }
 }
 
-}  // namespace alpha_hardware
+}  // namespace alpha::hardware
 
 #include "pluginlib/class_list_macros.hpp"
-PLUGINLIB_EXPORT_CLASS(alpha_hardware::AlphaHardware, hardware_interface::SystemInterface)
+PLUGINLIB_EXPORT_CLASS(alpha::hardware::AlphaHardware, hardware_interface::SystemInterface)

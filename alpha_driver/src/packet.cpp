@@ -28,7 +28,7 @@
 #include "alpha_driver/cobs.hpp"
 #include "alpha_driver/crc.hpp"
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 Packet::Packet(PacketId packet_id, DeviceId device_id, std::vector<unsigned char> data)
@@ -112,4 +112,4 @@ DeviceId Packet::getDeviceId() const { return device_id_; }
 
 std::vector<unsigned char> Packet::getData() const { return data_; }
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver

@@ -1,6 +1,6 @@
 <library path="alpha_hardware">
   <class name="alpha_hardware/AlphaHardware"
-    type="alpha_hardware::AlphaHardware"
+    type="alpha::hardware::AlphaHardware"
     base_class_type="hardware_interface::SystemInterface">
     <description>
       Reach Alpha manipulator plugin for ros2_control using a system hardware

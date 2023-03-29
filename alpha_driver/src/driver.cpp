@@ -28,7 +28,7 @@
 
 using namespace std::chrono_literals;
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 Driver::Driver()
@@ -169,7 +169,7 @@ void Driver::enableHeartbeat(int freq)
 {
   // We request the model number as the heartbeat because there isn't an official heartbeat message
   const std::vector<unsigned char> heartbeat_config = {
-    static_cast<unsigned char>(alpha_driver::PacketId::kModelNumber)};
+    static_cast<unsigned char>(alpha::driver::PacketId::kModelNumber)};
 
   const Packet packet(PacketId::kHeartbeatSet, DeviceId::kAllJoints, heartbeat_config);
 
@@ -217,4 +217,4 @@ void Driver::monitorHeartbeat(int heartbeat_timeout) const
   }
 }
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver
