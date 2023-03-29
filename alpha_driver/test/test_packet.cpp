@@ -25,21 +25,21 @@
 #include "alpha_driver/packet_id.hpp"
 #include "alpha_driver/serial_client.hpp"
 
-namespace test_alpha_driver
+namespace alpha::driver::test
 {
 
 TEST(PacketTest, TestPacketEncode)
 {
   const std::vector<unsigned char> data = {
-    static_cast<unsigned char>(alpha_driver::PacketId::kPosition)};
+    static_cast<unsigned char>(alpha::driver::PacketId::kPosition)};
 
   // Create an encoded test packet using the Reach structure based off of the test
   // data
   const std::vector<unsigned char> expected_encoding = {0x06, 0x03, 0x60, 0x01, 0x05, 0x52, 0x00};
 
   // Construct a new packet using the data and the expected IDs
-  auto packet = alpha_driver::Packet(
-    alpha_driver::PacketId::kRequest, alpha_driver::DeviceId::kLinearJaws, data);
+  auto packet = alpha::driver::Packet(
+    alpha::driver::PacketId::kRequest, alpha::driver::DeviceId::kLinearJaws, data);
 
   ASSERT_THAT(packet.encode(), ::testing::ElementsAreArray(expected_encoding));
 }
@@ -51,7 +51,7 @@ TEST(PacketTest, TestPacketDecode)
 
   const std::vector<unsigned char> decoded_data = {0x01, 0x02, 0x03, 0x04};
 
-  const alpha_driver::Packet packet = alpha_driver::Packet::decode(encoded_data);
+  const alpha::driver::Packet packet = alpha::driver::Packet::decode(encoded_data);
 
   ASSERT_THAT(packet.getData(), ::testing::ElementsAreArray(decoded_data));
 }
@@ -61,7 +61,7 @@ TEST(PacketTest, TestInvalidDecoding)
   const std::vector<unsigned char> decoded_data = {0x01, 0x02, 0x03, 0x04};
 
   // Cannot decoded data that has already been decoded
-  ASSERT_THROW(alpha_driver::Packet::decode(decoded_data), std::runtime_error);
+  ASSERT_THROW(alpha::driver::Packet::decode(decoded_data), std::runtime_error);
 }
 
 TEST(PacketTest, TestInvalidPacketConstruction)
@@ -69,12 +69,12 @@ TEST(PacketTest, TestInvalidPacketConstruction)
   const std::vector<unsigned char> empty_data = {};
 
   ASSERT_THROW(
-    alpha_driver::Packet(
-      alpha_driver::PacketId::kVelocity, alpha_driver::DeviceId::kAllJoints, empty_data),
+    alpha::driver::Packet(
+      alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kAllJoints, empty_data),
     std::invalid_argument);
 }
 
-}  // namespace test_alpha_driver
+}  // namespace alpha::driver::test
 
 int main(int argc, char ** argv)
 {

@@ -25,7 +25,7 @@
 #include "alpha_driver/device_id.hpp"
 #include "alpha_driver/packet_id.hpp"
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 class Packet
@@ -85,4 +85,4 @@ private:
   std::vector<unsigned char> data_;
 };
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver

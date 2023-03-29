@@ -20,7 +20,7 @@
 
 #pragma once
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 /**
@@ -62,4 +62,4 @@ enum class PacketId : unsigned char
   kVoltageThresholdParameters = 0x99,
 };
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver

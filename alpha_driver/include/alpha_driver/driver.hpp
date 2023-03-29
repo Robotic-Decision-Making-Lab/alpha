@@ -32,7 +32,7 @@
 #include "alpha_driver/packet_id.hpp"
 #include "alpha_driver/serial_client.hpp"
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 class Driver
@@ -213,4 +213,4 @@ private:
   std::chrono::time_point<std::chrono::steady_clock> last_heartbeat_;
 };
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver

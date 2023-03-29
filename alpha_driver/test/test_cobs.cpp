@@ -22,7 +22,7 @@
 
 #include "alpha_driver/cobs.hpp"
 
-namespace alpha_driver_test
+namespace alpha::driver::test
 {
 
 TEST(CobsTest, EncodesData)
@@ -30,7 +30,7 @@ TEST(CobsTest, EncodesData)
   const std::vector<unsigned char> data = {0x23, 0x00, 0xD4, 0x81, 0x00, 0xFA};
   const std::vector<unsigned char> encoded_data = {0x02, 0x23, 0x03, 0xD4, 0x81, 0x02, 0xFA, 0x00};
 
-  ASSERT_THAT(alpha_driver::cobsEncode(data), ::testing::ElementsAreArray(encoded_data));
+  ASSERT_THAT(alpha::driver::cobsEncode(data), ::testing::ElementsAreArray(encoded_data));
 }
 
 TEST(CobsTest, DecodesData)
@@ -38,10 +38,10 @@ TEST(CobsTest, DecodesData)
   const std::vector<unsigned char> encoded_data = {0x02, 0x23, 0x03, 0xD4, 0x81, 0x02, 0xFA, 0x00};
   const std::vector<unsigned char> decoded_data = {0x23, 0x00, 0xD4, 0x81, 0x00, 0xFA};
 
-  ASSERT_THAT(alpha_driver::cobsDecode(encoded_data), ::testing::ElementsAreArray(decoded_data));
+  ASSERT_THAT(alpha::driver::cobsDecode(encoded_data), ::testing::ElementsAreArray(decoded_data));
 }
 
-}  // namespace alpha_driver_test
+}  // namespace alpha::driver::test
 
 int main(int argc, char ** argv)
 {

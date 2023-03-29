@@ -22,7 +22,7 @@
 
 #include <vector>
 
-namespace alpha_driver
+namespace alpha::driver
 {
 
 /**
@@ -47,4 +47,4 @@ std::vector<unsigned char> cobsEncode(const std::vector<unsigned char> & data);
  */
 std::vector<unsigned char> cobsDecode(const std::vector<unsigned char> & data);
 
-}  // namespace alpha_driver
+}  // namespace alpha::driver
