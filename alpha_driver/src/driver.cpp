@@ -33,8 +33,10 @@ namespace alpha::driver
 
 Driver::Driver()
 {
-  subscribe(
-    PacketId::kModelNumber, std::bind(&Driver::updateLastHeartbeatCb, this, std::placeholders::_1));
+  subscribe(PacketId::kModelNumber, [this](const Packet &) -> void {
+    const std::lock_guard<std::mutex> lock(last_heartbeat_lock_);
+    last_heartbeat_ = std::chrono::steady_clock::now();
+  });
 }
 
 void Driver::start(const std::string & serial_port, int heartbeat_timeout)
@@ -185,12 +187,6 @@ void Driver::setHeartbeatFreq(int freq)
   const std::vector<unsigned char> heartbeat_frequency = {static_cast<unsigned char>(freq)};
   const Packet packet(PacketId::kHeartbeatFreqency, DeviceId::kAllJoints, heartbeat_frequency);
   client_.send(packet);
-}
-
-void Driver::updateLastHeartbeatCb(const Packet &)
-{
-  const std::lock_guard<std::mutex> lock(last_heartbeat_lock_);
-  last_heartbeat_ = std::chrono::steady_clock::now();
 }
 
 void Driver::monitorHeartbeat(int heartbeat_timeout) const

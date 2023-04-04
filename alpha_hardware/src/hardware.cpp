@@ -133,11 +133,11 @@ hardware_interface::CallbackReturn AlphaHardware::on_configure(const rclcpp_life
   // Register callbacks for joint states
   driver_.subscribe(
     alpha::driver::PacketId::kPosition,
-    std::bind(&AlphaHardware::updatePositionCb, this, std::placeholders::_1));
+    [this](const alpha::driver::Packet & packet) -> void { updatePositionCb(packet); });
 
   driver_.subscribe(
     alpha::driver::PacketId::kVelocity,
-    std::bind(&AlphaHardware::updateVelocityCb, this, std::placeholders::_1));
+    [this](const alpha::driver::Packet & packet) -> void { updateVelocityCb(packet); });
 
   // Start a thread to request state updates
   running_.store(true);
