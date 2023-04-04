@@ -4,12 +4,15 @@ FROM ros:$ROS_DISTRO-ros-base as ci
 LABEL maintainer="Evan Palmer"
 LABEL maintainer-email="evanp922@gmail.com"
 
+ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /root/ws_alpha
 
 COPY . src/alpha
 
-# Install the core apt packages
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install apt packages
+RUN apt-get -q update \
+    && apt-get -q -y upgrade \
+    && apt-get -q install --no-install-recommends -y \
     git \
     wget \
     curl \
@@ -24,10 +27,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install the alpha ROS dependencies
-RUN apt-get update \
+RUN apt-get -q update \
+    && apt-get -q -y upgrade \
     && rosdep update \
-    && DEBIAN_FRONTEND=noninteractive \
-    rosdep install -y --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} --as-root=apt:false \
+    && rosdep install -y --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} --as-root=apt:false \
     && rm -rf src \
     && apt-get autoremove -y \
     && apt-get clean -y \
@@ -35,22 +38,23 @@ RUN apt-get update \
 
 FROM ci as source
 
+ENV DEBIAN_FRONTEND=noninteractive
 ENV ROS_UNDERLAY /root/ws_alpha/install
 WORKDIR $ROS_UNDERLAY/..
 
 COPY . src/alpha
 
-RUN apt-get update \
+RUN apt-get -q update \
+    && apt-get -q -y upgrade \
     && rosdep update \
-    && DEBIAN_FRONTEND=noninteractive \
-    rosdep install -y --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} --as-root=apt:false \
+    && rosdep install -y --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} --as-root=apt:false \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" \
     && colcon build \
-    --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
     --ament-cmake-args -DCMAKE_BUILD_TYPE=Release \
     --event-handlers desktop_notification- status- \
     # Update /ros_entrypoint.sh to source the new workspace
@@ -58,22 +62,25 @@ RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" \
 
 FROM ci as develop
 
+ENV DEBIAN_FRONTEND=noninteractive
 ENV ROS_UNDERLAY /root/ws_alpha/install
 WORKDIR $ROS_UNDERLAY/..
 
 COPY . src/alpha
 
-RUN apt-get update \
+RUN apt-get -q update \
+    && apt-get -q -y upgrade \
     && rosdep update \
-    && DEBIAN_FRONTEND=noninteractive \
-    rosdep install -y --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} --as-root=apt:false \
+    && rosdep install -y --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} --as-root=apt:false \
     && rm -rf src \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install development tools
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get -q update \
+    && apt-get -q -y upgrade \
+    && apt-get -q install --no-install-recommends -y \
     python3-dev \
     python3-pip \
     iputils-ping \
