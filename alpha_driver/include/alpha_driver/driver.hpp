@@ -188,11 +188,6 @@ private:
   void setHeartbeatFreq(int freq);
 
   /**
-   * @brief Update the timestamp to indicate that a heartbeat was received.
-   */
-  void updateLastHeartbeatCb(const Packet &);
-
-  /**
    * @brief Monitor the latest heartbeat timestamp to determine whether or not the connection has
    * timed out.
    *
