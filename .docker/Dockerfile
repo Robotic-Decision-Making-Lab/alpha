@@ -54,7 +54,7 @@ RUN apt-get -q update \
 
 RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" \
     && colcon build \
-    --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
     --ament-cmake-args -DCMAKE_BUILD_TYPE=Release \
     --event-handlers desktop_notification- status- \
     # Update /ros_entrypoint.sh to source the new workspace
