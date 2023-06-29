@@ -19,7 +19,6 @@ The main features of the Alpha 5 driver are:
   trajectory control
 - Visualization support using RViz2
 - Integration with MoveIt2 for motion planning
-- Gazebo support for kinematic simulation
 
 ## Installation
 

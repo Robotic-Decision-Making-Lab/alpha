@@ -29,7 +29,7 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY config meshes moveit2 ros2_control rviz srdf urdf gazebo
+  DIRECTORY config meshes moveit2 ros2_control rviz srdf urdf
   DESTINATION share/${PROJECT_NAME}
 )
 
