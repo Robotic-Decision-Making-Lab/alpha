@@ -243,7 +243,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             {"use_sim_time": use_sim},
         ],
-        condition=UnlessCondition(use_sim)
+        condition=UnlessCondition(use_sim),
     )
 
     robot_state_pub_node = Node(
@@ -274,7 +274,7 @@ def generate_launch_description() -> LaunchDescription:
             [namespace, "controller_manager"],
         ],
         condition=IfCondition(use_planning),
-        parameters=[{"use_sim_time": use_sim}]
+        parameters=[{"use_sim_time": use_sim}],
     )
 
     robot_controller_spawner = Node(
@@ -286,7 +286,7 @@ def generate_launch_description() -> LaunchDescription:
             [namespace, "controller_manager"],
         ],
         condition=UnlessCondition(use_planning),
-        parameters=[{"use_sim_time": use_sim}]
+        parameters=[{"use_sim_time": use_sim}],
     )
 
     gz_spawner = Node(
@@ -382,7 +382,7 @@ def generate_launch_description() -> LaunchDescription:
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_moveit_controller_spawners_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawners_after_joint_state_broadcaster_spawner,
-        delay_joint_state_broadcaster_spawner_after_spawn_entity
+        delay_joint_state_broadcaster_spawner_after_spawn_entity,
     ]
 
     # Integrate additional launch files
