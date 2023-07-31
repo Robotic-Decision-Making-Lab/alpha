@@ -39,7 +39,7 @@
   <!-- Include Gazebo requirements -->
   <xacro:if value="${use_sim}">
     <xacro:include filename="$(find ${description_package})/xacro/alpha.gazebo.xacro" />
-    <xacro:angler_gazebo prefix="${prefix}" description_package="${description_package}"
+    <xacro:alpha_gazebo prefix="${prefix}" description_package="${description_package}"
       namespace="$(arg namespace)"
       controllers_file="$(arg controllers_file)" />
   </xacro:if>
