@@ -118,7 +118,7 @@ def generate_launch_description() -> LaunchDescription:
                     [
                         FindPackageShare(description_package),
                         "moveit2",
-                        "config.srdf.xacro",
+                        "alpha.config.srdf.xacro",
                     ]
                 ),
                 " ",

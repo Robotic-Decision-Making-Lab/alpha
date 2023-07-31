@@ -58,7 +58,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             "description_file",
-            default_value="config.xacro",
+            default_value="alpha_platform.config.xacro",
             description="The URDF/XACRO description file with the Alpha.",
         ),
         DeclareLaunchArgument(

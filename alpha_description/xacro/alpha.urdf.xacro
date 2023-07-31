@@ -224,7 +224,6 @@
       <xacro:insert_block name="origin" />
       <parent link="${parent}" />
       <child link="${prefix}base_link" />
-      <xacro:insert_block name="origin" />
     </joint>
 
     <joint name="${prefix}base_link_joint" type="fixed">

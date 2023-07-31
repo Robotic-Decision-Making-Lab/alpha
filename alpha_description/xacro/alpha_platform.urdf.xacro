@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<robot name="alpha_platform_urdf" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="alpha_platform_urdf" params="parent prefix description_package *origin">
+
+    <!-- Define a base platform for the alpha -->
+    <link name="${prefix}platform">
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <box size="0.3 0.3 0.1" />
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.3 0.3 0.01" />
+        </geometry>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+      </collision>
+    </link>
+
+    <link name="${prefix}base_footprint" />
+
+    <joint name="${prefix}platform_base_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}" />
+      <child link="${prefix}platform" />
+    </joint>
+
+    <joint name="${prefix}platform_joint" type="fixed">
+      <origin rpy="0 0 0" xyz="0.05 0 0.07" />
+      <parent link="${prefix}platform" />
+      <child link="${prefix}base_footprint" />
+    </joint>
+
+    <xacro:include filename="$(find ${description_package})/xacro/alpha.urdf.xacro" />
+
+    <xacro:alpha_urdf parent="${prefix}base_footprint" prefix="${prefix}"
+      description_package="${description_package}">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:alpha_urdf>
+
+  </xacro:macro>
+
+</robot>
