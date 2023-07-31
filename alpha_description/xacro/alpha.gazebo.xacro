@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="angler_gazebo"
+    params="
+      prefix
+      description_package
+      namespace
+      controllers_file">
+
+    <!-- ros2_control -->
+    <gazebo>
+      <plugin filename="gz_ros2_control-system"
+        name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <xacro:if value="${namespace != '/'}">
+          <ros>
+            <namespace>/${namespace[:-1]}</namespace>
+          </ros>
+          <robot_param_node>/${namespace}robot_state_publisher</robot_param_node>
+        </xacro:if>
+        <parameters>$(find ${description_package})/config/${controllers_file}</parameters>
+      </plugin>
+    </gazebo>
+
+    <!-- Materials -->
+    <gazebo reference="${prefix}alpha_base_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}alpha_ee_base_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}alpha_m1_link" />
+    <gazebo reference="${prefix}alpha_m1_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}alpha_m2_1_1_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}alpha_m2_1_2_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}alpha_m2_joint_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}alpha_m3_inline_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}alpha_push_rod">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}alpha_standard_jaws_base_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}alpha_standard_jaws_rs1_130_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+    <gazebo reference="${prefix}alpha_standard_jaws_rs1_139_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+
+  </xacro:macro>
+
+</robot>

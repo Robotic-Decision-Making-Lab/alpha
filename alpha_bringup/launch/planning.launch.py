@@ -77,12 +77,18 @@ def generate_launch_description() -> LaunchDescription:
             default_value="true",
             description="Automatically start RViz2.",
         ),
+        DeclareLaunchArgument(
+            "use_sim",
+            default_value="false",
+            description="Start the Gazebo simulation.",
+        ),
     ]
 
     # Initialize Arguments
     description_package = LaunchConfiguration("description_package")
     description_file = LaunchConfiguration("description_file")
     use_rviz = LaunchConfiguration("use_rviz")
+    use_sim = LaunchConfiguration("use_sim")
     prefix = LaunchConfiguration("prefix")
     namespace = LaunchConfiguration("namespace")
 
@@ -93,7 +99,7 @@ def generate_launch_description() -> LaunchDescription:
                 PathJoinSubstitution([FindExecutable(name="xacro")]),
                 " ",
                 PathJoinSubstitution(
-                    [FindPackageShare(description_package), "config", description_file]
+                    [FindPackageShare(description_package), "xacro", description_file]
                 ),
                 " ",
                 "prefix:=",
@@ -111,8 +117,8 @@ def generate_launch_description() -> LaunchDescription:
                 PathJoinSubstitution(
                     [
                         FindPackageShare(description_package),
-                        "config",
-                        "alpha.config.srdf.xacro",
+                        "moveit2",
+                        "config.srdf.xacro",
                     ]
                 ),
                 " ",
@@ -205,6 +211,7 @@ def generate_launch_description() -> LaunchDescription:
             moveit_controllers,
             ompl_planning_config,
             planning_scene_monitor_parameters,
+            {"use_sim_time": use_sim},
         ],
     )
 
@@ -227,6 +234,7 @@ def generate_launch_description() -> LaunchDescription:
             robot_description_kinematics,
             planning_pipelines_config,
             ompl_planning_config,
+            {"use_sim_time": use_sim},
         ],
         condition=IfCondition(use_rviz),
     )
