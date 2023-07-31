@@ -3,7 +3,7 @@
 The Alpha 5 driver is a collection of ROS 2 packages designed
 to support ROS 2 integration with the [Reach Alpha 5 manipulator](https://reachrobotics.com/products/manipulators/reach-alpha/).
 
-## Disclaimer :warning:
+## :warning: Disclaimer :warning:
 
 This is an independent project, and is not affiliated with or maintained by
 Reach Robotics. Please refer to the [Reach Robotics SDK](https://github.com/Reach-Robotics/reach_robotics_sdk/tree/master)
@@ -17,6 +17,7 @@ The main features of the Alpha 5 driver are:
   for hardware communication
 - ros2_control integration for manipulator position, velocity, and joint
   trajectory control
+- Simulation support using Gazebo Garden
 - Visualization support using RViz2
 - Integration with MoveIt2 for motion planning
 

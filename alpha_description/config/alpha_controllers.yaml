@@ -2,22 +2,42 @@ controller_manager:
   ros__parameters:
     update_rate: 225 # Hz
 
-    # Controllers for use with MoveIt
-    feedback_joint_trajectory_controller:
-      type: joint_trajectory_controller/JointTrajectoryController
-
-    # Feed-forward controllers
-    forward_position_controller:
-      type: position_controllers/JointGroupPositionController
-
     forward_velocity_controller:
-      type: velocity_controllers/JointGroupVelocityController
+      type: forward_command_controller/ForwardCommandController
 
-    # Joint state publisher
+    forward_position_controller:
+      type: forward_command_controller/ForwardCommandController
+
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-feedback_joint_trajectory_controller:
+    feedback_joint_position_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    feedback_joint_velocity_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+forward_velocity_controller:
+  ros__parameters:
+    joints:
+      - axis_a
+      - axis_b
+      - axis_c
+      - axis_d
+      - axis_e
+    interface_name: velocity
+
+forward_position_controller:
+  ros__parameters:
+    joints:
+      - axis_a
+      - axis_b
+      - axis_c
+      - axis_d
+      - axis_e
+    interface_name: position
+
+feedback_joint_position_trajectory_controller:
   ros__parameters:
     joints:
       - axis_a
@@ -29,8 +49,9 @@ feedback_joint_trajectory_controller:
       - position
     state_interfaces:
       - position
+      - velocity
 
-forward_position_controller:
+feedback_joint_velocity_trajectory_controller:
   ros__parameters:
     joints:
       - axis_a
@@ -38,12 +59,8 @@ forward_position_controller:
       - axis_c
       - axis_d
       - axis_e
-
-forward_velocity_controller:
-  ros__parameters:
-    joints:
-      - axis_a
-      - axis_b
-      - axis_c
-      - axis_d
-      - axis_e
+    command_interfaces:
+      - velocity
+    state_interfaces:
+      - position
+      - velocity

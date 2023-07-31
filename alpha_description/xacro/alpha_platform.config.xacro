@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot name="alpha" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Arguments -->
+  <xacro:arg name="use_fake_hardware" default="true" />
+  <xacro:arg name="serial_port" default="" />
+  <xacro:arg name="state_update_frequency" default="250" />
+  <xacro:arg name="controllers_file" default="alpha_controllers.yaml" />
+  <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
+  <xacro:arg name="namespace" default="" />
+  <xacro:arg name="prefix" default="" />
+  <xacro:arg name="use_sim" default="false" />
+  <xacro:arg name="description_package" default="alpha_description" />
+
+  <!-- Properties -->
+  <xacro:property name="description_package" value="$(arg description_package)" />
+  <xacro:property name="prefix" value="$(arg prefix)" />
+  <xacro:property name="use_sim" value="$(arg use_sim)" />
+
+  <!-- Imports -->
+  <xacro:include filename="$(find ${description_package})/xacro/alpha_platform.urdf.xacro" />
+  <xacro:include filename="$(find ${description_package})/xacro/alpha.ros2_control.xacro" />
+
+  <!-- Define a world frame for Moveit -->
+  <link name="world" />
+
+  <xacro:alpha_platform_urdf prefix="${prefix}" parent="world"
+    description_package="${description_package}">
+    <origin xyz="0 0 0.06" rpy="0 0 0" />
+  </xacro:alpha_platform_urdf>
+
+  <xacro:alpha_system prefix="${prefix}" name="ReachAlpha5" serial_port="$(arg serial_port)"
+    state_update_frequency="$(arg state_update_frequency)"
+    initial_positions_file="$(arg initial_positions_file)"
+    description_package="${description_package}" use_sim="${use_sim}"
+    use_fake_hardware="$(arg use_fake_hardware)"
+  />
+
+  <!-- Include Gazebo requirements -->
+  <xacro:if value="${use_sim}">
+    <xacro:include filename="$(find ${description_package})/xacro/alpha.gazebo.xacro" />
+    <xacro:angler_gazebo prefix="${prefix}" description_package="${description_package}"
+      namespace="$(arg namespace)"
+      controllers_file="$(arg controllers_file)" />
+  </xacro:if>
+
+</robot>

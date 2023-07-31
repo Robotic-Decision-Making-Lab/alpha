@@ -66,14 +66,20 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         ee_base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         m1_link:
           Alpha: 1
           Show Axes: false
@@ -103,6 +109,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         standard_jaws_base_link:
           Alpha: 1
           Show Axes: false
@@ -118,7 +125,7 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        world:
+        standard_jaws_tool:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -133,7 +140,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 188; 188; 188
-    Fixed Frame: world
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:

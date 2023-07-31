@@ -58,7 +58,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             "description_file",
-            default_value="alpha.config.xacro",
+            default_value="alpha_platform.config.xacro",
             description="The URDF/XACRO description file with the Alpha.",
         ),
         DeclareLaunchArgument(
@@ -116,6 +116,11 @@ def generate_launch_description() -> LaunchDescription:
             description="Automatically start the MoveIt2 interface.",
         ),
         DeclareLaunchArgument(
+            "use_sim",
+            default_value="false",
+            description="Start the Gazebo simulation.",
+        ),
+        DeclareLaunchArgument(
             "use_fake_hardware",
             default_value="true",
             description=(
@@ -149,6 +154,11 @@ def generate_launch_description() -> LaunchDescription:
                 " be used instead."
             ),
         ),
+        DeclareLaunchArgument(
+            "gazebo_world_file",
+            default_value="empty.sdf",
+            description="The world configuration to load if using Gazebo.",
+        ),
     ]
 
     # Initialize the arguments
@@ -166,6 +176,8 @@ def generate_launch_description() -> LaunchDescription:
     robot_controller = LaunchConfiguration("robot_controller")
     initial_velocities_file = LaunchConfiguration("initial_velocities_file")
     namespace = LaunchConfiguration("namespace")
+    use_sim = LaunchConfiguration("use_sim")
+    gazebo_world_file = LaunchConfiguration("gazebo_world_file")
 
     # Generate the robot description using xacro
     robot_description = {
@@ -176,7 +188,7 @@ def generate_launch_description() -> LaunchDescription:
                 PathJoinSubstitution(
                     [
                         FindPackageShare(description_package),
-                        "config",
+                        "xacro",
                         description_file,
                     ]
                 ),
@@ -204,6 +216,12 @@ def generate_launch_description() -> LaunchDescription:
                 " ",
                 "initial_velocities_file:=",
                 initial_velocities_file,
+                " ",
+                "description_package:=",
+                description_package,
+                " ",
+                "use_sim:=",
+                use_sim,
             ]
         )
     }
@@ -223,7 +241,9 @@ def generate_launch_description() -> LaunchDescription:
                     controllers_file,
                 ]
             ),
+            {"use_sim_time": use_sim},
         ],
+        condition=UnlessCondition(use_sim),
     )
 
     robot_state_pub_node = Node(
@@ -232,7 +252,7 @@ def generate_launch_description() -> LaunchDescription:
         name="robot_state_publisher",
         output="both",
         namespace=namespace,
-        parameters=[robot_description],
+        parameters=[robot_description, {"use_sim_time": use_sim}],
     )
 
     joint_state_broadcaster_spawner = Node(
@@ -249,11 +269,12 @@ def generate_launch_description() -> LaunchDescription:
         package="controller_manager",
         executable="spawner",
         arguments=[
-            "feedback_joint_trajectory_controller",
+            "feedback_joint_position_trajectory_controller",
             "--controller-manager",
             [namespace, "controller_manager"],
         ],
         condition=IfCondition(use_planning),
+        parameters=[{"use_sim_time": use_sim}],
     )
 
     robot_controller_spawner = Node(
@@ -265,6 +286,16 @@ def generate_launch_description() -> LaunchDescription:
             [namespace, "controller_manager"],
         ],
         condition=UnlessCondition(use_planning),
+        parameters=[{"use_sim_time": use_sim}],
+    )
+
+    gz_spawner = Node(
+        package="ros_gz_sim",
+        executable="create",
+        arguments=["-name", "alpha", "-topic", "robot_description"],
+        output="both",
+        condition=IfCondition(use_sim),
+        parameters=[{"use_sim_time": use_sim}],
     )
 
     rviz_node = Node(
@@ -277,12 +308,23 @@ def generate_launch_description() -> LaunchDescription:
                 [FindPackageShare(description_package), "rviz", rviz_config]
             ),
         ],
-        parameters=[robot_description],
+        parameters=[robot_description, {"use_sim_time": use_sim}],
         condition=IfCondition(
             PythonExpression(
                 ["'", use_planning, "' == 'false' and '", use_rviz, "' == 'true'"]
             )  # launch either MoveIt or the Alpha visualization, not both
         ),
+    )
+
+    gz_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=[
+            # Clock (IGN -> ROS 2)
+            "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+        ],
+        output="screen",
+        condition=IfCondition(use_sim),
     )
 
     # Delay `joint_state_broadcaster` after control_node
@@ -323,13 +365,24 @@ def generate_launch_description() -> LaunchDescription:
         )
     )
 
+    # Delay `joint_state_broadcaster` after spawn_entity
+    delay_joint_state_broadcaster_spawner_after_spawn_entity = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=gz_spawner,
+            on_exit=[joint_state_broadcaster_spawner],
+        ),
+    )
+
     nodes = [
         control_node,
+        gz_bridge,
         robot_state_pub_node,
+        gz_spawner,
         delay_joint_state_broadcaster_spawner_after_control_node,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_moveit_controller_spawners_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawners_after_joint_state_broadcaster_spawner,
+        delay_joint_state_broadcaster_spawner_after_spawn_entity,
     ]
 
     # Integrate additional launch files
@@ -347,6 +400,34 @@ def generate_launch_description() -> LaunchDescription:
         condition=IfCondition(use_planning),
     )
 
-    include = [moveit_launch]
+    gazebo_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [
+                PathJoinSubstitution(
+                    [
+                        FindPackageShare("ros_gz_sim"),
+                        "launch",
+                        "gz_sim.launch.py",
+                    ]
+                )
+            ]
+        ),
+        launch_arguments=[
+            (
+                "gz_args",
+                [
+                    "-v",
+                    "4",
+                    " ",
+                    "-r",
+                    " ",
+                    gazebo_world_file,
+                ],
+            )
+        ],
+        condition=IfCondition(use_sim),
+    )
+
+    include = [moveit_launch, gazebo_launch]
 
     return LaunchDescription(args + include + nodes)

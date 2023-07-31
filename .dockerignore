@@ -6,3 +6,6 @@
 !alpha_description
 !alpha_driver
 !alpha_hardware
+!alpha.repos
+!requirements-dev.txt
+!.docker/entrypoints
