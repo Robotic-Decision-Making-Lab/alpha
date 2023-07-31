@@ -17,6 +17,7 @@ The main features of the Alpha 5 driver are:
   for hardware communication
 - ros2_control integration for manipulator position, velocity, and joint
   trajectory control
+- Gazebo Garden integration for simulation
 - Visualization support using RViz2
 - Integration with MoveIt2 for motion planning
 
