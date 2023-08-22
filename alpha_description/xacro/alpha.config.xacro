@@ -16,6 +16,7 @@
   <xacro:property name="description_package" value="$(arg description_package)" />
   <xacro:property name="prefix" value="$(arg prefix)" />
   <xacro:property name="use_sim" value="$(arg use_sim)" />
+  <xacro:property name="ee_prefix" value="standard_jaws_" />
 
   <!-- Imports -->
   <xacro:include filename="$(find ${description_package})/xacro/alpha.urdf.xacro" />
@@ -23,22 +24,32 @@
 
   <link name="base_footprint" />
 
-  <xacro:alpha_urdf parent="base_footprint" prefix="${prefix}"
+  <xacro:alpha_urdf
+    parent="base_footprint"
+    prefix="${prefix}"
+    ee_prefix="${ee_prefix}"
     description_package="${description_package}">
     <origin xyz="0 0 0" rpy="0 0 0" />
   </xacro:alpha_urdf>
 
-  <xacro:alpha_system prefix="${prefix}" name="ReachAlpha5" serial_port="$(arg serial_port)"
+  <xacro:alpha_system
+    prefix="${prefix}"
+    ee_prefix="${ee_prefix}"
+    name="ReachAlpha5"
+    serial_port="$(arg serial_port)"
     state_update_frequency="$(arg state_update_frequency)"
     initial_positions_file="$(arg initial_positions_file)"
-    description_package="${description_package}" use_sim="${use_sim}"
+    description_package="${description_package}"
+    use_sim="${use_sim}"
     use_fake_hardware="$(arg use_fake_hardware)"
   />
 
   <!-- Include Gazebo requirements -->
   <xacro:if value="${use_sim}">
     <xacro:include filename="$(find ${description_package})/xacro/alpha.gazebo.xacro" />
-    <xacro:alpha_gazebo prefix="${prefix}" description_package="${description_package}"
+    <xacro:alpha_gazebo
+      prefix="${prefix}"
+      description_package="${description_package}"
       namespace="$(arg namespace)"
       controllers_file="$(arg controllers_file)" />
   </xacro:if>

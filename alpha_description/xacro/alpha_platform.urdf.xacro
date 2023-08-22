@@ -1,7 +1,13 @@
 <?xml version="1.0"?>
 <robot name="alpha_platform_urdf" xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:macro name="alpha_platform_urdf" params="parent prefix description_package *origin">
+  <xacro:macro name="alpha_platform_urdf"
+    params="
+      parent
+      prefix
+      ee_prefix
+      description_package
+      *origin">
 
     <!-- Define a base platform for the alpha -->
     <link name="${prefix}platform">
@@ -35,7 +41,10 @@
 
     <xacro:include filename="$(find ${description_package})/xacro/alpha.urdf.xacro" />
 
-    <xacro:alpha_urdf parent="${prefix}base_footprint" prefix="${prefix}"
+    <xacro:alpha_urdf
+      parent="${prefix}base_footprint"
+      prefix="${prefix}"
+      ee_prefix="${ee_prefix}"
       description_package="${description_package}">
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:alpha_urdf>

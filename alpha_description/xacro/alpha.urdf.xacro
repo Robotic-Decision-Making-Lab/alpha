@@ -1,7 +1,13 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:macro name="alpha_urdf" params="parent prefix description_package *origin">
+  <xacro:macro name="alpha_urdf"
+    params="
+      parent
+      prefix
+      ee_prefix
+      description_package
+      *origin">
 
     <material name="${prefix}black">
       <color rgba="0.3 0.3 0.3 1" />
@@ -181,12 +187,6 @@
     </link>
 
     <link name="${prefix}ee_base_link">
-      <visual>
-        <origin rpy="0 0 0" xyz="0 0 0" />
-        <geometry>
-          <box size="0.001 0.001 0.001" />
-        </geometry>
-      </visual>
       <inertial>
         <mass value="0.0001" />
         <inertia
@@ -201,12 +201,6 @@
     </link>
 
     <link name="${prefix}push_rod">
-      <visual>
-        <origin rpy="0 0 0" xyz="0 0 0" />
-        <geometry>
-          <box size="0.001 0.001 0.001" />
-        </geometry>
-      </visual>
       <inertial>
         <mass value="0.0001" />
         <inertia
@@ -283,7 +277,7 @@
       filename="$(find ${description_package})/xacro/end_effectors/standard_jaws.urdf.xacro" />
 
     <xacro:standard_jaws parent="${prefix}ee_base_link"
-      prefix="${prefix}standard_jaws_"
+      prefix="${prefix}${ee_prefix}"
       axis_a="${prefix}axis_a" description_package="${description_package}">
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:standard_jaws>

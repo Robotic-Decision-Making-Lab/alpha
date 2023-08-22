@@ -4,6 +4,7 @@
   <xacro:macro name="alpha_system"
     params="
       prefix
+      ee_prefix
       name
       serial_port
       state_update_frequency
@@ -21,6 +22,28 @@
         <hardware>
           <plugin>gz_ros2_control/GazeboSimSystem</plugin>
         </hardware>
+
+        <!-- Setup the mimic joints for simulation -->
+        <joint name="${prefix}${ee_prefix}rs1_130_joint">
+          <param name="mimic">${prefix}axis_a</param>
+          <param name="multiplier">51</param>
+          <param name="offset">0</param>
+          <command_interface name="position" />
+          <command_interface name="velocity" />
+          <state_interface name="position" />
+          <state_interface name="velocity" />
+        </joint>
+
+        <joint name="${prefix}${ee_prefix}rs1_139_joint">
+          <param name="mimic">${prefix}${ee_prefix}rs1_130_joint</param>
+          <param name="multiplier">1</param>
+          <param name="offset">0</param>
+          <command_interface name="position" />
+          <command_interface name="velocity" />
+          <state_interface name="position" />
+          <state_interface name="velocity" />
+        </joint>
+
       </xacro:if>
 
       <xacro:unless
