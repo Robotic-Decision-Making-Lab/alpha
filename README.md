@@ -43,10 +43,10 @@ rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
 ## Quick start
 
 A ROS 2 launch file has been provided to start the Alpha 5 driver. To launch the
-driver using default arguments, run
+driver using default arguments with RViz2 for visualization, run
 
 ```bash
-ros2 launch alpha_bringup alpha.launch.py
+ros2 launch alpha_bringup alpha.launch.py use_rviz:=true
 ```
 
 A full description of the launch arguments and their respective default values
