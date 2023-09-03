@@ -226,7 +226,7 @@ std::vector<hardware_interface::CommandInterface> AlphaHardware::export_command_
     command_interfaces.emplace_back(
       info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_commands_positions_[i]);
     command_interfaces.emplace_back(
-      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_states_velocities_[i]);
+      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_commands_velocities_[i]);
   }
 
   return command_interfaces;
