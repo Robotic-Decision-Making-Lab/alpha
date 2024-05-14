@@ -112,12 +112,12 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             "use_planning",
-            default_value="false",
+            default_value="true",
             description="Automatically start the MoveIt2 interface.",
         ),
         DeclareLaunchArgument(
             "use_sim",
-            default_value="false",
+            default_value="true",
             description="Automatically start Gazebo.",
         ),
         DeclareLaunchArgument(
