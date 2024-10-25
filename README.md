@@ -29,7 +29,7 @@ this project to the `src` directory of your ROS workspace, replacing
 `$ROS_DISTRO` with the desired ROS distribution or `main` for Rolling:
 
 ```bash
-git clone -b $ROS_DISTRO git@github.com:evan-palmer/alpha.git
+git clone -b $ROS_DISTRO git@github.com:Robotic-Decision-Making-Lab/alpha.git
 ```
 
 After cloning the project, install the ROS dependencies using `rosdep`, again,

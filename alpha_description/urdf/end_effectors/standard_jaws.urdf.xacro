@@ -19,7 +19,7 @@
       <visual>
         <geometry>
           <mesh
-            filename="package://alpha_description/meshes/end_effectors/RS1-124.stl" />
+            filename="file://$(find alpha_description)/meshes/end_effectors/RS1-124.stl" />
         </geometry>
         <material name="${prefix}black" />
       </visual>
@@ -34,7 +34,7 @@
       <visual>
         <geometry>
           <mesh
-            filename="package://alpha_description/meshes/end_effectors/RS1-130.stl" />
+            filename="file://$(find alpha_description)/meshes/end_effectors/RS1-130.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -65,7 +65,7 @@
       <visual>
         <geometry>
           <mesh
-            filename="package://alpha_description/meshes/end_effectors/RS1-139.stl" />
+            filename="file://$(find alpha_description)/meshes/end_effectors/RS1-139.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0 0 0" rpy="0 0 0" />
