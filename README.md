@@ -3,11 +3,11 @@
 The Alpha 5 driver is a collection of ROS 2 packages designed
 to support ROS 2 integration with the [Reach Alpha 5 manipulator](https://reachrobotics.com/products/manipulators/reach-alpha/).
 
-## :warning: Disclaimer :warning:
+## Deprecation Notice
 
-This is an independent project, and is not affiliated with or maintained by
-Reach Robotics. Please refer to the [Reach Robotics SDK](https://github.com/Reach-Robotics/reach_robotics_sdk/tree/master)
-for all official software.
+We have deprecated this repository in favor of our [reach](https://github.com/Robotic-Decision-Making-Lab/reach)
+repository, which integrates additional features and support for the 
+Reach Bravo 7 manipulator.
 
 ## Main features
 
@@ -61,6 +61,12 @@ ros2 launch alpha_bringup alpha.launch.py --show-args
 If you have questions regarding usage of the Alpha 5 driver or regarding
 contributing to this project, please ask a question on our
 [Discussions](https://github.com/evan-palmer/alpha/discussions) board!
+
+## Disclaimer
+
+This is an independent project, and is not affiliated with or maintained by
+Reach Robotics. Please refer to the [Reach Robotics SDK](https://github.com/Reach-Robotics/reach_robotics_sdk/tree/master)
+for all official software.
 
 ## License
 
